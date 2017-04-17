@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<title>Carto Editor - simple test</title>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+	<link rel="stylesheet" href="http://libs.cartocdn.com/cartodb.js/v3/3.15/themes/css/cartodb.css" />
+	<script src="http://libs.cartocdn.com/cartodb.js/v3/3.15/cartodb.js"></script>
+	<script src="//d3js.org/d3.v3.min.js"></script>
+	<script>
+	//Global vars:
+		var map
+		var sql = new cartodb.SQL({ user: 'sco-admin' });
+		var colorValuePairs = {"A1":"#A6CEE3","A3":"#1F78B4","A4":"#B2DF8A","B1":"#33A02C","B3":"#FB9A99","C":"#E31A1C","C1":"#FDBF6F","D3":"#FF7F00","P":"#CAB2D6","SP":"#6A3D9A"}
+		// Not used yet ... var nonNumericFields = ["cartodb_id","the_geom","the_geom_webmercator","objectid_1","objectid","notes","judgemen_1","judgementc","judgemen_3","judgemen_2","twprng","sec","rng","twp","dir","dtrs","cnt_dtrs","cov1","cov2","cov3","cov4","cov5"]
+		var histogramFieldNames = [/*"pctcov5","den5","maxdiam5","mindiam5","extradigit","pctcov4","den4","maxdiam4","mindiam4","pctcov3","den3","maxdiam3","mindiam3","pctcov2",*/"den2",/*"maxdiam2","mindiam2","pctcov1",*/"den1","maxdiam1",/*"mindiam1","shape_le_2","shape_area","shape_le_1","shape_leng","dtrs_id","dtrs_","perimeter","area"*/]
+		var pieFieldNames = ["cov1","cov2","cov3","cov4","cov5","sec"]
+		//create the layer objet that then an perform methods on
+		   map = new L.Map('map', { 
+			zoom: 10,
+			center_lat: 46.38,
+			center_lon: -91
+		  }) 
+		  cartodb.createLayer(mapLayer, {
+			user_name: 'sco-admin',
+			type: 'cartodb',
+			sublayers: [{
+				sql: "SELECT * FROM coastal_bordner_counties" 
+			}]
+		  }).addTo(map)
+		// Load the Carto "Vis"
+		/*window.onload = function() {
+			cartodb.createVis('map', 'https://sco-admin.carto.com/api/v2/viz/4d26135a-cc79-11e6-b347-0ee66e2c9693/viz.json', {
+				shareable: false,
+				title: false,
+				description: false,
+				search: false,
+				tiles_loader: false,
+				//center_lat: 46.38,
+				//center_lon: -91,
+				//zoom: (isMobile ? 7 : 9),
+				cartodb_logo: false
+			}).done(function(vis, layers) {
+				map = vis.getNativeMap();
+				setUpMap();
+				var basemap = L.tileLayer('http://maps.sco.wisc.edu/V1/bordner/03_WHAI_Tiles/00_Demo_Kewaunee/{z}/{x}/{y}.png', {
+					attribution: 'WHAI Finder'
+				}).addTo(map);
+			})
+		}*/
+		function setUpMap(){
+			
+			map.on('moveend', function() { 
+				grabSomeData(map.getBounds(),map.getZoom());
+			});
+		}
+		function isInArray(array, search){
+			return array.indexOf(search) >= 0;
+		}
+		function getColor(i,d){
+			var color
+			if (d == ""){
+				if (colorValuePairs.hasOwnProperty(i)){
+					color = colorValuePairs[i]
+				}else{
+					color =  "#DDDDDD";
+				}
+			}else{
+				if (colorValuePairs.hasOwnProperty(d.data.label)){
+					color = colorValuePairs[d.data.label]
+				}else{
+					if (/^\d+$/.test(d.data.label)){
+						var letters = '0123456789ABCDEF';
+						color = '#';
+						for (var i = 0; i < 6; i++ ) {
+							color += letters[Math.floor(Math.random() * 16)];
+						}
+					}else{
+						color =  "#DDDDDD";
+					}
+				}
+			}
+			return color;
+		}
+		function grabSomeData(boundsIn,zoomIn){
+			drawFilter(["dataIn","test"], "filter")
+			if (zoomIn >= 13){
+				//sql.execute("SELECT * FROM coastal_bordner_counties WHERE cov1 = 'C1' ORDER BY den1 ASC") // Gets all 'C1' values and orders them ascendantly 
+				sql.execute("SELECT * FROM coastal_bordner_counties WHERE the_geom && ST_SetSRID(ST_MakeBox2D(ST_Point("+String(boundsIn._northEast.lng)+","+String(boundsIn._northEast.lat)+"), ST_Point("+String(boundsIn._southWest.lng)+","+String(boundsIn._southWest.lat)+")), 4326) ORDER BY den1 DESC") // Gets ...
+					.done(function(data) {
+						var f = data.rows.length;
+						if (f > 0){
+						var histogramFields = {};
+						var pieFields = {};
+						jQuery.each(data.fields, function(i, val) {
+							if (isInArray(histogramFieldNames,i)){
+								window[i] = []
+								histogramFields[i] = val
+							}
+							if (isInArray(pieFieldNames,i)){
+								window[i] = []
+								pieFields[i] = val
+							}
+						})
+						for (var x = 0; x < f; x++) {
+							jQuery.each(histogramFields, function(i, val) {
+								window[i].push([data.rows[x][i], data.rows[x]["cov1"]])
+							});
+							jQuery.each(pieFields, function(i, val) {
+								window[i].push(data.rows[x][i])
+							});
+						}
+						jQuery.each(histogramFields, function(i, val) {
+							window[i].sort(function(a, b){return b[0]-a[0]});
+							drawHistogram(window[i], i) 
+						})
+						jQuery.each(pieFields, function(i, val) {
+							window[i].sort();
+							drawPie(window[i], i) 
+						})
+						}
+					})
+					.error(function(errors) {
+						console.log("errors:" + errors);
+					})
+			}
+		}
+		function filterMapData(){
+			//alert("filtering")
+			//console.log(d.layers)
+			console.log(this)
+		}
+		// Test out filter functionality
+		function drawFilter(dataIn, typeIn){
+			if (!($("#" + typeIn).length)){
+				$(".tocView").append('<div class="graph-small" id="'+ typeIn +'"></div>')
+			}else{
+				$("#" + typeIn).html("");
+			}
+			$("#" + typeIn).append('<div class="filter-label">'+ typeIn + '</div>')
+			$("#" + typeIn).append('<button onClick="filterMapData()" type="button" class="btn btn-danger">Filter Map</button>')
+		}	
+		// Histogram
+		function drawHistogram(dataIn, typeIn){
+			if (!($("#" + typeIn).length)){
+				$(".tocView").append('<div class="graph-small" id="'+ typeIn +'"></div>')
+			}else{
+				$("#" + typeIn).html("");
+			}
+			var maxValue = dataIn[0][0];
+			if (!maxValue){ maxValue = 3 }
+			var h = $("#" + typeIn).height();
+			var w = $("#" + typeIn).width();
+			var widthAdjustment = w / maxValue 
+			var l = dataIn.length;
+			for (var x = 0; x < l; x++) {
+				var dataX = dataIn[x][0]
+				if (!dataX){ dataX = 0 }
+				var barWidth = String( dataX * widthAdjustment)
+				if (barWidth === "0"){ barWidth = 3 }
+				var barHeight = (h / l)
+				$("#" + typeIn).append('<div class="histogram-bar" cachedValue="'+ String(dataIn[x][0]) +'" style="background-color:' + getColor(dataIn[x][1],'') + '; top:' + String((barHeight * x) -2) + 'px; height:' + barHeight + 'px; width:' + barWidth + 'px;"></div>')
+			}
+			$("#" + typeIn).append('<div class="histogram-label">'+ typeIn + '</div>')
+		}	
+		
+		function drawPie(dataIn, typeIn){
+			if (!($("#" + typeIn).length)){
+				$(".tocView").append('<div class="graph-small" id="'+ typeIn +'"></div>')
+			}else{
+				$("#" + typeIn).html("");
+			}
+			var w = $("#" + typeIn).height();
+			var h = $("#" + typeIn).width();
+			var	r = Math.min(w, h) / 2;
+			var dataSum = {}
+			var l = dataIn.length;
+			for (var x = 0; x < l; x++) {
+				if(dataSum[dataIn[x]]){
+					dataSum[dataIn[x]] = dataSum[dataIn[x]] + 1
+				}else{
+					dataSum[dataIn[x]] = 1
+				}
+			}
+			var data = [];
+			
+			jQuery.each(dataSum, function(i, val) {
+				data.push({"label":i, "value":val})
+			});
+			
+			var vis = d3.select("#" + typeIn)
+				.append("svg:svg")           
+				.data([data])                  
+					.attr("width", w)           
+					.attr("height", h)
+				.append("svg:g")               
+					.attr("transform", "translate(" + r + "," + r + ")")    
+			var arc = d3.svg.arc()              
+				.outerRadius(r);
+
+			var pie = d3.layout.pie()          
+				.value(function(d) { return d.value; });  
+
+			var arcs = vis.selectAll("g.slice") 
+				.data(pie)                         
+				.enter()                        
+					.append("svg:g")              
+						.attr("class", "slice");    
+
+				arcs.append("svg:path")
+						.attr("fill", function(d, i) { 
+							return getColor(i,d); 
+						} )
+						.attr("d", arc);                                  
+
+				arcs.append("svg:text")                                  
+						.attr("transform", function(d) {            
+						d.innerRadius = 0;
+						d.outerRadius = r;
+						return "translate(" + arc.centroid(d) + ")";       
+					})
+					.attr("text-anchor", "middle")                       
+					.text(function(d, i) { return data[i].label; });    
+			$("#" + typeIn).append('<div class="histogram-label">'+ typeIn + '</div>')
+		}	
+
+var Map = cdb.core.View.extend({
+	initialize: function() {
+	  console.log("Map.initialize")
+	  _.bindAll(this, '_initMap');
+	  this.filters = this.options.filters;
+	  this._getVizJson();
+	  this._bindEvents();
+	},
+
+	_getVizJson: function() {
+	  $.ajax({
+		url: 'data.json',
+		success: this._initMap,
+		error: function() {
+		  cdb.log.info('problems getting vizjson info, check tools.json url please')
+		}
+	  })
+	},
+
+	_initMap: function(data) {
+	  var self = this;
+	  cartodb.createVis(this.$el, data.vizjson)
+		.done(function(vis, layers) {
+		  self.layers = layers[1];
+		  self.map = vis.getNativeMap();
+		});
+	},
+
+	_bindEvents: function() {
+	  this.filters.bind('change', this._changeLayerGroup, this);
+	},
+
+	_changeLayerGroup: function(layers) {
+	  var self = this;
+
+	  _.each(layers, function(opts, i) {
+		var pos = i.split('-')[1];
+		var sublayer = self.layers.getSubLayer(pos);
+
+		if (sublayer) {
+		  sublayer.set(opts);
+		}
+	  });
+	}
+
+})
+	
+var Filters = cdb.core.View.extend({
+	
+	initialize: function() {
+	  console.log("Filters.initialize")
+	  _.bindAll(this, 'render');
+	  this._getActions();
+	},
+
+	render: function(data) {
+	  this.clearSubViews();
+
+	  var self = this;
+
+	  if (!data.interactions) return false;
+	  var buttons = data.interactions;
+
+	  for (var i = 0, l = buttons.length; i < l; i++) {
+		var a = new FiltersItem({ data: buttons[i] });
+		a.bind('change', this._triggerChange, this)
+		self.addView(a);
+		self.$('ul').append(a.render().el);
+	  }
+
+	  return this;
+	},
+
+	_triggerChange: function(d) {
+	  this._setSelectedFilter(d);
+	  this.trigger('change', d.layers, this);
+	},
+
+	_setSelectedFilter: function(d) {
+	  this.$('ul li a').removeClass('selected');
+	  this.$('ul li a').each(function(i,a) {
+		if ($(a).text() == d.text && $(a).attr('class') == d.className) {
+		  $(a).addClass('selected')
+		}
+	  })
+	},
+
+	_getActions: function() {
+	  $.ajax({
+		url: 'data.json',
+		success: this.render,
+		error: function() {
+		  cdb.log.info('oh no!, check your json location or if you are using a web server (Apache?)')
+		}
+	  })
+	}
+})		
+	</script>
+    <style>
+		/* CSS (if needed) */
+		
+		.tocView{
+			background-color: #c3dbe7;
+			height: 100%;
+			padding-right:5px;
+			padding-left:5px;
+			overflow-y: scroll;
+			//min-width: 360px;
+		}
+		.mapView{
+			background-color: #619ec7;
+			height: 100%;
+			padding-right:5px;
+			padding-left:5px;
+		}
+		.allView{
+			background-color: black;
+			height: 100vh;
+		}
+		.graph-small{
+			height: 160px;
+			width: 160px;
+			background-color: #b0c5d0;
+			float:left;
+			margin-right:5px;
+			margin-top:5px;
+		}
+		.histogram-bar{
+			//background-color: #fba34c;
+			//height:1px;
+			//position:absolute;
+		}
+		.histogram-label{
+			position: relative;
+			top: -20px;
+			left: 5px;
+		}
+		.filter-label{
+			//position: relative;
+			top: -20px;
+			left: 5px;
+		}
+		.arc text {
+		  font: 10px sans-serif;
+		  text-anchor: middle;
+		}
+		.arc path {
+		  stroke: #fff;
+		}
+    </style>
+</head>
+<body>
+
+<div class="container-fluid">
+  <div class="row allView">
+    <div class="col-sm-3 tocView">
+		<!-- <div class="graph-small" onClick="grabSomeData()">Grab some data, press me!</div> --> 
+	</div>
+    <div class="col-sm-9 mapView" id="map"></div>
+  </div>
+</div>
+
+</body>
+</html>
