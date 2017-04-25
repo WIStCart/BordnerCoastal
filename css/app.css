@@ -1,0 +1,115 @@
+body{
+	overflow-y: hidden;
+}
+/* apply this class for animation transitions between classes */
+.transition-class{
+    -webkit-transition: all 0.5s ease;
+    -moz-transition: all 0.5s ease;
+    -o-transition: all 0.5s ease;
+    transition: all 0.5s ease;
+}
+
+/* for css when tablet mode is engaged */
+@media (max-width: 767px){
+	.toc-view{
+		background-color:  rgba(255,255,255,0) !important;
+	}
+	.map-view{
+		height: 100vh !important;
+	}
+	#legendButton{
+		visibility: visible;
+	}
+	.toc-button{
+		visibility: hidden;
+	}
+}
+
+/* for css when desktop mode is engaged */
+@media (min-width: 768px){
+	.toc-view{
+		height: 20vh;
+		background-color: #619ec7 !important;
+	}
+	.map-view{
+		height: 80vh;
+	}
+	#legendButton{
+		visibility: hidden;
+	}
+	.toc-button{
+		visibility: visible;
+	}
+}
+
+.icon-class{
+	color: #ffffff;
+}
+
+.button-icon-class{
+	color: #999;
+	top: 8px;
+}
+
+.toc-button{
+    height: 20px;
+    width: 80px;
+    position: absolute;
+    background-color: #2c5875;
+    left: 50%;
+    z-index: 99;
+	cursor: pointer;
+	text-align: center;
+	opacity: 0;
+}
+.toc-button-unfade{
+ 	opacity: 100;
+}
+.toc-button-open{
+	margin: -10px -40px;
+}
+.toc-button-closed{
+	margin: -20px -40px;
+}
+.map-view{
+	background-color: #619ec7;
+	padding-right:5px;
+	padding-left:5px;
+}
+.map-view-full{
+	height: 100vh;
+}
+.map-view-toc{
+	height: 80vh;
+}
+.toc-view{
+	padding-right:5px;
+	padding-left:5px;
+}
+.toc-view-open{
+	height: 20vh;
+}
+.toc-view-closed{
+	height: 0vh;
+}
+.layer-list-view{
+	background-color: #2c5875;
+	padding-left:5px;
+	height: 100%;
+}
+.level-toggle-view{
+	background-color: #e95d5f;
+	height: 100%;
+}
+.legend-view{
+	background-color: #c8e6ab;
+	height: 100%;
+}
+
+.leaflet-control-custom{
+	width: 28px;
+	height: 28px;
+	background-color: #fff;
+	cursor: pointer !important;
+    text-align: center;
+}
