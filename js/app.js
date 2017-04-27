@@ -41,12 +41,15 @@ window.onload = function() {
 
 // Sets everything up after pageload and map creation are complete 
 function setUpMap(){
+	// Explicitly set the layer 1/layer 2 toggle (will likely use a stateful URL parameter in the future to drive this)
+	$("#levelSliderCheckbox").attr("checked", true);
+	
+	// Fade-in the toc button and give it a click handler
 	$("#tocButton").addClass( "toc-button-unfade");
 	$("#tocButton").click(function() { toggleTOC() });
 	
+	// Create a custom control in bottom left of map, then add html for the four buttons that will exist within this control
 	map.addControl(new tabletCustomControl({position: "bottomleft"})); //Could also be: 'topleft', 'topright', 'bottomleft', 'bottomright'
-	map.addLayer(L.tileLayer('http://maps.sco.wisc.edu/V1/bordner/03_WHAI_Tiles/00_Demo_Kewaunee/{z}/{x}/{y}.png', {attribution: 'WHAI Finder'}))
-	
 	$(".tablet-custom-control")
 		.attr("id", "tabletCustomControl")
 		.html('<div data-toggle="tooltip" title="legend" class="leaflet-bar leaflet-control leaflet-control-custom" id="legendButton" onClick="dispatchButtonClick(this.id)">' +
@@ -58,11 +61,16 @@ function setUpMap(){
 			  '<div data-toggle="tooltip" title="layers" class="leaflet-bar leaflet-control leaflet-control-custom" id="layerListButton" onClick="dispatchButtonClick(this.id)">' +
 					'<span id="layerListButtonIcon" class="button-icon-class glyphicon glyphicon-menu-hamburger"></span></div></br>'
 		)
+	// Engage Bootstrap-style tooltips
 	$('[data-toggle="tooltip"]').tooltip();
+	
+	// Add WHAI tile layer 
+	map.addLayer(L.tileLayer('http://maps.sco.wisc.edu/V1/bordner/03_WHAI_Tiles/00_Demo_Kewaunee/{z}/{x}/{y}.png', {attribution: 'WHAI Finder'}))
+	
 	console.log("setUpMap() complete. desktopMode = " + desktopMode)
 }
 
-// JS to dock/undock the table of contents from bottom 
+// To dock/undock the table of contents from bottom 
 function toggleTOC(){
 	if ($( "#toc" ).hasClass( "toc-view-open" )){
 		$( "#toc" ).removeClass( "toc-view-open" );
@@ -85,12 +93,12 @@ function toggleTOC(){
 	}
 }
 
-// JS to configure desktop view (not called upon pageload)
+// To configure desktop view (not called upon pageload)
 function transformToDesktop(){
 	$( "#toc" ).appendTo( $( "#tocParent" ) );
 }
 
-// JS to configure tablet view (is called upon pageload)
+// To configure tablet view (is called upon pageload)
 function transformToTablet(){
 	$( "#toc" ).appendTo( $( "#modalDialogue" ) );
 }
@@ -114,6 +122,11 @@ function dispatchButtonClick(buttonClicked){
 		default:
 			console.log("unidentified")
 	}
+}
+
+// Handle toggle of the level 1/level 2 checkbox
+function toggleCheckbox(checkObj){
+	console.log(checkObj.checked) // true = level 2, false = level 1
 }
 
 // Extends the leaflet control for creating the buttons in the lower left of the map
