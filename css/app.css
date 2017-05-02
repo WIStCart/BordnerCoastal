@@ -15,6 +15,17 @@ body{
 	.toc-view{
 		background-color:  rgba(255,255,255,0) !important;
 	}
+	.legend-view{
+		height: 300% !important;
+	}
+	.level-toggle-view{
+		background-color: rgba(0,0,0,.25) !important;
+	}
+	.layer-list-view{
+		//background-color: rgba(0,0,0,.25) !important;
+		visibility: hidden !important;
+		height: 0px !important;
+	}
 	.map-view{
 		height: 100vh !important;
 	}
@@ -23,6 +34,32 @@ body{
 	}
 	.toc-button{
 		visibility: hidden;
+	}
+	.rotate-text {
+		-moz-transform: rotate(-69deg);
+		-webkit-transform: rotate(-69deg);
+		transform:  rotate(-69deg);
+		bottom: 10px !important;
+		left: 15%;
+		text-align-last: left;
+		background-color: rgba(0,0,0,0) !important;
+		white-space: nowrap;
+	}
+	.level-switch-slider {
+		text-align: left !important;
+		//top: -100%;
+		//position: relative;
+	}
+}
+
+/* for css when *PHONE* mode is engaged */
+@media (max-width: 499px){
+	.rotate-text {
+		-moz-transform: rotate(-90deg);
+		-webkit-transform: rotate(-90deg);
+		transform:  rotate(-90deg);
+		text-align-last: left;
+		left: 50%;
 	}
 }
 
@@ -52,7 +89,7 @@ body{
 	top: 8px;
 }
 
-/* buttons */
+/* dock/undock button */
 .toc-button{
     height: 20px;
     width: 80px;
@@ -108,8 +145,9 @@ body{
 	height: 100%;
 }
 .legend-view{
-	background-color: #c8e6ab;
 	height: 100%;
+	padding-right: 0px;
+    padding-left: 0px;
 }
 
 /* level 1 level 2 toggle */
@@ -184,6 +222,36 @@ input:checked + .slider:before {
 	bottom: 12.5px;
 }
 
+/* legend classes text */
+.shade-level-1-label-text {
+	background-color:rgba(0,0,0,.25) !important;
+	height: 28px !important;
+}
+
+.level-1-label-text{
+    font-size: 8pt;
+	bottom:0px;
+    width: 100%;
+    height: 46px;
+	color: #ffffff;
+	position: absolute;
+	line-height: 1;
+	text-align: center;
+	padding-top: 2px;
+	//white-space: nowrap;
+}
+
+.histogram-div{
+	position: absolute;
+	bottom: 0px;
+}
+
+.legend-holder{
+	width:100%;
+	height:100%;
+	background-color: rgba(0,0,0,.25);
+}
+
 /* leaflet customized css */ 
 .leaflet-control-custom{
 	width: 28px;
@@ -191,4 +259,7 @@ input:checked + .slider:before {
 	background-color: #fff;
 	cursor: pointer !important;
     text-align: center;
+}
+.leaflet-control-attribution, .cartodb-legend-stack{
+	visibility:hidden;
 }
