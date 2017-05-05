@@ -1,9 +1,12 @@
 //Global vars:
 var desktopMode = true;
 var level1Classes = {}
+var cov1Classes = {}
 var totalFeatures = 0
 var map;
 var sql = new cartodb.SQL({ user: 'sco-admin' });
+var currentBasemap;
+var bordner;
 
 // Overlay definitions:
 var overlay1 = L.tileLayer('http://{s}.tile.stamen.com/toner-labels/{z}/{x}/{y}.png', {
@@ -37,10 +40,6 @@ var basemapC = L.tileLayer('http://stamen-tiles-{s}.a.ssl.fastly.net/terrain-bac
 	maxZoom: 18,
 	ext: 'png'
 });
-var currentBasemap = basemapA;
-
-// Carto layer needs to be global
-var bordner;
 
 // Load the Carto map:
 window.onload = function() {
@@ -79,9 +78,10 @@ function setUpMap(){
 	$("#lineLegendHolder").addClass( "legend-holder-hidden" )
 		// --> $("#pointLegendHolder").addClass( "legend-holder-hidden" )
 	
-	// Explicitly set basemap radio button 
+	// Explicitly set current basemap and click its radio button 
+	currentBasemap = basemapB;
 	$( "#basemapB" ).trigger( "click" );
-	
+
 	// Fade-in the toc button and give it a click handler
 	$("#tocButton").addClass( "toc-button-unfade" );
 	$("#tocButton").click(function() { toggleTOC() });
@@ -229,7 +229,7 @@ function transformToTablet(){
 	}
 }
 
-// Handles all click events from 4 main buttons 
+// Handles all click events from the 4 main UI buttons 
 function dispatchButtonClick(buttonClicked){
 	// If modal is not already open, then open it
 	if ($('.modal.in').length <= 0){ 
@@ -324,68 +324,92 @@ function demoLegend(){
 			level1Classes[value.level1] = {"level1": value.level1 , "level1frq": value.level1frq , "hex1": value.hex1}
 		}
 	} 
-	console.log(highestClass)
-	console.log(highestValue2)
-	console.log(highestValue)
-	// console.log(_.size(level1Classes)) playing with http://underscorejs.org/
 	level1Classes = _.indexBy(level1Classes, 'level1frq') // playing with http://underscorejs.org/
 	var countKey = 0;
 	for (var key in level1Classes) {
 		var value = level1Classes[key];
-		//featurePct = (value.level1frq / totalFeatures) * 100
 		featurePct = (value.level1frq / highestValue) * 100
-		//if (featurePct < 2){ featurePct = 2 }
-		$("#polygonLegendHolder").append('<div class="histogram-div"; style="height:' + String(featurePct) + '%; width:10%; left:' + (countKey * 10) + '%; background-color:' + value.hex1 + ';" >'
-			+ '<div style="background-color:' + value.hex1 + ';" class="level-1-label-text rotate-text shade-level-1-label-text transition-class">' + level1Classes[key].level1 + '</div></div>')
-
 		$("#lineLegendHolder").append('<div class="histogram-div"; style="height:' + String(featurePct) + '%; width:10%; left:' + (countKey * 10) + '%; background-color:' + value.hex1 + ';" >'
 			+ '<div style="background-color:' + value.hex1 + ';" class="level-1-label-text rotate-text shade-level-1-label-text transition-class">' + level1Classes[key].level1 + '</div></div>')
 		countKey++; 
 	}
-	createWordCloud("#pointLegendHolder");
 }
 
 // Called upon map extent change
 function grabSomeData(boundsIn,zoomIn){
 		//drawFilter(["dataIn","test"], "filter")
-		console.log(zoomIn)
 		if (zoomIn >= 13){
 			//sql.execute("SELECT * FROM coastal_bordner_counties WHERE cov1 = 'C1' ORDER BY den1 ASC") // Gets all 'C1' values and orders them ascendantly 
-			sql.execute("SELECT * FROM coastal_bordner_counties WHERE the_geom && ST_SetSRID(ST_MakeBox2D(ST_Point("+String(boundsIn._northEast.lng)+","+String(boundsIn._northEast.lat)+"), ST_Point("+String(boundsIn._southWest.lng)+","+String(boundsIn._southWest.lat)+")), 4326) ORDER BY den1 DESC") // Gets ...
+			sql.execute("SELECT * FROM coastal_bordner_counties WHERE the_geom && ST_SetSRID(ST_MakeBox2D(ST_Point(" +
+			String(boundsIn._northEast.lng)+","+String(boundsIn._northEast.lat)+"), ST_Point(" +
+			String(boundsIn._southWest.lng)+","+String(boundsIn._southWest.lat)+")), 4326) ORDER BY cov1 DESC") // Gets ...
 				.done(function(data) {
-					//var f = data.rows.length;
+					$("#polygonLegendHolder").empty();
+					cov1Classes = {}
+					var highestValue = 0;
+					var lengthValue = 0;
+					var countCov1 = 0
+					var lastCov1 = ""
+					jQuery.each(data.rows, function(i, val) {
+						if (val.cov1 == lastCov1){
+							countCov1++;
+							lastCov1 = val.cov1
+						}else{
+							if (i == 0){
+								countCov1++;
+								lastCov1 = val.cov1								
+							}else{
+								if (countCov1 > highestValue){ highestValue = countCov1; }
+								cov1Classes[val.cov1] = {"level1": val.cov1 , "level1frq": countCov1 , "hex1": "#ffffff"}
+								lastCov1 = val.cov1
+								lengthValue++;
+							}
+						}
+					})
 					
-					console.log(data)
-					/*if (f > 0){
-					var histogramFields = {};
-					var pieFields = {};
-					jQuery.each(data.fields, function(i, val) {
-						if (isInArray(histogramFieldNames,i)){
-							window[i] = []
-							histogramFields[i] = val
-						}
-						if (isInArray(pieFieldNames,i)){
-							window[i] = []
-							pieFields[i] = val
-						}
-					})
-					for (var x = 0; x < f; x++) {
-						jQuery.each(histogramFields, function(i, val) {
-							window[i].push([data.rows[x][i], data.rows[x]["cov1"]])
-						});
-						jQuery.each(pieFields, function(i, val) {
-							window[i].push(data.rows[x][i])
-						});
+					cov1Classes = _.indexBy(cov1Classes, 'level1frq') // playing with http://underscorejs.org/
+					var countKey = 0;
+					for (var key in cov1Classes) {
+						var value = cov1Classes[key];
+						featurePct = (value.level1frq / highestValue) * 100
+						$("#polygonLegendHolder").append('<div class="histogram-div"; style="height:' + String(featurePct) + '%; width:'+ 100 / lengthValue +'%; left:' + (countKey * (100 / lengthValue)) + '%; background-color:' + value.hex1 + ';" >'
+							+ '<div style="background-color:' + value.hex1 + ';" class="level-1-label-text rotate-text shade-level-1-label-text transition-class">' + cov1Classes[key].level1 + '</div></div>')
+						countKey++; 
 					}
-					jQuery.each(histogramFields, function(i, val) {
-						window[i].sort(function(a, b){return b[0]-a[0]});
-						drawHistogram(window[i], i) 
-					})
-					jQuery.each(pieFields, function(i, val) {
-						window[i].sort();
-						drawPie(window[i], i) 
-					})
+					/* // From original, histogram and pie chart demo
+					var f = data.rows.length;
+					if (f > 0){
+						var histogramFields = {};
+						var pieFields = {};
+						jQuery.each(data.fields, function(i, val) {
+							if (isInArray(histogramFieldNames,i)){
+								window[i] = []
+								histogramFields[i] = val
+							}
+							if (isInArray(pieFieldNames,i)){
+								window[i] = []
+								pieFields[i] = val
+							}
+						})
+						for (var x = 0; x < f; x++) {
+							jQuery.each(histogramFields, function(i, val) {
+								window[i].push([data.rows[x][i], data.rows[x]["cov1"]])
+							});
+							jQuery.each(pieFields, function(i, val) {
+								window[i].push(data.rows[x][i])
+							});
+						}
+						jQuery.each(histogramFields, function(i, val) {
+							window[i].sort(function(a, b){return b[0]-a[0]});
+							drawHistogram(window[i], i) 
+						})
+						jQuery.each(pieFields, function(i, val) {
+							window[i].sort();
+							drawPie(window[i], i) 
+						})
 					}*/
+					//createWordCloud("#pointLegendHolder", tempClasses);
+					createWordCloud("#pointLegendHolder", cov1Classes);
 				})
 				.error(function(errors) {
 					console.log("errors:" + errors);
@@ -440,7 +464,7 @@ var Map = cdb.core.View.extend({
 	}
 
 })
-/// More stock code	
+//////////////////// More stock code
 var Filters = cdb.core.View.extend({
 	
 	initialize: function() {
@@ -494,15 +518,15 @@ var Filters = cdb.core.View.extend({
 
 // create a word cloud just for fun...
 var word_count = {};
-function createWordCloud(hashedDivID){
-	for (var key in tempClasses) {
-		var value = tempClasses[key];
-		//var word = (tempClasses[key].level2).toLowerCase();
-		word_count[tempClasses[key].level2] = value.level2frq;
+function createWordCloud(hashedDivID, tempC){
+	//console.log(tempC)
+	$(hashedDivID).empty();
+	for (var key in tempC) {
+		var value = tempC[key];
+		word_count[tempC[key].level1] = value.level1frq;
 	}
-	//word_count["POINTS"] = 12000;
 
-	var svg_location = hashedDivID //"#chart";
+	var svg_location = hashedDivID
 	var width = ($(document).width()) * 0.9
 	var height = ($(document).height()) * 0.18
 
