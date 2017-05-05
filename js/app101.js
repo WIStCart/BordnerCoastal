@@ -34,7 +34,8 @@ window.onload = function() {
 function setUpMap(){
 	// Explicitly set the layer 1/layer 2 toggle (will likely use a stateful URL parameter in the future to drive this)
 	$("#levelSliderCheckbox").attr("checked", true);
-	
+	$("#featurePolygons").prop("checked", true);
+	$("#baseB").prop("checked", true);
 	// Fade-in the toc button and give it a click handler
 	$("#tocButton").addClass( "toc-button-unfade");
 	$("#tocButton").click(function() { toggleTOC() });
@@ -127,28 +128,28 @@ function transformToTablet(){
 	$( "#legend" ).addClass( "legend-off" );
 }
 
-// Handles all click events from lower lefthand corner
+// Handles all click events from 4 main buttons 
 function dispatchButtonClick(buttonClicked){
 	if ($('.modal.in').length <= 0){ $( "#tocModal" ).modal(); }
 	if ($( "#toc" ).hasClass( "toc-view-closed" )){ toggleTOC(); }
-	$( "#toc" ).appendTo( $( "#tocModalDialogue" ) );
-	$( "#toc" ).append($(".leaflet-control-container").addClass( "leaflet-control-container-tablet-custom" ));
 	switch(buttonClicked) {
 		case "legendButton":
 			console.log("Legend TOC")
+			$( "#toc" ).appendTo( $( "#tocModalDialogue" ) );
+			$( "#toc" ).append($(".leaflet-control-container").addClass( "leaflet-control-container-tablet-custom" ));
 			$( "#legend" ).removeClass( "legend-off" );
 			break;
 		case "layerListButton":
 			console.log("Layer List")
-			$( "#legend" ).addClass( "legend-off" );
+			//$( "#legend" ).addClass( "legend-off" );
 			break;
 		case "infoButton":
 			console.log("Info")
-			$( "#legend" ).addClass( "legend-off" );
+			//$( "#legend" ).addClass( "legend-off" );
 			break;
 		case "shareButton":
 			console.log("Share")
-			$( "#legend" ).addClass( "legend-off" );
+			//$( "#legend" ).addClass( "legend-off" );
 			break;
 		default:
 			console.log("unidentified")
@@ -202,7 +203,7 @@ function demoLegend(){
 function grabSomeData(boundsIn,zoomIn){
 		//drawFilter(["dataIn","test"], "filter")
 		console.log(zoomIn)
-		//if (zoomIn >= 13){
+		if (zoomIn >= 13){
 			//sql.execute("SELECT * FROM coastal_bordner_counties WHERE cov1 = 'C1' ORDER BY den1 ASC") // Gets all 'C1' values and orders them ascendantly 
 			sql.execute("SELECT * FROM coastal_bordner_counties WHERE the_geom && ST_SetSRID(ST_MakeBox2D(ST_Point("+String(boundsIn._northEast.lng)+","+String(boundsIn._northEast.lat)+"), ST_Point("+String(boundsIn._southWest.lng)+","+String(boundsIn._southWest.lat)+")), 4326) ORDER BY den1 DESC") // Gets ...
 				.done(function(data) {
@@ -243,7 +244,7 @@ function grabSomeData(boundsIn,zoomIn){
 				.error(function(errors) {
 					console.log("errors:" + errors);
 				})
-		//}
+		}
 }
 
 var Map = cdb.core.View.extend({

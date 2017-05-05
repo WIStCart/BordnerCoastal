@@ -45,6 +45,7 @@ var tempClasses = {
   "S": { "level1":"Other", "level1frq":1470, "hex1":"#F1C40F", "level2":"Stump", "level2frq":607},
   "Blowdown": { "level1":"Other", "level1frq":1470, "hex1":"#9677b5", "level2":"Blowdown", "level2frq":1},
   "Cutover": { "level1":"Other", "level1frq":1470, "hex1":"#873600", "level2":"Cutover", "level2frq":7},
+  "Cutover": { "level1":"Other", "level1frq":1470, "hex1":"#873600", "level2":"Cutover", "level2frq":7},
   "Rcnt_Cut": { "level1":"Other", "level1frq":1470, "hex1":"#D6DBDF", "level2":"Recent Cut", "level2frq":3},
   "Slash": { "level1":"Other", "level1frq":1470, "hex1":"#2C3E50", "level2":"Slash", "level2frq":16},
   "D4": { "level1":"Shrubland", "level1frq":3092, "hex1":"#C39BD3", "level2":"Leather Leaf", "level2frq":1427},
