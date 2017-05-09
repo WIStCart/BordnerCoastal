@@ -25,14 +25,16 @@
 				<span id="tocIcon" class="icon-class glyphicon glyphicon-chevron-up transition-class"></span>
 			</div>
 			<div class="col-sm-2 layer-list-view transition-class" id="layerList">
-				<div class="radio">
-					<label><input type="radio" name="featureType" id="featurePolygons">Polygons</label>
-				</div>
-				<div class="radio">
-					<label><input type="radio" name="featureType" id="featurePoints">Points</label>
-				</div>
-				<div class="radio">
-					<label><input type="radio" name="featureType" id="featureLines">Lines</label>
+				<div class="feature-type-radio-group">
+					<div class="radio">
+						<label><input type="radio" name="featureType" id="featurePolygons">Polygons</label>
+					</div>
+					<div class="radio">
+						<label><input type="radio" name="featureType" id="featurePoints">Points</label>
+					</div>
+					<div class="radio">
+						<label><input type="radio" name="featureType" id="featureLines">Lines</label>
+					</div>
 				</div>
 				<div class="checkbox">
 					<label><input type="checkbox" name="overlayType" id="overlay1">Overlay 1</label>
@@ -65,7 +67,7 @@
 				</div>
 			</div>-->
 			<div class="col-sm-10 legend-view transition-class" id="legend">
-				<div class="poly-legend-holder" id="polygonLegendHolder" ></div>
+				<div class="poly-legend-holder" id="polygonLegendHolder" >POLYGONS</div>
 				<div class="point-legend-holder" id="pointLegendHolder" >POINTS</div>
 				<div class="line-legend-holder" id="lineLegendHolder" >LINES</div>
 			</div>
@@ -77,15 +79,29 @@
 	  <div class="modal-dialog" id="tocModalDialogue">
 	  </div>
 	</div>
+	<script type="infowindow/html" id="infowindow_template">
+		<div class="infowindow-custom">
+			<a href="#close" class="cartodb-popup-close-button close">x</a>
+			<div class="cartodb-popup-content">
+				<div class="content" style="padding:20px">
+				  <p>cov1: {{content.data.cov1}}</p>
+				  <p>cov2: {{content.data.cov2}}</p>
+				<div>
+			<div>
+		<div>
+		<div>
+		  <div class="cartodb-popup-tip-container"></div>
+		</div>
+	</script>
     <!-- js \/ -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
 	<script src="http://libs.cartocdn.com/cartodb.js/v3/3.15/cartodb.js"></script>
 	<script src="//d3js.org/d3.v3.min.js"></script>
 	<script src="js/underscore-min.js"></script>
-    <script src="js/bootstrap.min.js"></script> <!-- Currently using Bootstrap 3.3.7 -->
-    <script src="js/app102.js"></script>
+	<script src="js/bootstrap.min.js"></script> <!-- Currently using Bootstrap 3.3.7 -->
+	<script src="js/app102.js"></script>
 	<script src="js/cloud.js"></script>
-    <script src="data/temp_classes.js"></script>
+	<script src="data/temp_classes.js"></script>
 	<!-- js /\ -->
   </body>
 </html>

@@ -15,6 +15,9 @@ body{
 	.toc-view{
 		background-color:  rgba(255,255,255,0) !important;
 	}
+	#tocModal{
+		padding-left: 0px !important;
+	}
 	.legend-view{
 		height: 300% !important;
 	}
@@ -49,6 +52,11 @@ body{
 		position: absolute;
 		top: 0px;
 		left: -5px;
+	}
+	.layer-list-view{
+	    padding-left: 50px !important;
+		padding-top: 12px;
+		height: 300% !important;
 	}
 }
 
@@ -249,6 +257,7 @@ input:checked + .slider:before {
 
 .legend-off, .layer-list-off{
 	visibility: hidden;
+	height: 0% !important;
 }
 
 .poly-legend-holder{
@@ -291,9 +300,96 @@ input:checked + .slider:before {
 	cursor: pointer !important;
     text-align: center;
 }
+
 .leaflet-control-attribution, .cartodb-legend-stack {
 	visibility:hidden;
 }
+
 .cartodb-logo {
 	visibility:hidden !important;
+}
+
+body > div.cartodb-tooltip{
+	margin-bottom: 15px !important;
+	margin-left: 10px !important;
+	border-radius: 5px;
+	width: 100%;
+	min-width: 17.5px;
+    max-width: 24px;
+	height: 17.5px;
+}
+/* gives to the tooltip different styles */
+div.cartodb-tooltip-content-wrapper{
+	padding: 1px 1px 1px 1px;
+	max-width:none;
+	text-align: center;
+	background-color: #FFF!important;
+	opacity: 0.9;
+	border-radius: 5px!important;
+}
+/* set styles to the <p> tag of the tooltip */
+div.cartodb-tooltip-content-wrapper p{
+	color: #2c5875 !important;
+	font-size:8pt;
+}
+/* set infobox styles */
+.cartodb-infobox{
+	opacity:0.9;
+	background-color: #FFF!important;
+	color: #2c5875 !important;
+	border-radius: 5px!important;
+}
+
+/* set styles to the custom infowindow */
+.infowindow-custom{ 
+	position: relative;
+	width: 100%;
+	background-color: #FFF;
+	margin-bottom: 2px;
+	opacity: 0.9;
+	text-align: left;
+	font-style: oblique;
+	background-color: #FFF;
+	color: #2c5875;
+	border-radius: 10px;
+}
+
+.cartodb-popup-content .content h3{
+  font-style: italic;
+}
+.cartodb-popup-content .content p{
+  text-align: left;
+  font-size: 8pt;
+  color:#2c5875;
+  margin-left: 1px;
+}
+
+/* set styles to the custom infowindow -> close button */
+.cartodb-popup-close-button {
+	position: absolute;
+	top: -12px;
+	right: -11px;
+	width: 26px;
+	height: 26px;
+	background: url('http://libs.cartodb.com/cartodb.js/v3/themes/img/light.png') no-repeat 0 -23px;
+	text-indent: -9999px;
+	font-size: 0;
+	line-height: 0;
+	opacity: 1;
+	text-transform: uppercase;
+	z-index: 3;
+}
+/* set styles to the custom infowindow -> tip container */
+.cartodb-popup-tip-container{
+	position: absolute;
+	bottom: -13px;
+	left: 23px;
+	width: 16px;
+	height: 14px;
+	background: url('http://libs.cartodb.com/cartodb.js/v3/themes/img/light.png') no-repeat -23px -7px;
+	text-indent: -9999px;
+	font-size: 0;
+	line-height: 0;
+	opacity: 1;
+	z-index: 3;
 }

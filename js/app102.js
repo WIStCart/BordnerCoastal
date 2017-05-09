@@ -33,12 +33,17 @@ var basemapB =  L.tileLayer('http://server.arcgisonline.com/ArcGIS/rest/services
 	attribution: 'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community'
 });
 
-var basemapC = L.tileLayer('http://stamen-tiles-{s}.a.ssl.fastly.net/terrain-background/{z}/{x}/{y}.{ext}', {
+/*var basemapC = L.tileLayer('http://stamen-tiles-{s}.a.ssl.fastly.net/terrain-background/{z}/{x}/{y}.{ext}', {
 	attribution: 'Map tiles by <a href="http://stamen.com">Stamen Design</a>, <a href="http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a> &mdash; Map data &copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>',
 	subdomains: 'abcd',
 	minZoom: 0,
 	maxZoom: 18,
 	ext: 'png'
+});*/
+
+var basemapC = L.tileLayer('https://tiles{s}.arcgis.com/tiles/n6uYoouQZW75n5WI/arcgis/rest/services/V2_RasterParcelOnly_2_20160929/MapServer/tile/{z}/{y}/{x}', {
+	attribution: 'V2 Statewide Parcels',
+	subdomains: '123'
 });
 
 // Load the Carto map:
@@ -52,13 +57,55 @@ window.onload = function() {
 	});
 
 	// Promise for the first layer
-	bordner = cartodb.createLayer(map, {user_name: 'sco-admin',
-		type: 'cartodb',
-		sublayers: [{
+	bordner = cartodb.createLayer(map, {
+      user_name: 'sco-admin',
+      type: 'cartodb',
+      sublayers: [
+        {
+           type: "cartodb",
 			sql: 'SELECT * FROM coastal_bordner_counties',
-			cartocss: '#layer{polygon-fill: #DDDDDD;polygon-opacity: 0.65;[cov1="A1"]{polygon-fill: #A6CEE3;}[cov1="A3"]{polygon-fill: #1F78B4;}[cov1="A4"]{polygon-fill: #B2DF8A;}[cov1="B1"]{polygon-fill: #33A02C;}[cov1="B3"]{polygon-fill: #FB9A99;}[cov1="C"]{polygon-fill: #E31A1C;}[cov1="C1"]{polygon-fill: #FDBF6F;}[cov1="D3"]{polygon-fill: #FF7F00;}[cov1="P"]{polygon-fill: #CAB2D6;}[cov1="SP"]{polygon-fill: #6A3D9A;}}'
-		}]
-	}).addTo(map);
+			cartocss: '#layer{polygon-fill: #DDDDDD;polygon-opacity: 0.65;[cov1="A1"]{polygon-fill: #A6CEE3;}[cov1="A3"]{polygon-fill: #1F78B4;}[cov1="A4"]{polygon-fill: #B2DF8A;}[cov1="B1"]{polygon-fill: #33A02C;}[cov1="B3"]{polygon-fill: #FB9A99;}[cov1="C"]{polygon-fill: #E31A1C;}[cov1="C1"]{polygon-fill: #FDBF6F;}[cov1="D3"]{polygon-fill: #FF7F00;}[cov1="P"]{polygon-fill: #CAB2D6;}[cov1="SP"]{polygon-fill: #6A3D9A;}}',
+           interactivity: ['cov1','cov2']
+        }
+      ]
+    })
+	.addTo(map) // add cartodb layer and basemap to map object
+	.done(function(layer) {
+		layer.setInteraction(true);
+
+		/* To print lat/long of mouseover
+		layer.on('featureOver',function(e,latlng,pos,data){
+		  console.log(latlng[0], latlng[1]) 
+		});*/
+
+		/* To construct a rudimentary popup on click (check .html for #infowindow_template) */
+		cdb.vis.Vis.addInfowindow(map, layer, ['cov1','cov2'],{
+			 infowindowTemplate: $('#infowindow_template').html()
+		});
+
+		/* To display a tooltip upon mouseover of map */
+		var tooltip = layer.leafletMap.viz.addOverlay({
+			type: 'tooltip',
+			layer: layer,
+			template: '<div class="cartodb-tooltip-content-wrapper"><p>{{cov1}}</p></div>', 
+			width: 200,
+			position: 'bottom|right',
+			fields: [{ cov1: 'cov1' }]
+		});
+		$('body').append(tooltip.render().el);
+		
+
+		/* To display an infobox within a leaflet control */
+		var infoBox = layer.leafletMap.viz.addOverlay({
+		  type: 'infobox',
+		  layer: layer,
+		  template: '<div class="cartodb-tooltip-content-wrapper"><p>cov1 = {{cov1}}<span></span></p></div>', 
+		  width: 75,
+		  position: 'top|right'
+		});
+		$('body').append(infoBox.render().el);     
+		
+	});
 	setUpMap();
 };
 
@@ -209,6 +256,7 @@ function toggleTOC(){
 // To configure desktop view (not called upon pageload - all HTML defaults to desktop styles)
 function transformToDesktop(){
 	$( "#toc" ).appendTo( $( "#tocParent" ) );
+	$( ".feature-type-radio-group" ).prependTo( $( "#layerList" ) );
 	$( "#legend" ).removeClass( "legend-off" );
 	$( "#layerList" ).removeClass( "layer-list-off" );
     if ($( "#toc" ).hasClass( "toc-view-open" )){
@@ -223,6 +271,7 @@ function transformToDesktop(){
 // To configure tablet view (is called upon pageload)
 function transformToTablet(){
 	$( "#toc" ).appendTo( $( "#tocModalDialogue" ) );
+	$( ".feature-type-radio-group" ).appendTo( $( "#legend" ) );
 	$( ".level-1-label-text").removeClass( "shade-level-1-label-text" );
 	if ($('.modal.in').length > 0){ 
 		$( "#tocModal" ).modal('hide');
