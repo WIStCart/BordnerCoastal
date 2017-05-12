@@ -68,6 +68,7 @@ function getPolyStyle(level){
 	style += "}";
 	return style;
 };
+
 // Load the Carto map:
 window.onload = function() {
 	//Create the leaflet map
@@ -78,8 +79,8 @@ window.onload = function() {
 		zoom: 7
 	});
 
-	cartoCSSRules = getPolyStyle("level1");
-	console.log(cartoCSSRules)						   
+	cartoCSSRules = getPolyStyle("level2");
+	console.log(cartoCSSRules)
 	// Promise for the first layer
 	bordner = cartodb.createLayer(map, {
       user_name: 'sco-admin',
@@ -87,7 +88,7 @@ window.onload = function() {
       sublayers: [{type: "cartodb",
 			sql: 'SELECT * FROM final_coastal_polygons',
 			// cartocss: '#layer{polygon-fill: #DDDDDD;polygon-opacity: 0.65;[cov1="A1"]{polygon-fill: #A6CEE3;}[cov1="A3"]{polygon-fill: #1F78B4;}[cov1="A4"]{polygon-fill: #B2DF8A;}[cov1="B1"]{polygon-fill: #33A02C;}[cov1="B3"]{polygon-fill: #FB9A99;}[cov1="C"]{polygon-fill: #E31A1C;}[cov1="C1"]{polygon-fill: #FDBF6F;}[cov1="D3"]{polygon-fill: #FF7F00;}[cov1="P"]{polygon-fill: #CAB2D6;}[cov1="SP"]{polygon-fill: #6A3D9A;}}',
-			cartocss: cartoCSSRules,   
+			cartocss: cartoCSSRules,
 			interactivity: ['cov1','cov2']
 	}]
     })
@@ -417,74 +418,43 @@ function grabSomeData(boundsIn,zoomIn){
 					$("#polygonLegendHolder").empty();
 					cov1Classes = {}
 					var highestValue = 0;
+					var lengthValue = 0;
+					var countCov1 = 0;
 					var covArea = 0;
-					var lastCov1 = "NULL"
-					var hexColor = "#ffffff"
-					//console.log(data)
-					/*
-					var cov1Counts = _.countBy(data.rows, function(num) {
-					  return num.cov1;
-					})
-					var A1 = _.where(data.rows, {cov1:"A1"});
-					console.log(A1)
-					var max = _.max(data.rows,  function(num){ return num.shape_area; }) 
-					console.log(max)
-					*/
-					var grouped = _.groupBy(data.rows, function(num){ return num.cov1; });
-					//console.log(grouped)
-					//var counted = _.countBy(data.rows, function(num) {
-					//  return num.cov1;
-					//});		
-					jQuery.each(grouped, function(i, val) {
-						var collectiveVal2 = 0;
-						//console.log(val)
-						//console.log(i)
-						jQuery.each(val, function(j, val2) {
-							//console.log(val2.shape_area)
-							collectiveVal2 += val2.shape_area;
-							//console.log(collectiveVal2)
-						})
-						var hexColor = "#ffffff"
-						if (colorsHex[i]){ hexColor = colorsHex[i]}
-						cov1Classes[i] = {"level1": i , "level1frq": collectiveVal2 , "hex1": hexColor }
-					})
-					var max = _.max(cov1Classes,  function(num){ return num.level1frq; }) 
-					//console.log(max)
-					/*jQuery.each(data.rows, function(i, val) {
-						console.log(val.shape_area)
-						console.log(val.cov1)
-						if (i == 0){
-							covArea = 0;
-							highestValue = 0;
-						}
-						covArea = covArea + val.shape_area
-						if lastCov == {
+					var lastCov1 = ""
+					console.log(data)
+					jQuery.each(data.rows, function(i, val) {
+						if (val.cov1 == lastCov1){
+							countCov1++;
 							covArea = covArea + val.shape_area
-							if (covArea > highestValue){ highestValue = covArea; }
-							//if (colorsHex[val.cov1]){ hexColor = colorsHex[val.cov1]}
-							cov1Classes[val.cov1] = {"level1": val.cov1 , "level1frq": covArea , "hex1": hexColor }
 							lastCov1 = val.cov1
-							covArea = 0;
+						}else{
+							if (i == 0){
+								countCov1++;
+								covArea = covArea + val.shape_area
+								lastCov1 = val.cov1							
+							}else{
+								if (covArea > highestValue){ highestValue = covArea; }
+								var hexColor = "#ffffff"
+								if (colorsHex[val.cov1]){ hexColor = colorsHex[val.cov1]}
+								cov1Classes[val.cov1] = {"level1": val.cov1 , "level1frq": covArea , "hex1": hexColor }
+								lastCov1 = val.cov1
+								covArea = 0;
+							}
+							lengthValue++;
 						}
-						lastCov1 = val.cov1
-					})*/
+					})
 					
-					cov1Classes2 = cov1Classes
-					cov1Classes3 = _.indexBy(cov1Classes2, 'level1frq') // playing with http://underscorejs.org/
-					console.log(cov1Classes3)
+					cov1Classes = _.indexBy(cov1Classes, 'level1frq') // playing with http://underscorejs.org/
 					var countKey = 0;
 					var widthInPercent = (100 / Object.keys(cov1Classes).length) 
-					_.each(cov1Classes3, function(num){console.log(num)});
-					/*for (var key in cov1Classes2) {
-						var value = cov1Classes2[key];
-						//console.log(max.level1frq)
-						console.log(value.level1frq)
-						featurePct = (value.level1frq / max.level1frq) * 100
-						$("#polygonLegendHolder").append('<div class="histogram-div"; style="height:' + String(featurePct) + '%; width:'+ widthInPercent +'%; left:' 
-						+ (countKey * widthInPercent) + '%; background-color:' + value.hex1 + ';" >'
-						+ '<div style="background-color:' + value.hex1 + ';" class="level-1-label-text rotate-text shade-level-1-label-text transition-class">' + cov1Classes2[key].level1 + '</div></div>')
+					for (var key in cov1Classes) {
+						var value = cov1Classes[key];
+						featurePct = (value.level1frq / highestValue) * 100
+						$("#polygonLegendHolder").append('<div class="histogram-div"; style="height:' + String(featurePct) + '%; width:'+ widthInPercent +'%; left:' + (countKey * widthInPercent) + '%; background-color:' + value.hex1 + ';" >'
+							+ '<div style="background-color:' + value.hex1 + ';" class="level-1-label-text rotate-text shade-level-1-label-text transition-class">' + cov1Classes[key].level1 + '</div></div>')
 						countKey++; 
-					}*/
+					}
 					/* // From original, histogram and pie chart demo
 					var f = data.rows.length;
 					if (f > 0){
