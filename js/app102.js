@@ -7,8 +7,8 @@ var map;
 var sql = new cartodb.SQL({ user: 'sco-admin' });
 var currentBasemap;
 var bordner;
-var colorsHex = {"A1":"#A6CEE3;","A3":"#1F78B4;","A4":"#B2DF8A;","B1":"#33A02C;","B3":"#FB9A99;","C":"#E31A1C;","C1":"#FDBF6F;","D3":"#FF7F00;","P":"#CAB2D6;","SP":"#6A3D9A;"}
-console.log(colorsHex)
+var colorsHex = {}; 
+
 // Overlay definitions:
 var overlay1 = L.tileLayer('http://{s}.tile.stamen.com/toner-labels/{z}/{x}/{y}.png', {
 	attribution: 'stamen toner labels'
@@ -47,6 +47,7 @@ var basemapC = L.tileLayer('https://tiles{s}.arcgis.com/tiles/n6uYoouQZW75n5WI/a
 	subdomains: '123'
 });
 
+// Create CartoCSS
 function getPolyStyle(level){
 	classes = tempClasses2.classes;
 	
@@ -55,7 +56,7 @@ function getPolyStyle(level){
 
 	if (level =="level1"){
 		for(var i = 0; i < classes.length; i++) { 
-			console.log(classes[i])
+			//console.log(classes[i])
 			var thisStyle = "[cov1='"+classes[i].code+"']{polygon-fill: "+classes[i].color1+";}";
 			style += thisStyle;
 		}
@@ -68,6 +69,15 @@ function getPolyStyle(level){
 	style += "}";
 	return style;
 };
+
+// Create a hex dictionary for with cov1 as key (for easy access) 
+function createHexStyles(){
+	classes = tempClasses2.classes;
+	for(var i = 0; i < classes.length; i++) { 
+		colorsHex[classes[i].code] = {"level1": classes[i].color1 , "level2": classes[i].color1}
+	}
+};
+
 // Load the Carto map:
 window.onload = function() {
 	//Create the leaflet map
@@ -77,9 +87,9 @@ window.onload = function() {
 		center: [43.7844,-88.7879],
 		zoom: 7
 	});
-
+	createHexStyles()
 	cartoCSSRules = getPolyStyle("level1");
-	console.log(cartoCSSRules)						   
+	//console.log(cartoCSSRules)
 	// Promise for the first layer
 	bordner = cartodb.createLayer(map, {
       user_name: 'sco-admin',
@@ -87,7 +97,7 @@ window.onload = function() {
       sublayers: [{type: "cartodb",
 			sql: 'SELECT * FROM final_coastal_polygons',
 			// cartocss: '#layer{polygon-fill: #DDDDDD;polygon-opacity: 0.65;[cov1="A1"]{polygon-fill: #A6CEE3;}[cov1="A3"]{polygon-fill: #1F78B4;}[cov1="A4"]{polygon-fill: #B2DF8A;}[cov1="B1"]{polygon-fill: #33A02C;}[cov1="B3"]{polygon-fill: #FB9A99;}[cov1="C"]{polygon-fill: #E31A1C;}[cov1="C1"]{polygon-fill: #FDBF6F;}[cov1="D3"]{polygon-fill: #FF7F00;}[cov1="P"]{polygon-fill: #CAB2D6;}[cov1="SP"]{polygon-fill: #6A3D9A;}}',
-			cartocss: cartoCSSRules,   
+			cartocss: cartoCSSRules,
 			interactivity: ['cov1','cov2']
 	}]
     })
@@ -128,6 +138,7 @@ window.onload = function() {
 		$('body').append(infoBox.render().el);     
 	});
 	setUpMap();
+	//testArraySorting();
 };
 
 // Sets everything up after pageload and map creation are complete 
@@ -180,7 +191,7 @@ function setUpMap(){
 	
 	// For dynamic legend queries (in progress)
 	map.on('moveend', function() { 
-		grabSomeData(map.getBounds(),map.getZoom());
+		drawThisView(map.getBounds(),map.getZoom());
 	});
 	
 	// Done, tell the console!
@@ -406,8 +417,13 @@ function demoLegend(){
 }
 
 // Called upon map extent change
-function grabSomeData(boundsIn,zoomIn){
-		//drawFilter(["dataIn","test"], "filter")
+function testArraySorting(classesIn, classIn){
+	tempClasses2 = _.indexBy(classesIn, classIn)
+	console.log(tempClasses2)
+	_.each(tempClasses2, function(numZ){console.log(numZ[classIn])});
+}
+
+function drawThisView(boundsIn,zoomIn){
 		if (zoomIn >= 13){
 			//sql.execute("SELECT * FROM final_coastal_polygons WHERE cov1 = 'C1' ORDER BY den1 ASC") // Gets all 'C1' values and orders them ascendantly 
 			sql.execute("SELECT * FROM final_coastal_polygons WHERE the_geom && ST_SetSRID(ST_MakeBox2D(ST_Point(" +
@@ -415,77 +431,31 @@ function grabSomeData(boundsIn,zoomIn){
 			String(boundsIn._southWest.lng)+","+String(boundsIn._southWest.lat)+")), 4326) ORDER BY cov1 DESC") // Gets ...
 				.done(function(data) {
 					$("#polygonLegendHolder").empty();
-					cov1Classes = {}
-					var highestValue = 0;
-					var covArea = 0;
-					var lastCov1 = "NULL"
-					var hexColor = "#ffffff"
-					//console.log(data)
-					/*
-					var cov1Counts = _.countBy(data.rows, function(num) {
-					  return num.cov1;
-					})
-					var A1 = _.where(data.rows, {cov1:"A1"});
-					console.log(A1)
-					var max = _.max(data.rows,  function(num){ return num.shape_area; }) 
-					console.log(max)
-					*/
+					var cov1Classes = {}
 					var grouped = _.groupBy(data.rows, function(num){ return num.cov1; });
-					//console.log(grouped)
-					//var counted = _.countBy(data.rows, function(num) {
-					//  return num.cov1;
-					//});		
 					jQuery.each(grouped, function(i, val) {
-						var collectiveVal2 = 0;
-						//console.log(val)
-						//console.log(i)
+						var collectiveVal = 0;
 						jQuery.each(val, function(j, val2) {
-							//console.log(val2.shape_area)
-							collectiveVal2 += val2.shape_area;
-							//console.log(collectiveVal2)
+							collectiveVal += val2.shape_area;
 						})
 						var hexColor = "#ffffff"
-						if (colorsHex[i]){ hexColor = colorsHex[i]}
-						cov1Classes[i] = {"level1": i , "level1frq": collectiveVal2 , "hex1": hexColor }
+						if (colorsHex[i]){ hexColor = colorsHex[i].level1}
+						cov1Classes[i] = {"level1": i , "level1frq": Math.round(collectiveVal) , "hex1": hexColor }
 					})
-					var max = _.max(cov1Classes,  function(num){ return num.level1frq; }) 
-					//console.log(max)
-					/*jQuery.each(data.rows, function(i, val) {
-						console.log(val.shape_area)
-						console.log(val.cov1)
-						if (i == 0){
-							covArea = 0;
-							highestValue = 0;
-						}
-						covArea = covArea + val.shape_area
-						if lastCov == {
-							covArea = covArea + val.shape_area
-							if (covArea > highestValue){ highestValue = covArea; }
-							//if (colorsHex[val.cov1]){ hexColor = colorsHex[val.cov1]}
-							cov1Classes[val.cov1] = {"level1": val.cov1 , "level1frq": covArea , "hex1": hexColor }
-							lastCov1 = val.cov1
-							covArea = 0;
-						}
-						lastCov1 = val.cov1
-					})*/
-					
-					cov1Classes2 = cov1Classes
-					cov1Classes3 = _.indexBy(cov1Classes2, 'level1frq') // playing with http://underscorejs.org/
-					console.log(cov1Classes3)
+					var max = _.max(cov1Classes,  function(num){ return num.level1frq; })
+					var cov1Classes = _.indexBy(cov1Classes, 'level1frq') // playing with http://underscorejs.org/
 					var countKey = 0;
 					var widthInPercent = (100 / Object.keys(cov1Classes).length) 
-					_.each(cov1Classes3, function(num){console.log(num)});
-					/*for (var key in cov1Classes2) {
-						var value = cov1Classes2[key];
-						//console.log(max.level1frq)
-						console.log(value.level1frq)
+					_.each(cov1Classes, function(num){
+						var value = num;
 						featurePct = (value.level1frq / max.level1frq) * 100
 						$("#polygonLegendHolder").append('<div class="histogram-div"; style="height:' + String(featurePct) + '%; width:'+ widthInPercent +'%; left:' 
 						+ (countKey * widthInPercent) + '%; background-color:' + value.hex1 + ';" >'
-						+ '<div style="background-color:' + value.hex1 + ';" class="level-1-label-text rotate-text shade-level-1-label-text transition-class">' + cov1Classes2[key].level1 + '</div></div>')
+						+ '<div style="background-color:' + value.hex1 + ';" class="level-1-label-text rotate-text shade-level-1-label-text transition-class">' + value.level1 + '</div></div>')
 						countKey++; 
-					}*/
-					/* // From original, histogram and pie chart demo
+					});
+					// From original, histogram and pie chart demo
+					/*
 					var f = data.rows.length;
 					if (f > 0){
 						var histogramFields = {};
@@ -516,8 +486,8 @@ function grabSomeData(boundsIn,zoomIn){
 							window[i].sort();
 							drawPie(window[i], i) 
 						})
-					}*/
-					//createWordCloud("#pointLegendHolder", tempClasses);
+					}
+					*/
 					createWordCloud("#pointLegendHolder", cov1Classes);
 				})
 				.error(function(errors) {
