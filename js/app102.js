@@ -48,13 +48,13 @@ var basemapC = L.tileLayer('https://tiles{s}.arcgis.com/tiles/n6uYoouQZW75n5WI/a
 });
 
 // Create CartoCSS
-function getPolyStyle(level){
+function getPolyStyle(levelClass){
 	classes = tempClasses2.classes;
 	
 	//Beginning part of the cartocss style
 	style = "#layer{polygon-fill: #DDDDDD;polygon-opacity: 0.65;";
 
-	if (level =="level1"){
+	if (levelClass =="level1"){
 		for(var i = 0; i < classes.length; i++) { 
 			//console.log(classes[i])
 			var thisStyle = "[cov1='"+classes[i].code+"']{polygon-fill: "+classes[i].color1+";}";
@@ -62,7 +62,9 @@ function getPolyStyle(level){
 		}
 	}else{
 		for(var i = 0; i < classes.length; i++) { 
-			var thisStyle = "[cov1='"+classes[i].code+"']{polygon-fill: "+classes[i].color2+";}";
+			if (classes.level2 == levelClass){
+				var thisStyle = "[cov1='"+classes[i].code+"']{polygon-fill: "+classes[i].color2+";}";
+			};
 			style += thisStyle;
 		}
 	}
@@ -410,11 +412,41 @@ function demoLegend(){
 	for (var key in level1Classes) {
 		var value = level1Classes[key];
 		featurePct = (value.level1frq / highestValue) * 100
-		$("#lineLegendHolder").append('<div class="histogram-div"; style="height:' + String(featurePct) + '%; width:10%; left:' + (countKey * 10) + '%; background-color:' + value.hex1 + ';" >'
+		$("#lineLegendHolder").append('<div class="histogram-div"; id=legend-'+level1Classes[key].level1+' style="height:' + String(featurePct) + '%; width:10%; left:' + (countKey * 10) + '%; background-color:' + value.hex1 + ';" >'
 			+ '<div style="background-color:' + value.hex1 + ';" class="level-1-label-text rotate-text shade-level-1-label-text transition-class">' + level1Classes[key].level1 + '</div></div>')
-		countKey++; 
+		countKey++;
+		//Add click event
+		$("#legend-"+level1Classes[key].level1).click(function(){
+			var subclasses = getLegendSubclasses(level1Classes[key].level1);
+
+			var list = '<ul>';
+			for (var i = 0; i < subclasses.length; i++) {
+				list += '<li>'+subclasses[i]+'</li>';
+
+			}
+			list += '</ul>';
+			$("#legend-"+level1Classes[key].level1).append(list);
+
+			//Restyle map
+			getPolyStyle(level1Classes[key].level1);
+		});
 	}
 }
+
+//Gets the level 2 classes for a level 1 class and returns an array of objects
+function getLegendSubclasses(levelClass){
+	var subclasses = tempClasses2.classes.filter(function(e){
+		return (e.level1 === levelClass);
+	});
+
+	var level2List = [];
+	for(i = 0; i< subclasses.length; i++){    
+		if(level2List.indexOf(subclasses[i].level2) === -1){
+			level2List.push(subclasses[i].level2);        
+		};        
+	};
+	return level2List;
+};
 
 // Called upon map extent change
 function testArraySorting(classesIn, classIn){
