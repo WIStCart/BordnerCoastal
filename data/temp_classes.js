@@ -165,7 +165,7 @@ classes:[{"code":"FX","name":"FX - Fox Farm","level2":"Other agriculture","level
 {"code":"CT","name":"CT - City","level2":"City","level1":"Developed","color1":"#ffde56","color2":"#c7e28f"},
 {"code":"CV","name":"CV - Urban Property","level2":"Urban","level1":"Developed","color1":"#ffde56","color2":"#c7e28f"},
 {"code":"BRICK YARD","name":"BRICK YARD","level2":"Other developed","level1":"Developed","color1":"#ffde56","color2":"#c7e28f"},
-{"code":"RESERVE","name":"RESERVE","level2":"Recreation Area","level1":"Developed","color1":"#ffde56","color2":"#c7e28f"},
+{"code":"Reserve","name":"Reserve","level2":"Recreation Area","level1":"Developed","color1":"#ffde56","color2":"#c7e28f"},  // CS changed this from RESERVE to Reserve (the CARTO data must have it as the later)
 {"code":"UR","name":"UR - Unknown Residential","level2":"City","level1":"Developed","color1":"#ffde56","color2":"#c7e28f"},
 {"code":"PARK","name":"PARK","level2":"Recreation Area","level1":"Developed","color1":"#ffde56","color2":"#c7e28f"},
 {"code":"Rec","name":"Rec - Recreation Area","level2":"Recreation Area","level1":"Developed","color1":"#ffde56","color2":"#c7e28f"},

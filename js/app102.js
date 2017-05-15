@@ -7,8 +7,8 @@ var map;
 var sql = new cartodb.SQL({ user: 'sco-admin' });
 var currentBasemap;
 var bordner;
-var colorsHex = {}; 
 var classConfigs = {}; 
+var level1Membership = {}; 
 
 // Overlay definitions:
 var overlay1 = L.tileLayer('http://{s}.tile.stamen.com/toner-labels/{z}/{x}/{y}.png', {
@@ -75,17 +75,20 @@ function getPolyStyle(level){
 function createStyles(){
 	classes = tempClasses2.classes;
 	for(var i = 0; i < classes.length; i++) { 
-		colorsHex[classes[i].code] = {"level1": classes[i].color1 , "level2": classes[i].color1}
 		classes[i].level1var = makeVariableFromString(classes[i].level1)
 		classes[i].level2var = makeVariableFromString(classes[i].level2)
-		classConfigs[classes[i].code]  = classes[i]
+		classConfigs[classes[i].code] = classes[i]
 	}
+	level1Membership = _.groupBy(classes, function(classObj){
+		return makeVariableFromString(classObj.level1); 
+	});
+	console.log(level1Membership)
 };
-
 function makeVariableFromString(stringIn){
 	var stringOut = stringIn.replace(/\s/g, "_").replace(/[(),.?]/g, "").toLowerCase(); // 1 replace whitespace with _ 2) replace (),.? with nothing 3) set to lowercase
 	return stringOut
 }
+
 // Load the Carto map:
 window.onload = function() {
 	//Create the leaflet map
@@ -200,7 +203,7 @@ function setUpMap(){
 	
 	// For dynamic legend queries (in progress)
 	map.on('moveend', function() { 
-		drawThisView(map.getBounds(),map.getZoom());
+		drawThisView(map.getBounds(), map.getZoom(), "1", "agriculture");
 	});
 	
 	// Done, tell the console!
@@ -425,33 +428,50 @@ function demoLegend(){
 	}
 }
 
-function drawThisView(boundsIn,zoomIn){
-		// level1 = more granular (Scrub Oak)
-		// level2 = less granular (Deciduous)
-		var drawLevel = "2"
+function drawThisView(boundsIn,zoomIn, drawLevel, selectedLevel2){
+		// level1 = less granular (Deciduous)
+		// level2 = more granular (Scrub Oak)
+		//var drawLevel = "1"
 		if (zoomIn >= 13){
-			//sql.execute("SELECT * FROM final_coastal_polygons WHERE cov1 = 'C1' ORDER BY den1 ASC") // Gets all 'C1' values and orders them ascendantly 
-			sql.execute("SELECT * FROM final_coastal_polygons WHERE the_geom && ST_SetSRID(ST_MakeBox2D(ST_Point(" +
-			String(boundsIn._northEast.lng)+","+String(boundsIn._northEast.lat)+"), ST_Point(" +
-			String(boundsIn._southWest.lng)+","+String(boundsIn._southWest.lat)+")), 4326) ORDER BY cov1 DESC")
+			if (drawLevel == "1"){
+				var cartoQuery = "SELECT * FROM final_coastal_polygons WHERE the_geom && ST_SetSRID(ST_MakeBox2D(ST_Point(" +
+					String(boundsIn._northEast.lng)+","+String(boundsIn._northEast.lat)+"), ST_Point(" +
+					String(boundsIn._southWest.lng)+","+String(boundsIn._southWest.lat)+")), 4326) ORDER BY cov1 DESC"
+			}else{
+				var classesSelected = "";
+				var countClasses = 0;
+				var operatorInclusion = ""
+				jQuery.each(level1Membership[selectedLevel2], function(i, val) {
+					if (countClasses == 1){
+						operatorInclusion = " OR "
+					}
+					classesSelected = classesSelected + operatorInclusion + "(cov1 = '" + val.code + "')" 
+					countClasses++;
+				})
+				var cartoQuery = "SELECT * FROM final_coastal_polygons WHERE (" + classesSelected + 
+					") AND the_geom && ST_SetSRID(ST_MakeBox2D(ST_Point(" +
+					String(boundsIn._northEast.lng)+","+String(boundsIn._northEast.lat)+"), ST_Point(" +
+					String(boundsIn._southWest.lng)+","+String(boundsIn._southWest.lat)+")), 4326) ORDER BY cov1 DESC"
+			}
+			//console.log(cartoQuery)
+			sql.execute(cartoQuery)
 				.done(function(data) {
 					$("#polygonLegendHolder").empty();
 					var cov1Classes = {}
-					var grouped = _.groupBy(data.rows, function(num){ 
-						return classConfigs[num.cov1].level1var; 
+					var grouped = _.groupBy(data.rows, function(num){
+						return classConfigs[num.cov1]["level" + drawLevel + "var"]; 
 					});
 					jQuery.each(grouped, function(i, val) {
 						var collectiveVal = 0;
 						jQuery.each(val, function(j, val2) {
 							collectiveVal += val2.shape_area;
 						})
-						var hexColor = "#ffffff"
-						if (colorsHex[val[0].cov1]){
-							hexColor = colorsHex[val[0].cov1].level1
+						var hexColor = "#f545e9" // default to hot pink
+						if (classConfigs[val[0].cov1]){
+							hexColor = classConfigs[val[0].cov1]["color" + drawLevel]
 						}
 						cov1Classes[i] = {"cov1": val[0].cov1, "groupSize": Math.round(collectiveVal) , "hex": hexColor }
 					})
-					console.log(cov1Classes)
 					var max = _.max(cov1Classes,  function(num){ return num.groupSize; })
 					var cov1Classes = _.indexBy(cov1Classes, 'groupSize') // playing with http://underscorejs.org/
 					var countKey = 0;
@@ -461,44 +481,10 @@ function drawThisView(boundsIn,zoomIn){
 						featurePct = (value.groupSize / max.groupSize) * 100
 						$("#polygonLegendHolder").append('<div class="histogram-div"; style="height:' + String(featurePct) + '%; width:'+ widthInPercent +'%; left:' 
 						+ (countKey * widthInPercent) + '%; background-color:' + value.hex + ';" >'
-						+ '<div style="background-color:' + value.hex + ';" class="level-1-label-text rotate-text shade-level-1-label-text transition-class">' + classConfigs[value.cov1].level1 + '</div></div>')
+						+ '<div style="background-color:' + value.hex + ';" class="level-1-label-text rotate-text shade-level-1-label-text transition-class">' + classConfigs[value.cov1]["level" + drawLevel] + '</div></div>')
 						countKey++; 
 					});
-					// From original, histogram and pie chart demo
-					/*
-					var f = data.rows.length;
-					if (f > 0){
-						var histogramFields = {};
-						var pieFields = {};
-						jQuery.each(data.fields, function(i, val) {
-							if (isInArray(histogramFieldNames,i)){
-								window[i] = []
-								histogramFields[i] = val
-							}
-							if (isInArray(pieFieldNames,i)){
-								window[i] = []
-								pieFields[i] = val
-							}
-						})
-						for (var x = 0; x < f; x++) {
-							jQuery.each(histogramFields, function(i, val) {
-								window[i].push([data.rows[x][i], data.rows[x]["cov1"]])
-							});
-							jQuery.each(pieFields, function(i, val) {
-								window[i].push(data.rows[x][i])
-							});
-						}
-						jQuery.each(histogramFields, function(i, val) {
-							window[i].sort(function(a, b){return b[0]-a[0]});
-							drawHistogram(window[i], i) 
-						})
-						jQuery.each(pieFields, function(i, val) {
-							window[i].sort();
-							drawPie(window[i], i) 
-						})
-					}
-					*/
-					createWordCloud("#pointLegendHolder", cov1Classes);
+					createWordCloud("#pointLegendHolder", cov1Classes, drawLevel);
 				})
 				.error(function(errors) {
 					console.log("errors:" + errors);
@@ -607,14 +593,13 @@ var Filters = cdb.core.View.extend({
 /////////////////////////////////////////
 // create a word cloud just for fun...
 var word_count = {};
-function createWordCloud(hashedDivID, tempC){
+function createWordCloud(hashedDivID, tempC, _drawLevel){
 	//console.log(tempC)
 	$(hashedDivID).empty();
 	for (var key in tempC) {
 		var value = tempC[key];
-		word_count[tempC[key].level1] = value.level1frq;
+		word_count[classConfigs[value.cov1]["level" + _drawLevel]] = value.groupSize;
 	}
-
 	var svg_location = hashedDivID
 	var width = ($(document).width()) * 0.9
 	var height = ($(document).height()) * 0.18
