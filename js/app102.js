@@ -8,6 +8,7 @@ var sql = new cartodb.SQL({ user: 'sco-admin' });
 var currentBasemap;
 var bordner;
 var colorsHex = {}; 
+var classConfigs = {}; 
 
 // Overlay definitions:
 var overlay1 = L.tileLayer('http://{s}.tile.stamen.com/toner-labels/{z}/{x}/{y}.png', {
@@ -71,10 +72,11 @@ function getPolyStyle(level){
 };
 
 // Create a hex dictionary for with cov1 as key (for easy access) 
-function createHexStyles(){
+function createStyles(){
 	classes = tempClasses2.classes;
 	for(var i = 0; i < classes.length; i++) { 
 		colorsHex[classes[i].code] = {"level1": classes[i].color1 , "level2": classes[i].color1}
+		classConfigs[classes[i].code]  = classes[i]
 	}
 };
 
@@ -87,7 +89,7 @@ window.onload = function() {
 		center: [43.7844,-88.7879],
 		zoom: 7
 	});
-	createHexStyles()
+	createStyles()
 	cartoCSSRules = getPolyStyle("level1");
 	//console.log(cartoCSSRules)
 	// Promise for the first layer
@@ -432,26 +434,29 @@ function drawThisView(boundsIn,zoomIn){
 				.done(function(data) {
 					$("#polygonLegendHolder").empty();
 					var cov1Classes = {}
-					var grouped = _.groupBy(data.rows, function(num){ return num.cov1; });
+					var grouped = _.groupBy(data.rows, function(num){ 
+						return classConfigs[num.cov1].level1; 
+					});
+					console.log(grouped)
 					jQuery.each(grouped, function(i, val) {
 						var collectiveVal = 0;
 						jQuery.each(val, function(j, val2) {
 							collectiveVal += val2.shape_area;
 						})
 						var hexColor = "#ffffff"
-						if (colorsHex[i]){ hexColor = colorsHex[i].level1}
-						cov1Classes[i] = {"level1": i , "level1frq": Math.round(collectiveVal) , "hex1": hexColor }
+						if (colorsHex[i]){ hexColor1 = colorsHex[i].level1, hexColor2 = colorsHex[i].level2}
+						cov1Classes[i] = {"cov1": i , "cov1frq": Math.round(collectiveVal) , "hex1": hexColor1 }
 					})
-					var max = _.max(cov1Classes,  function(num){ return num.level1frq; })
-					var cov1Classes = _.indexBy(cov1Classes, 'level1frq') // playing with http://underscorejs.org/
+					var max = _.max(cov1Classes,  function(num){ return num.cov1frq; })
+					var cov1Classes = _.indexBy(cov1Classes, 'cov1frq') // playing with http://underscorejs.org/
 					var countKey = 0;
 					var widthInPercent = (100 / Object.keys(cov1Classes).length) 
 					_.each(cov1Classes, function(num){
 						var value = num;
-						featurePct = (value.level1frq / max.level1frq) * 100
+						featurePct = (value.cov1frq / max.cov1frq) * 100
 						$("#polygonLegendHolder").append('<div class="histogram-div"; style="height:' + String(featurePct) + '%; width:'+ widthInPercent +'%; left:' 
 						+ (countKey * widthInPercent) + '%; background-color:' + value.hex1 + ';" >'
-						+ '<div style="background-color:' + value.hex1 + ';" class="level-1-label-text rotate-text shade-level-1-label-text transition-class">' + value.level1 + '</div></div>')
+						+ '<div style="background-color:' + value.hex1 + ';" class="level-1-label-text rotate-text shade-level-1-label-text transition-class">' + classConfigs[value.cov1].level2 + '</div></div>')
 						countKey++; 
 					});
 					// From original, histogram and pie chart demo
