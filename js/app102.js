@@ -61,14 +61,16 @@ function getPolyStyle(level, level1Selected){
 
 	if (level =="level1"){
 		for(var i = 0; i < classes.length; i++) { 
-			//console.log(classes[i])
 			var thisStyle = "[cov1='"+classes[i].code+"']{polygon-fill: "+classes[i].color1+";}";
 			style += thisStyle;
 		}
 	}else{
+		style = "#layer{polygon-fill: #DDDDDD;polygon-opacity: 0;";
 		for(var i = 0; i < classes.length; i++) { 
-			var thisStyle = "[cov1='"+classes[i].code+"']{polygon-fill: "+classes[i].color2+";}";
-			style += thisStyle;
+			if (level1Selected == classes[i].level1var) {
+				var thisStyle = "[cov1='"+classes[i].code+"']{polygon-fill: "+classes[i].color2+";polygon-opacity: 0.65;}";
+				style += thisStyle;
+			}
 		}
 	}
 	style += "}";
@@ -124,9 +126,9 @@ window.onload = function() {
 		setupInteraction(layer, levelEngaged)
 	});
 	setUpMap();
-	//testArraySorting();
 };
 
+// set up interaction upon map load or when level1 level2 is toggled 
 function setupInteraction(layer, _levelEngaged){
 		layer.setInteraction(true);
 		window["sublayer" + _levelEngaged] = layer.getSubLayer(0);
@@ -141,7 +143,7 @@ function setupInteraction(layer, _levelEngaged){
 			 infowindowTemplate: $('#infowindow_template').html()
 		});
 
-		/* To display a tooltip upon mouseover of map */
+		/* To display a tooltip upon mouseover of map
 		var tooltip = layer.leafletMap.viz.addOverlay({
 			type: 'tooltip',
 			layer: layer,
@@ -151,7 +153,7 @@ function setupInteraction(layer, _levelEngaged){
 			fields: [{ cov1: 'cov1' }]
 		});
 		$('body').append(tooltip.render().el);
-		
+		 */
 
 		/* To display an infobox within a leaflet control */
 		var infoBox = layer.leafletMap.viz.addOverlay({
@@ -470,6 +472,7 @@ function getLegendSubclasses(levelClass){
 	return level2List;
 };
 
+// Function called upon change in map extent or upon click of legend item
 function drawThisView(boundsIn, zoomIn, _levelEngaged, _level1Selected){
 		// level1 = (Deciduous)
 		// level2 = (Scrub Oak)
@@ -556,7 +559,6 @@ function switchLevel(_levelEngaged, _level1Selected){
 		type: 'cartodb',
 		sublayers: [{type: "cartodb",
 			sql: 'SELECT * FROM final_coastal_polygons',
-			// cartocss: '#layer{polygon-fill: #DDDDDD;polygon-opacity: 0.65;[cov1="A1"]{polygon-fill: #A6CEE3;}[cov1="A3"]{polygon-fill: #1F78B4;}[cov1="A4"]{polygon-fill: #B2DF8A;}[cov1="B1"]{polygon-fill: #33A02C;}[cov1="B3"]{polygon-fill: #FB9A99;}[cov1="C"]{polygon-fill: #E31A1C;}[cov1="C1"]{polygon-fill: #FDBF6F;}[cov1="D3"]{polygon-fill: #FF7F00;}[cov1="P"]{polygon-fill: #CAB2D6;}[cov1="SP"]{polygon-fill: #6A3D9A;}}',
 			cartocss: cartoCSSRules,
 			interactivity: ['cov1','cov2']
 		}]
