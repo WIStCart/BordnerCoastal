@@ -8,7 +8,9 @@ var sql = new cartodb.SQL({ user: 'sco-admin' });
 var currentBasemap;
 var bordner;
 var classConfigs = {}; 
-var level1Membership = {}; 
+var level1Membership = {};
+var levelEngaged = "1";
+var level1Selected = "agriculture"
 
 // Overlay definitions:
 var overlay1 = L.tileLayer('http://{s}.tile.stamen.com/toner-labels/{z}/{x}/{y}.png', {
@@ -203,7 +205,7 @@ function setUpMap(){
 	
 	// For dynamic legend queries (in progress)
 	map.on('moveend', function() { 
-		drawThisView(map.getBounds(), map.getZoom(), "1", "agriculture");
+		drawThisView(map.getBounds(), map.getZoom(), levelEngaged, level1Selected);
 	});
 	
 	// Done, tell the console!
@@ -458,12 +460,12 @@ function getLegendSubclasses(levelClass){
 	return level2List;
 };
 
-function drawThisView(boundsIn,zoomIn, drawLevel, selectedLevel2){
-		// level1 = less granular (Deciduous)
-		// level2 = more granular (Scrub Oak)
-		//var drawLevel = "1"
+function drawThisView(boundsIn, zoomIn, _levelEngaged, _level1Selected){
+		// level1 = (Deciduous)
+		// level2 = (Scrub Oak)
+		//var _levelEngaged = "1"
 		if (zoomIn >= 13){
-			if (drawLevel == "1"){
+			if (_levelEngaged == "1"){
 				var cartoQuery = "SELECT * FROM final_coastal_polygons WHERE the_geom && ST_SetSRID(ST_MakeBox2D(ST_Point(" +
 					String(boundsIn._northEast.lng)+","+String(boundsIn._northEast.lat)+"), ST_Point(" +
 					String(boundsIn._southWest.lng)+","+String(boundsIn._southWest.lat)+")), 4326) ORDER BY cov1 DESC"
@@ -471,7 +473,7 @@ function drawThisView(boundsIn,zoomIn, drawLevel, selectedLevel2){
 				var classesSelected = "";
 				var countClasses = 0;
 				var operatorInclusion = ""
-				jQuery.each(level1Membership[selectedLevel2], function(i, val) {
+				jQuery.each(level1Membership[_level1Selected], function(i, val) {
 					if (countClasses == 1){
 						operatorInclusion = " OR "
 					}
@@ -488,8 +490,8 @@ function drawThisView(boundsIn,zoomIn, drawLevel, selectedLevel2){
 				.done(function(data) {
 					$("#polygonLegendHolder").empty();
 					var cov1Classes = {}
-					var grouped = _.groupBy(data.rows, function(num){
-						return classConfigs[num.cov1]["level" + drawLevel + "var"]; 
+					var grouped = _.groupBy(data.rows, function(num){ // http://underscorejs.org/
+						return classConfigs[num.cov1]["level" + _levelEngaged + "var"]; 
 					});
 					jQuery.each(grouped, function(i, val) {
 						var collectiveVal = 0;
@@ -498,28 +500,37 @@ function drawThisView(boundsIn,zoomIn, drawLevel, selectedLevel2){
 						})
 						var hexColor = "#f545e9" // default to hot pink
 						if (classConfigs[val[0].cov1]){
-							hexColor = classConfigs[val[0].cov1]["color" + drawLevel]
+							hexColor = classConfigs[val[0].cov1]["color" + _levelEngaged]
 						}
 						cov1Classes[i] = {"cov1": val[0].cov1, "groupSize": Math.round(collectiveVal) , "hex": hexColor }
 					})
 					var max = _.max(cov1Classes,  function(num){ return num.groupSize; })
-					var cov1Classes = _.indexBy(cov1Classes, 'groupSize') // playing with http://underscorejs.org/
+					var cov1Classes = _.indexBy(cov1Classes, 'groupSize')
 					var countKey = 0;
 					var widthInPercent = (100 / Object.keys(cov1Classes).length) 
-					_.each(cov1Classes, function(num){
-						var value = num;
+					_.each(cov1Classes, function(value){
 						featurePct = (value.groupSize / max.groupSize) * 100
 						$("#polygonLegendHolder").append('<div class="histogram-div"; style="height:' + String(featurePct) + '%; width:'+ widthInPercent +'%; left:' 
-						+ (countKey * widthInPercent) + '%; background-color:' + value.hex + ';" >'
-						+ '<div style="background-color:' + value.hex + ';" class="level-1-label-text rotate-text shade-level-1-label-text transition-class">' + classConfigs[value.cov1]["level" + drawLevel] + '</div></div>')
+						+ (countKey * widthInPercent) + '%; background-color:' + value.hex + ';" id="div_'+ value.cov1 +'" onClick="dispatchLegendClick(this.id)">'
+						+ '<div style="background-color:' + value.hex + ';" class="level-1-label-text rotate-text shade-level-1-label-text transition-class">' + classConfigs[value.cov1]["level" + _levelEngaged] + '</div></div>')
 						countKey++; 
 					});
-					createWordCloud("#pointLegendHolder", cov1Classes, drawLevel);
+					createWordCloud("#pointLegendHolder", cov1Classes, _levelEngaged);
 				})
 				.error(function(errors) {
 					console.log("errors:" + errors);
 				})
 		}
+}
+
+function dispatchLegendClick(classCode){
+	level1Selected = classConfigs[classCode.replace("div_", "")].level1var;
+	if (levelEngaged == "1"){
+		levelEngaged = "2";
+	}else{
+		levelEngaged = "1";
+	}
+	drawThisView(map.getBounds(), map.getZoom(), levelEngaged, level1Selected);
 }
 
 //////////////////// Stock code for enabling map queries against CARTO server
