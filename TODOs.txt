@@ -10,9 +10,20 @@ TODO:
 8) Remove the gray transparent ribbon behind the legend labels, it distorts the legend colors.
 9) Make the legend selector be a leaflet control button that pops out upon click. This will free the entire bottom up for the legend. **I think we might need to keep the point, line, poly toggle within the legend though.   
 10) Include "density1" as another layer that is mutually exclusive of the "cov1" layer. I'm not sure that this is expected/is low priority at this point.
-11) Implement an accordion effect for legend transition from level1 to level2 and vice versa. Do not ever remove the level1 bars, instead, squish them down to make room for the level2 classes of the selected level1.  
+11) Implement an accordion effect for legend transition from level1 to level2 and vice versa. Do not ever remove the level1 bars, instead, squish them down to make room for the level2 classes of the selected level1.
+12) Turn the zoom control on again (especially for laptops) 
 
 BUGS:
 1) CS: Troubleshoot issues with level1/level2 toggle via legend (the legend occasionally gets stuck on one or the other). 
 2) Any latency should be considered - refactoring may be required - we also will need to think about what to do when user is viewing below level 13.
-3) ...
+	- A general legend at this point? No scaling of bars?
+3) Point and line data?
+	- Filter to all, none, or one.
+	
+DOWN THE ROAD:
+1) Locate me functionality - SCO, Jay.
+2) Stateful URL 
+3) Points/Lines
+4) WHAI imagery
+5) Info/about pages, etc.
+6) Dictionary/key page for defining the classes better (seems lower priority right now)
