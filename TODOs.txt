@@ -3,10 +3,10 @@ TODO:
 	- We may want to do this through CARTO instead of having to tile up a whole custom layer? 
 2) Search: for now we can target a conventional geocoder search (addresses, places). This was voiced to be a low priority for now.
 3) C$: In progress. Include a transparency slider that allows the user to control the opacity of the bordner layer (it was not determined where this should go or what it should look like, so feel free to brainstorm)
-4) Include descriptive attribute names for all attributes within the popup window (this will require a scrollbar). We want to use user friendly field names (i.e. "Density of Coverage 1" instead of "den1")
+4) SF: *DONE* Include descriptive attribute names for all attributes within the popup window (this will require a scrollbar). We want to use user friendly field names (i.e. "Density of Coverage 1" instead of "den1")
 5) CS: *DONE* Remove tooltips
-6) C$: Could be an issue with data model. Make the upper right infobox be dockable (undeterined if this should only display "cov1" or more attributes). We could consider removing it also. 
-7) C$: Need to get it to work w/o expand. Create a neatline at the bottom of the legend (to make it look like the legend doesnt sprout from your taskbar)
+6) C$: Bug with layer click. Make the upper right infobox be dockable (undeterined if this should only display "cov1" or more attributes). We could consider removing it also. 
+7) SF: *DONE* Create a neatline at the bottom of the legend (to make it look like the legend doesnt sprout from your taskbar)
 8) C$:*DONE* Remove the gray transparent ribbon behind the legend labels, it distorts the legend colors.
 9) Make the legend selector be a leaflet control button that pops out upon click. This will free the entire bottom up for the legend. **I think we might need to keep the point, line, poly toggle within the legend though.   
 10) Include "density1" as another layer that is mutually exclusive of the "cov1" layer. I'm not sure that this is expected/is low priority at this point.
