@@ -9,6 +9,7 @@
     <title>Bordner User Interface - Template</title>
     <!-- css \/ -->
 	<link href="css/bootstrap.min.css" rel="stylesheet"> <!-- Currently using Bootstrap 3.3.7 -->
+	<link href="css/bootstrap-slider.min.css" rel="stylesheet"> <!--For transparency slider -->
     <link href="css/app102.css" rel="stylesheet">
 	<link rel="stylesheet" href="http://libs.cartocdn.com/cartodb.js/v3/3.15/themes/css/cartodb.css" />
 	<!-- css /\ -->
@@ -53,8 +54,11 @@
 					</div>
 					<div class="radio"> 
 						<label><input type="radio" name="basemapType" id="basemapC">Basemap C</label>
+						<input type="text" value="50" id="rangeSlider" data-slider-min="1" data-slider-max="100" data-slider-step="1" data-slider-value="65">
 					</div>
+
 				</div>
+
 				<div class="col-sm-10 legend-view transition-class" id="legend">
 					<div class="poly-legend-holder" id="polygonLegendHolder" >POLYGONS</div>
 					<div class="point-legend-holder" id="pointLegendHolder" >POINTS</div>
@@ -87,6 +91,7 @@
 	<script src="http://libs.cartocdn.com/cartodb.js/v3/3.15/cartodb.js"></script>
 	<script src="//d3js.org/d3.v3.min.js"></script>
 	<script src="js/underscore-min.js"></script>
+	<script src="js/bootstrap-slider.min.js"></script>
 	<script src="js/bootstrap.min.js"></script> <!-- Currently using Bootstrap 3.3.7 -->
 	<script src="js/app102.js"></script>
 	<script src="js/cloud.js"></script>

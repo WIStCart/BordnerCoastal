@@ -57,7 +57,7 @@ function getPolyStyle(level, level1Selected){
 	classes = tempClasses2.classes;
 	
 	//Beginning part of the cartocss style
-	style = "#layer{polygon-fill: #DDDDDD;polygon-opacity: 0.65;";
+	style = "#layer{polygon-fill: #DDDDDD;polygon-opacity: 1;";
 
 	if (level =="level1"){
 		for(var i = 0; i < classes.length; i++) { 
@@ -115,15 +115,21 @@ window.onload = function() {
       type: 'cartodb',
       sublayers: [{type: "cartodb",
 			sql: 'SELECT * FROM final_coastal_polygons',
-			// cartocss: '#layer{polygon-fill: #DDDDDD;polygon-opacity: 0.65;[cov1="A1"]{polygon-fill: #A6CEE3;}[cov1="A3"]{polygon-fill: #1F78B4;}[cov1="A4"]{polygon-fill: #B2DF8A;}[cov1="B1"]{polygon-fill: #33A02C;}[cov1="B3"]{polygon-fill: #FB9A99;}[cov1="C"]{polygon-fill: #E31A1C;}[cov1="C1"]{polygon-fill: #FDBF6F;}[cov1="D3"]{polygon-fill: #FF7F00;}[cov1="P"]{polygon-fill: #CAB2D6;}[cov1="SP"]{polygon-fill: #6A3D9A;}}',
 			cartocss: cartoCSSRules,
 			interactivity: ['cov1','cov2'],
-			layerIndex:1 
+			layerIndex:1
 	}]
     })
 	.addTo(map) // add cartodb layer and basemap to map object
 	.done(function(layer) {
-		setupInteraction(layer, levelEngaged)
+		layer.setOpacity(.65)
+		setupInteraction(layer, levelEngaged);
+		$('#rangeSlider').slider().on('slide', function (ev) {
+			sliderVal = this.value;
+			layer.setOpacity(sliderVal/100);
+		});
+
+		
 	});
 	setUpMap();
 };
