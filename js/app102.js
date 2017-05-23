@@ -101,7 +101,7 @@ function makeVariableFromString(stringIn){
 window.onload = function() {
 	//Create the leaflet map
 	map = L.map('map', {
-		zoomControl: false,
+		zoomControl: true,
 		cartodb_logo: false,
 		center: [43.7844,-88.7879],
 		zoom: 7
@@ -334,6 +334,7 @@ function transformToDesktop(){
 
 // To configure tablet view (is called upon pageload)
 function transformToTablet(){
+	map.removeControl(map.zoomControl); //Remove the zoom
 	$( "#toc" ).appendTo( $( "#tocModalDialogue" ) );
 	$( ".feature-type-radio-group" ).appendTo( $( "#legend" ) );
 	$( ".level-1-label-text").removeClass( "shade-level-1-label-text" );
