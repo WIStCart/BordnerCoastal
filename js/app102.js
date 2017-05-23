@@ -75,7 +75,7 @@ function getPolyStyle(level, level1Selected){
 		style = "#layer{polygon-fill: #DDDDDD;polygon-opacity: 0;";
 		for(var i = 0; i < classes.length; i++) {
 			if (level1Selected == classes[i].level1var) {
-				var thisStyle = "[cov1='"+classes[i].code+"']{polygon-fill: "+classes[i].color2+";polygon-opacity:"+layerOpacity.polygons+";}";
+				var thisStyle = "[cov1='"+classes[i].code+"']{polygon-fill: "+classes[i].color2+";polygon-opacity:1;}";
 				style += thisStyle;
 			}
 		}
