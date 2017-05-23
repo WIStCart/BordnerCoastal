@@ -13,6 +13,7 @@ var levelEngaged = "1";
 var level1Selected = "agriculture"
 var sublayer1;
 var sublayer2;
+var layerOpacity = {polygons:0.65};
 
 var infowindowVars = ['cov1','cov2', 'cov3', 'cov4', 'cov5',
 					'den1', 'den2', 'den3', 'den4', 'den5',
@@ -63,8 +64,8 @@ function getPolyStyle(level, level1Selected){
 	classes = tempClasses2.classes;
 
 	//Beginning part of the cartocss style
-	style = "#layer{polygon-fill: #DDDDDD;polygon-opacity: 1;";
-
+	style = "#layer{polygon-fill: #DDDDDD;polygon-opacity:1;";
+	console.log()
 	if (level =="level1"){
 		for(var i = 0; i < classes.length; i++) {
 			var thisStyle = "[cov1='"+classes[i].code+"']{polygon-fill: "+classes[i].color1+";}";
@@ -74,7 +75,7 @@ function getPolyStyle(level, level1Selected){
 		style = "#layer{polygon-fill: #DDDDDD;polygon-opacity: 0;";
 		for(var i = 0; i < classes.length; i++) {
 			if (level1Selected == classes[i].level1var) {
-				var thisStyle = "[cov1='"+classes[i].code+"']{polygon-fill: "+classes[i].color2+";polygon-opacity: 0.65;}";
+				var thisStyle = "[cov1='"+classes[i].code+"']{polygon-fill: "+classes[i].color2+";polygon-opacity:"+layerOpacity.polygons+";}";
 				style += thisStyle;
 			}
 		}
@@ -107,7 +108,7 @@ function makeVariableFromString(stringIn){
 window.onload = function() {
 	//Create the leaflet map
 	map = L.map('map', {
-		zoomControl: false,
+		zoomControl: true,
 		cartodb_logo: false,
 		center: [43.7844,-88.7879],
 		zoom: 7
@@ -128,14 +129,13 @@ window.onload = function() {
     })
 	.addTo(map) // add cartodb layer and basemap to map object
 	.done(function(layer) {
-		layer.setOpacity(.65)
+		layerOpacity.polygons = 0.65;
+		layer.setOpacity(layerOpacity.polygons);
 		setupInteraction(layer, levelEngaged);
 		$('#rangeSlider').slider().on('slide', function (ev) {
-			sliderVal = this.value;
-			layer.setOpacity(sliderVal/100);
-		});
-
-
+			layerOpacity.polygons = this.value / 100;
+			layer.setOpacity(layerOpacity.polygons);
+		});		
 	});
 	setUpMap();
 };
@@ -449,6 +449,7 @@ function transformToDesktop(){
 
 // To configure tablet view (is called upon pageload)
 function transformToTablet(){
+	map.removeControl(map.zoomControl); //Remove the zoom
 	$( "#toc" ).appendTo( $( "#tocModalDialogue" ) );
 	$( ".feature-type-radio-group" ).appendTo( $( "#legend" ) );
 	$( ".level-1-label-text").removeClass( "shade-level-1-label-text" );
@@ -560,21 +561,6 @@ function demoLegend(){
 		$("#lineLegendHolder").append('<div class="histogram-div"; id=legend-'+level1Classes[key].level1+' style="height:' + String(featurePct) + '%; width:10%; left:' + (countKey * 10) + '%; background-color:' + value.hex1 + ';" >'
 			+ '<div style="background-color:' + value.hex1 + ';" class="level-1-label-text rotate-text shade-level-1-label-text transition-class">' + level1Classes[key].level1 + '</div></div>')
 		countKey++;
-		//Add click event
-		$("#legend-"+level1Classes[key].level1).click(function(){
-			var subclasses = getLegendSubclasses(level1Classes[key].level1);
-
-			var list = '<ul>';
-			for (var i = 0; i < subclasses.length; i++) {
-				list += '<li>'+subclasses[i]+'</li>';
-
-			}
-			list += '</ul>';
-			$("#legend-"+level1Classes[key].level1).append(list);
-
-			//Restyle map
-			getPolyStyle(level1Classes[key].level1);
-		})
 	}
 }
 
@@ -686,7 +672,12 @@ function switchLevel(_levelEngaged, _level1Selected){
 	})
 	.addTo(map)
 	.done(function(layer) {
-		setupInteraction(layer, _levelEngaged)
+		layer.setOpacity(layerOpacity.polygons);
+		setupInteraction(layer, levelEngaged);
+		$('#rangeSlider').slider().on('slide', function (ev) {
+			layerOpacity.polygons = this.value / 100;
+			layer.setOpacity(layerOpacity.polygons);
+		});
 	});
 }
 
