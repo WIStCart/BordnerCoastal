@@ -307,6 +307,17 @@ input:checked + .slider:before {
     text-align: center;
 }
 
+/*Aligns zoom controls with other custom controls*/
+.leaflet-control-zoom{
+	margin-left: 20px !important;
+	
+}
+
+/*Matches zoom control color to other control colors*/
+.leaflet-control-zoom-in, .leaflet-control-zoom-out{
+	color: #999 !important;
+}
+
 .leaflet-control-attribution, .cartodb-legend-stack {
 	visibility:hidden;
 }
