@@ -142,13 +142,15 @@ window.onload = function() {
 
 
 function lookupClassFromCode(code){
+	//get the object metadata corresponding to the cover code
 	theClass = _.where(tempClasses2.classes, {code: code})[0]
 	return theClass
 }
 
 
-//utility functions that handle errors for formating the infowindow content
+//utility function that handle errors for formating the infowindow content
 function getNameFromCode(code){
+	//get the name from a code
 	try{
 		covClass = lookupClassFromCode(code)
 		return covClass.name
@@ -159,6 +161,15 @@ function getNameFromCode(code){
 	}
 }
 
+function getLevel1FromCode(code){
+	//get the level one feature type from the cover code
+	try{
+		covClass = lookupClassFromCode(code);
+		return covClass.level1
+	}catch(err){
+		return undefined
+	}
+}
 
 function formatCoverageForInfowindow(content){
 	//prepare the data for templating in the infowindow
@@ -209,6 +220,7 @@ function formatCoverageForInfowindow(content){
 	return infowindowContent
 }
 
+
 // set up interaction upon map load or when level1 level2 is toggled
 function setupInteraction(layer, _levelEngaged){
 		layer.setInteraction(true);
@@ -247,17 +259,27 @@ function setupInteraction(layer, _levelEngaged){
 		});
 		$('body').append(tooltip.render().el);
 		 */
-		console.log(layer)
 
+		//  console.log(layer.leafletmap)
+		//
 		/* To display an infobox within a leaflet control */
-		var infoBox = layer.leafletMap.viz.addOverlay({
+		var infoBox = layer.leafletMap.viz.addOverlay( {
 		  type: 'infobox',
 		  layer: layer,
-		  template: '<div class="cartodb-tooltip-content-wrapper"><p>Cover Type 1 = {{2}}<span></span></p></div>',
-		  width: 1000,
+			template: '<div class="cartodb-tooltip-content-wrapper"><p><span id="level1-set"></span></p></div>',
+		  // width: 75,
 		  position: 'top|right'
 		});
+
+		//render the box (no template features)
 		$('body').append(infoBox.render().el);
+
+		//manually change the popup text on mouseover
+		//only way to actually manipulate the data in the mouse events
+		layer.bind('featureOver', function(e, latln, pxPos, data, layer){
+			level1 = getLevel1FromCode(data.cov1)
+			$("#level1-set").html(level1)
+		})
 }
 
 // Sets everything up after pageload and map creation are complete
