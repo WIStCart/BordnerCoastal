@@ -250,7 +250,7 @@ input:checked + .slider:before {
 	//white-space: nowrap;
 	color: white;
 	text-shadow:
-		-1px -1px 0 #000,  
+		-1px -1px 0 #000,
 		1px -1px 0 #000,
 		-1px 1px 0 #000,
 		1px 1px 0 #000;
@@ -289,7 +289,7 @@ input:checked + .slider:before {
 	height: 0%;
 }
 
-/* leaflet customized css */ 
+/* leaflet customized css */
 .radio, .checkbox{
 	color: #ffffff;
 	font-size: 8pt;
@@ -298,7 +298,7 @@ input:checked + .slider:before {
 	margin-top: 5px;
 }
 
-/* leaflet customized css */ 
+/* leaflet customized css */
 .leaflet-control-custom{
 	width: 28px;
 	height: 28px;
@@ -347,7 +347,7 @@ div.cartodb-tooltip-content-wrapper p{
 }
 
 /* set styles to the custom infowindow */
-.infowindow-custom{ 
+.infowindow-custom{
 	position: relative;
 	width: 100%;
 	background-color: #FFF;
@@ -398,4 +398,13 @@ div.cartodb-tooltip-content-wrapper p{
 	line-height: 0;
 	opacity: 1;
 	z-index: 3;
+}
+
+
+th{
+	padding-left: 25px!important;
+}
+td{
+	padding-left: 25px!important;
+	text-align: left;
 }

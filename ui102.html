@@ -13,7 +13,7 @@
     <link href="css/app102.css" rel="stylesheet">
 	<link rel="stylesheet" href="http://libs.cartocdn.com/cartodb.js/v3/3.15/themes/css/cartodb.css" />
 	<!-- css /\ -->
-	
+
   </head>
   <body>
 	<div class="container-fluid">
@@ -52,7 +52,7 @@
 					<div class="radio">
 						<label><input type="radio" name="basemapType" id="basemapB">Basemap B</label>
 					</div>
-					<div class="radio"> 
+					<div class="radio">
 						<label><input type="radio" name="basemapType" id="basemapC">Basemap C</label>
 						<input type="text" value="50" id="rangeSlider" data-slider-min="1" data-slider-max="100" data-slider-step="1" data-slider-value="65">
 					</div>
@@ -72,13 +72,33 @@
 		<div class="modal-dialog" id="tocModalDialogue">
 		</div>
 	</div>
+  <!-- Templating using the underscore templating functions included in Carto -->
+  <!-- //make a table with the properties -->
+  <!-- //all props are container in the object fed here via the _.template function-->
 	<script type="infowindow/html" id="infowindow_template">
 		<div class="infowindow-custom">
 			<a href="#close" class="cartodb-popup-close-button close">x</a>
 			<div class="cartodb-popup-content">
 				<div class="content" style="padding:20px">
-				  <p>cov1: {{content.data.cov1}}</p>
-				  <p>cov2: {{content.data.cov2}}</p>
+        <table>
+        <thead><tr><th>Name</th><th>Density</th><th>Min. Diameter (in)</th><th>Max Diameter (in)</th><th>%</th></tr></thead>
+
+        <% if (typeof(coverage1.name) !== "undefined") { %>
+            <tr><td><%= coverage1.name %></td><td><%= coverage1.density %></td><td><%= coverage1.minDiameter %></td><td><%= coverage1.maxDiameter %></td><td><%= coverage1.percentCover %></td></tr>
+        <% } %>
+        <% if (typeof(coverage3.name) !== "undefined") { %>
+            <tr><td><%= coverage1.name %></td><td><%= coverage2.density %></td><td><%= coverage2.minDiameter %></td><td><%= coverage2.maxDiameter %></td><td><%= coverage2.percentCover %></td></tr>
+        <% } %>
+        <% if (typeof(coverage3.name) !== "undefined") { %>
+            <tr><td><%= coverage3.name %></td><td><%= coverage3.density %></td><td><%= coverage3.minDiameter %></td><td><%= coverage3.maxDiameter %></td><td><%= coverage3.percentCover %></td></tr>
+        <% } %>
+        <% if (typeof(coverage4.name) !== "undefined") { %>
+            <tr><td><%= coverage4.name %></td><td><%= coverage4.density %></td><td><%= coverage4.minDiameter %></td><td><%= coverage4.maxDiameter %></td><td><%= coverage4.percentCover %></td></tr>
+        <% } %>
+        <% if (typeof(coverage5.name) !== "undefined") { %>
+            <tr><td><%= coverage5.name %></td><td><%= coverage5.density %></td><td><%= coverage5.minDiameter %></td><td><%= coverage5.maxDiameter %></td><td><%= coverage5.percentCover %></td></tr>
+        <% } %>
+
 				<div>
 			<div>
 		<div>

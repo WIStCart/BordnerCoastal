@@ -7,12 +7,18 @@ var map;
 var sql = new cartodb.SQL({ user: 'sco-admin' });
 var currentBasemap;
 var bordner;
-var classConfigs = {}; 
+var classConfigs = {};
 var level1Membership = {};
 var levelEngaged = "1";
 var level1Selected = "agriculture"
 var sublayer1;
 var sublayer2;
+
+var infowindowVars = ['cov1','cov2', 'cov3', 'cov4', 'cov5',
+					'den1', 'den2', 'den3', 'den4', 'den5',
+					'pctcov1', 'pctcov2', 'pctcov3', 'pctcov4', 'pctcov5',
+					'mindiam1','mindiam2','mindiam3','mindiam4','mindiam5',
+					 'maxdiam1','maxdiam2','maxdiam3','maxdiam4','maxdiam5' ]
 
 // Overlay definitions:
 var overlay1 = L.tileLayer('http://{s}.tile.stamen.com/toner-labels/{z}/{x}/{y}.png', {
@@ -55,18 +61,18 @@ var basemapC = L.tileLayer('https://tiles{s}.arcgis.com/tiles/n6uYoouQZW75n5WI/a
 // Create CartoCSS
 function getPolyStyle(level, level1Selected){
 	classes = tempClasses2.classes;
-	
+
 	//Beginning part of the cartocss style
 	style = "#layer{polygon-fill: #DDDDDD;polygon-opacity: 1;";
 
 	if (level =="level1"){
-		for(var i = 0; i < classes.length; i++) { 
+		for(var i = 0; i < classes.length; i++) {
 			var thisStyle = "[cov1='"+classes[i].code+"']{polygon-fill: "+classes[i].color1+";}";
 			style += thisStyle;
 		}
 	}else{
 		style = "#layer{polygon-fill: #DDDDDD;polygon-opacity: 0;";
-		for(var i = 0; i < classes.length; i++) { 
+		for(var i = 0; i < classes.length; i++) {
 			if (level1Selected == classes[i].level1var) {
 				var thisStyle = "[cov1='"+classes[i].code+"']{polygon-fill: "+classes[i].color2+";polygon-opacity: 0.65;}";
 				style += thisStyle;
@@ -77,16 +83,16 @@ function getPolyStyle(level, level1Selected){
 	return style;
 };
 
-// Create a hex dictionary for with cov1 as key (for easy access) 
+// Create a hex dictionary for with cov1 as key (for easy access)
 function createStyles(){
 	classes = tempClasses2.classes;
-	for(var i = 0; i < classes.length; i++) { 
+	for(var i = 0; i < classes.length; i++) {
 		classes[i].level1var = makeVariableFromString(classes[i].level1)
 		classes[i].level2var = makeVariableFromString(classes[i].level2)
 		classConfigs[classes[i].code] = classes[i]
 	}
 	level1Membership = _.groupBy(classes, function(classObj){
-		return makeVariableFromString(classObj.level1); 
+		return makeVariableFromString(classObj.level1);
 	});
 	console.log(level1Membership)
 };
@@ -116,7 +122,7 @@ window.onload = function() {
       sublayers: [{type: "cartodb",
 			sql: 'SELECT * FROM final_coastal_polygons',
 			cartocss: cartoCSSRules,
-			interactivity: ['cov1','cov2'],
+			interactivity: ['cov1'],
 			layerIndex:1
 	}]
     })
@@ -129,74 +135,156 @@ window.onload = function() {
 			layer.setOpacity(sliderVal/100);
 		});
 
-		
+
 	});
 	setUpMap();
 };
 
-// set up interaction upon map load or when level1 level2 is toggled 
+
+function lookupClassFromCode(code){
+	theClass = _.where(tempClasses2.classes, {code: code})[0]
+	return theClass
+}
+
+
+//utility functions that handle errors for formating the infowindow content
+function getNameFromCode(code){
+	try{
+		covClass = lookupClassFromCode(code)
+		return covClass.name
+	}catch(err){
+		//covClass might be undefined
+		//if the code is null
+		return undefined
+	}
+}
+
+
+function formatCoverageForInfowindow(content){
+	//prepare the data for templating in the infowindow
+	//not totally necessary but makes the template cleaner
+	//essential --  get the name for the coverage type here
+	infowindowContent = {
+		 coverage1: {
+			 code: content.data.cov1,
+			 name: getNameFromCode(content.data.cov1),
+			 density: content.data.den1,
+			 minDiameter: content.data.mindiam1,
+			 maxDiameter: content.data.maxdiam1,
+			 percentCover: content.data.pctcov1
+		 },
+		 coverage2: {
+			 code: content.data.cov2,
+			 name: getNameFromCode(content.data.cov2),
+			 density: content.data.den2,
+			 minDiameter: content.data.mindiam2,
+			 maxDiameter: content.data.maxdiam2,
+			 percentCover: content.data.pctcov2
+		 },
+		 coverage3: {
+			 code: content.data.cov3,
+			 name: getNameFromCode(content.data.cov3),
+			 density: content.data.den3,
+			 minDiameter: content.data.mindiam3,
+			 maxDiameter: content.data.maxdiam3,
+			 percentCover: content.data.pctcov3
+		 },
+		 coverage4: {
+			 code: content.data.cov3,
+			 name: getNameFromCode(content.data.cov4),
+			 density: content.data.den4,
+			 minDiameter: content.data.mindiam4,
+			 maxDiameter: content.data.maxdiam4,
+			 percentCover: content.data.pctcov4
+		 },
+		 coverage5: {
+			 code: content.data.cov5,
+			 name: getNameFromCode(content.data.cov5),
+			 density: content.data.den5,
+			 minDiameter: content.data.mindiam5,
+			 maxDiameter: content.data.maxdiam5,
+			 percentCover: content.data.pctcov5
+		 }
+	}
+	return infowindowContent
+}
+
+// set up interaction upon map load or when level1 level2 is toggled
 function setupInteraction(layer, _levelEngaged){
 		layer.setInteraction(true);
 		window["sublayer" + _levelEngaged] = layer.getSubLayer(0);
 		//sublayer1 = layer.getSubLayer(1);
 		/* To print lat/long of mouseover
 		layer.on('featureOver',function(e,latlng,pos,data){
-		  console.log(latlng[0], latlng[1]) 
-		});*/
+		  console.log(latlng[0], latlng[1])
+		});*
+
+
+
 
 		/* To construct a rudimentary popup on click (check .html for #infowindow_template) */
-		cdb.vis.Vis.addInfowindow(map, layer, ['cov1','cov2'],{
-			 infowindowTemplate: $('#infowindow_template').html()
-		});
+		cdb.vis.Vis.addInfowindow(map, layer,infowindowVars,{
+            'sanitizeTemplate':false
+          }).model.set({
+            'template' :  function(obj){
+								//!! important
+                //modify the object here before sending to templating engine
+								//lookup the classname
+								content = obj.content
+								windowContent = formatCoverageForInfowindow(content)
+                return _.template($('#infowindow_template').html())(windowContent);
+              }
+            });
 
 		/* To display a tooltip upon mouseover of map
 		var tooltip = layer.leafletMap.viz.addOverlay({
 			type: 'tooltip',
 			layer: layer,
-			template: '<div class="cartodb-tooltip-content-wrapper"><p>{{cov1}}</p></div>', 
+			template: '<div class="cartodb-tooltip-content-wrapper"><p>{{cov1}}</p></div>',
 			width: 200,
 			position: 'bottom|right',
 			fields: [{ cov1: 'cov1' }]
 		});
 		$('body').append(tooltip.render().el);
 		 */
+		console.log(layer)
 
 		/* To display an infobox within a leaflet control */
 		var infoBox = layer.leafletMap.viz.addOverlay({
 		  type: 'infobox',
 		  layer: layer,
-		  template: '<div class="cartodb-tooltip-content-wrapper"><p>cov1 = {{cov1}}<span></span></p></div>', 
-		  width: 75,
+		  template: '<div class="cartodb-tooltip-content-wrapper"><p>Cover Type 1 = {{2}}<span></span></p></div>',
+		  width: 1000,
 		  position: 'top|right'
 		});
-		$('body').append(infoBox.render().el); 
+		$('body').append(infoBox.render().el);
 }
 
-// Sets everything up after pageload and map creation are complete 
-function setUpMap(){	
+// Sets everything up after pageload and map creation are complete
+function setUpMap(){
 	$('input[name=featureType]').click(function(){ turnOnFeatureType(this.id) });
 	$('input[name=basemapType]').click(function(){ turnOnBasemap(this.id) });
 	$('input[name=overlayType]').click(function(){ turnOnOverlay(this.id) });
-	
+
 	// Hide point, line or poly legend as appropriate
 	$("#polygonLegendHolder").addClass( "legend-holder-hidden" )
 	$("#lineLegendHolder").addClass( "legend-holder-hidden" )
 	$("#pointLegendHolder").addClass( "legend-holder-hidden" )
-	
+
 	// Explicitly set the feature type(will likely use a stateful URL parameter in the future to drive this)
 	$( "#featurePolygons" ).trigger( "click" );
 		// --> $("#featurePolygons").prop("checked", true);
 		// --> $("#featurePoints").prop("checked", true);
 		// --> $("#featureLines").prop("checked", true);
-		
-	// Explicitly set current basemap and click its radio button 
+
+	// Explicitly set current basemap and click its radio button
 	currentBasemap = basemapB;
 	$( "#basemapB" ).trigger( "click" );
 
 	// Fade-in the toc button and give it a click handler
 	$("#tocButton").addClass( "toc-button-unfade" );
 	$("#tocButton").click(function() { toggleTOC() });
-	
+
 	// Create a custom control in bottom left of map, then add html for the four buttons that will exist within this control
 	map.addControl(new tabletCustomControl({position: "topleft"})); //Could also be: 'topleft', 'topright', 'bottomleft', 'bottomright'
 	$(".tablet-custom-control")
@@ -208,30 +296,30 @@ function setUpMap(){
 			  '<div data-toggle="tooltip" title="legend" class="leaflet-bar leaflet-control leaflet-control-custom" id="legendButton" onClick="dispatchButtonClick(this.id)">' +
 					'<span id="legendButtonIcon" class="button-icon-class glyphicon glyphicon-option-horizontal"></span></div></br>' +
 			  '<div data-toggle="tooltip" title="layers" class="leaflet-bar leaflet-control leaflet-control-custom" id="layerListButton" onClick="dispatchButtonClick(this.id)">' +
-					'<span id="layerListButtonIcon" class="button-icon-class glyphicon glyphicon-menu-hamburger"></span></div></br>' 
+					'<span id="layerListButtonIcon" class="button-icon-class glyphicon glyphicon-menu-hamburger"></span></div></br>'
 		)
-		
+
 	// Engage Bootstrap-style tooltips
 	$('[data-toggle="tooltip"]').tooltip();
-	
+
 	// Make a demonstration legend
 	demoLegend();
-	
+
 	// call jsMediaQuery to handle tablet/mobile thresholds upon screen resize, then call it once to configure the initial view
 	$(window).resize(jsMediaQuery);
 	jsMediaQuery();
-	
+
 	// For dynamic legend queries (in progress)
-	map.on('moveend', function() { 
+	map.on('moveend', function() {
 		drawThisView(map.getBounds(), map.getZoom(), levelEngaged, level1Selected);
 	});
-	
+
 	// Done, tell the console!
 	console.log("setUpMap() complete. desktopMode = " + desktopMode)
 }
 
-// Media query for when the app traverses the tablet/desktop threshold 
-var jsMediaQuery = function() { 
+// Media query for when the app traverses the tablet/desktop threshold
+var jsMediaQuery = function() {
 	if (window.matchMedia('(max-width: 768px)').matches){
 		if (desktopMode){
 			desktopMode = false;
@@ -270,7 +358,7 @@ function turnOnFeatureType(featureTypeCalled){
 			break;
 		default:
 			console.log("unidentified feature type called")
-	}	
+	}
 }
 
 // To turn on the appropriate basemap, note, the radio button's id must match the basemap's variable name
@@ -279,7 +367,7 @@ function turnOnBasemap(basemapCalled){
 	map.addLayer(window[basemapCalled]);
 	window[basemapCalled].bringToBack();
 	currentBasemap = window[basemapCalled]
-} 
+}
 
 // To turn on the appropriate basemap, note, the radio button's id must match the basemap's variable name
 function turnOnOverlay(overlayCalled){
@@ -288,9 +376,9 @@ function turnOnOverlay(overlayCalled){
 	}else{
 		map.addLayer(window[overlayCalled]);
 	}
-} 
+}
 
-// To dock/undock the table of contents from bottom 
+// To dock/undock the table of contents from bottom
 function toggleTOC(){
 	if ($( "#toc" ).hasClass( "toc-view-open" )){
 		$( ".level-1-label-text").removeClass( "shade-level-1-label-text" );
@@ -303,7 +391,7 @@ function toggleTOC(){
 		$( "#tocIcon" ).removeClass( "glyphicon-chevron-down" );
 		$( "#tocIcon" ).addClass( "glyphicon-chevron-up" );
 	}else{
-		if (desktopMode){ 
+		if (desktopMode){
 			$( ".level-1-label-text").addClass( "shade-level-1-label-text" );
 		}
 		$( "#toc" ).addClass( "toc-view-open" );
@@ -326,10 +414,10 @@ function transformToDesktop(){
     if ($( "#toc" ).hasClass( "toc-view-open" )){
 		$( ".level-1-label-text").addClass( "shade-level-1-label-text" );
 	}
-	if ($('.modal.in').length > 0){ 
+	if ($('.modal.in').length > 0){
 		$( "#tocModal" ).modal('hide');
 		$("#map").append($(".leaflet-control-container").addClass( "leaflet-control-container-tablet-custom" ));
-	}	
+	}
 }
 
 // To configure tablet view (is called upon pageload)
@@ -337,24 +425,24 @@ function transformToTablet(){
 	$( "#toc" ).appendTo( $( "#tocModalDialogue" ) );
 	$( ".feature-type-radio-group" ).appendTo( $( "#legend" ) );
 	$( ".level-1-label-text").removeClass( "shade-level-1-label-text" );
-	if ($('.modal.in').length > 0){ 
+	if ($('.modal.in').length > 0){
 		$( "#tocModal" ).modal('hide');
 	}
 }
 
-// Handles all click events from the 4 main UI buttons 
+// Handles all click events from the 4 main UI buttons
 function dispatchButtonClick(buttonClicked){
 	// If modal is not already open, then open it
-	if ($('.modal.in').length <= 0){ 
+	if ($('.modal.in').length <= 0){
 		$( "#tocModal" ).modal();
 	}
-	// If the table of contents is collapsed and we are in tablet mode, then open it by toggleTOC() 
+	// If the table of contents is collapsed and we are in tablet mode, then open it by toggleTOC()
 	if (($( "#toc" ).hasClass( "toc-view-closed" )) && (desktopMode == false)){
 		toggleTOC();
 	}
-	
+
 	modalAttachTOC();
-	
+
 	// Specific button events...
 	switch(buttonClicked) {
 		case "legendButton":
@@ -401,7 +489,7 @@ function configInfoShareModal(){
 	}
 }
 
-// Whenever the modal is closed... 
+// Whenever the modal is closed...
 $('.modal').on('hidden.bs.modal', function () {
 	$("#map").append($(".leaflet-control-container").addClass( "leaflet-control-container-tablet-custom" ));
 	$( "#legend" ).removeClass( "legend-off" );
@@ -415,8 +503,8 @@ function toggleCheckbox(checkObj){
 // Extends the leaflet control for creating the buttons in the lower left of the map
 var tabletCustomControl = L.Control.extend({
 	options: {
-		position: 'topleft' 
-	}, 
+		position: 'topleft'
+	},
 	onAdd: function (map) {
 		var container = L.DomUtil.create('div', 'tablet-custom-control');
 		return container;
@@ -433,10 +521,10 @@ function demoLegend(){
 		if (value.level2frq > highestValue2){ highestValue2 = value.level2frq; highestClass = value.level2}
 		if (!level1Classes.hasOwnProperty(value.level1)) {
 			if (value.level1frq > highestValue){ highestValue = value.level1frq; }
-			totalFeatures = totalFeatures + value.level1frq 
+			totalFeatures = totalFeatures + value.level1frq
 			level1Classes[value.level1] = {"level1": value.level1 , "level1frq": value.level1frq , "hex1": value.hex1}
 		}
-	} 
+	}
 	level1Classes = _.indexBy(level1Classes, 'level1frq') // playing with http://underscorejs.org/
 	var countKey = 0;
 	for (var key in level1Classes) {
@@ -470,10 +558,10 @@ function getLegendSubclasses(levelClass){
 	});
 
 	var level2List = [];
-	for(i = 0; i< subclasses.length; i++){    
+	for(i = 0; i< subclasses.length; i++){
 		if(level2List.indexOf(subclasses[i].level2) === -1){
-			level2List.push(subclasses[i].level2);        
-		};        
+			level2List.push(subclasses[i].level2);
+		};
 	};
 	return level2List;
 };
@@ -496,10 +584,10 @@ function drawThisView(boundsIn, zoomIn, _levelEngaged, _level1Selected){
 					if (countClasses == 1){
 						operatorInclusion = " OR "
 					}
-					classesSelected = classesSelected + operatorInclusion + "(cov1 = '" + val.code + "')" 
+					classesSelected = classesSelected + operatorInclusion + "(cov1 = '" + val.code + "')"
 					countClasses++;
 				})
-				var cartoQuery = "SELECT * FROM final_coastal_polygons WHERE (" + classesSelected + 
+				var cartoQuery = "SELECT * FROM final_coastal_polygons WHERE (" + classesSelected +
 					") AND the_geom && ST_SetSRID(ST_MakeBox2D(ST_Point(" +
 					String(boundsIn._northEast.lng)+","+String(boundsIn._northEast.lat)+"), ST_Point(" +
 					String(boundsIn._southWest.lng)+","+String(boundsIn._southWest.lat)+")), 4326) ORDER BY cov1 DESC"
@@ -510,7 +598,7 @@ function drawThisView(boundsIn, zoomIn, _levelEngaged, _level1Selected){
 					$("#polygonLegendHolder").empty();
 					var cov1Classes = {}
 					var grouped = _.groupBy(data.rows, function(num){ // http://underscorejs.org/
-						return classConfigs[num.cov1]["level" + _levelEngaged + "var"]; 
+						return classConfigs[num.cov1]["level" + _levelEngaged + "var"];
 					});
 					jQuery.each(grouped, function(i, val) {
 						var collectiveVal = 0;
@@ -526,13 +614,13 @@ function drawThisView(boundsIn, zoomIn, _levelEngaged, _level1Selected){
 					var max = _.max(cov1Classes,  function(num){ return num.groupSize; })
 					var cov1Classes = _.indexBy(cov1Classes, 'groupSize')
 					var countKey = 0;
-					var widthInPercent = (100 / Object.keys(cov1Classes).length) 
+					var widthInPercent = (100 / Object.keys(cov1Classes).length)
 					_.each(cov1Classes, function(value){
 						featurePct = (value.groupSize / max.groupSize) * 100
-						$("#polygonLegendHolder").append('<div class="histogram-div"; style="height:' + String(featurePct) + '%; width:'+ widthInPercent +'%; left:' 
+						$("#polygonLegendHolder").append('<div class="histogram-div"; style="height:' + String(featurePct) + '%; width:'+ widthInPercent +'%; left:'
 						+ (countKey * widthInPercent) + '%; background-color:' + value.hex + ';" id="div_'+ value.cov1 +'" onClick="dispatchLegendClick(this.id)">'
 						+ '<div style="background-color:' + value.hex + ';" class="level-1-label-text rotate-text shade-level-1-label-text transition-class">' + classConfigs[value.cov1]["level" + _levelEngaged] + '</div></div>')
-						countKey++; 
+						countKey++;
 					});
 					createWordCloud("#pointLegendHolder", cov1Classes, _levelEngaged);
 				})
@@ -625,7 +713,7 @@ var Map = cdb.core.View.extend({
 })
 //////////////////// More stock code
 var Filters = cdb.core.View.extend({
-	
+
 	initialize: function() {
 	  console.log("Filters.initialize")
 	  _.bindAll(this, 'render');
@@ -673,7 +761,7 @@ var Filters = cdb.core.View.extend({
 		}
 	  })
 	}
-})		
+})
 /////////////////////////////////////////
 // create a word cloud just for fun...
 var word_count = {};
