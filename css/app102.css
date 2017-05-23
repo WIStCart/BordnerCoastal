@@ -126,7 +126,7 @@ body{
 	padding-left:5px;
 }
 .map-view-full{
-	height: 100vh;
+	height: 100vh!important;
 }
 .map-view-toc{
 	height: 80vh;
@@ -137,10 +137,10 @@ body{
 	padding-bottom: 4px;
 }
 .toc-view-open{
-	height: 20vh;
+	height: 20vh!important;
 }
 .toc-view-closed{
-	height: 0vh;
+	height: 5vh;
 }
 
 /* toc elements  */
@@ -166,6 +166,16 @@ body{
 	display: inline-block;
 	width: 2vh;
 	height: 16vh;
+}
+
+#neatline{
+	height: 3px;
+	width:100%;
+	position: absolute;
+	bottom:0px;
+	left:0px;
+	background-color: #619ec7 !important;
+	display: none;
 }
 
 .switch input {display:none;}
