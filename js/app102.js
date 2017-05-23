@@ -402,7 +402,7 @@ function turnOnOverlay(overlayCalled){
 
 // To dock/undock the table of contents from bottom
 function toggleTOC(){
-	if ($( "#toc" ).hasClass( "toc-view-open" )){
+	if ($( "#toc" ).hasClass( "toc-view-open" )){ //is closed
 		$( ".level-1-label-text").removeClass( "shade-level-1-label-text" );
 		$( "#toc" ).removeClass( "toc-view-open" );
 		$( "#toc" ).addClass( "toc-view-closed" );
@@ -412,10 +412,14 @@ function toggleTOC(){
 		$( "#tocButton" ).addClass( "toc-button-closed" );
 		$( "#tocIcon" ).removeClass( "glyphicon-chevron-down" );
 		$( "#tocIcon" ).addClass( "glyphicon-chevron-up" );
-	}else{
+		if (desktopMode){
+			$("#neatline").show();
+		}
+	}else{ //is open
 		if (desktopMode){
 			$( ".level-1-label-text").addClass( "shade-level-1-label-text" );
 		}
+					//the interface is open
 		$( "#toc" ).addClass( "toc-view-open" );
 		$( "#toc" ).removeClass( "toc-view-closed" );
 		$( "#map" ).addClass( "map-view-toc" );
@@ -424,6 +428,7 @@ function toggleTOC(){
 		$( "#tocButton" ).removeClass( "toc-button-closed" );
 		$( "#tocIcon" ).addClass( "glyphicon-chevron-down" );
 		$( "#tocIcon" ).removeClass( "glyphicon-chevron-up" );
+		$("#neatline").hide()
 	}
 }
 
