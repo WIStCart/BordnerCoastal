@@ -199,7 +199,7 @@ body{
 	height: 2vh;
 	width: 2vh;
 	left: 0vh;
-	background-color: #ffffff;
+	background-color: rgba(0,0,0,0);
 	-webkit-transition: .4s;
 	transition: .4s;
 }
