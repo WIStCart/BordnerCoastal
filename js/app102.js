@@ -115,7 +115,6 @@ window.onload = function() {
 	});
 	createStyles()
 	cartoCSSRules = getPolyStyle("level1");
-	//console.log(cartoCSSRules)
 	// Promise for the first layer
 	bordner = cartodb.createLayer(map, {
       user_name: 'sco-admin',
@@ -123,15 +122,22 @@ window.onload = function() {
       sublayers: [{type: "cartodb",
 			sql: 'SELECT * FROM final_coastal_polygons',
 			cartocss: cartoCSSRules,
-			interactivity: ['cov1'],
+			interactivity: ['cov1', 'cov2'],
 			layerIndex:1
+	},{type: "cartodb",
+			sql: 'SELECT * FROM final_coastal_polygons',
+			cartocss: cartoCSSRules,
+			interactivity: ['cov1', 'cov2'],
+			layerIndex:2
 	}]
     })
 	.addTo(map) // add cartodb layer and basemap to map object
 	.done(function(layer) {
 		layerOpacity.polygons = 0.65;
 		layer.setOpacity(layerOpacity.polygons);
-		setupInteraction(layer, levelEngaged);
+		layer.setInteraction(true);
+		setupSublayer(layer, 1, "visible");
+		setupSublayer(layer, 2, "hidden");
 		$('#rangeSlider').slider().on('slide', function (ev) {
 			layerOpacity.polygons = this.value / 100;
 			layer.setOpacity(layerOpacity.polygons);
@@ -140,6 +146,15 @@ window.onload = function() {
 	setUpMap();
 };
 
+// function for setting up the two sublayers - will turn off the sublayer if it is "hidden" 
+function setupSublayer(layer, _levelEngaged, _visibility){	
+	window["sublayer" + _levelEngaged] = layer.getSubLayer(_levelEngaged - 1);
+	if (_visibility == "hidden"){
+		window["sublayer" + _levelEngaged].hide();
+	}else{
+		setupInteraction(layer, _levelEngaged, _visibility)
+	}
+}	
 
 function lookupClassFromCode(code){
 	//get the object metadata corresponding to the cover code
@@ -222,64 +237,59 @@ function formatCoverageForInfowindow(content){
 
 
 // set up interaction upon map load or when level1 level2 is toggled
-function setupInteraction(layer, _levelEngaged){
-		layer.setInteraction(true);
-		window["sublayer" + _levelEngaged] = layer.getSubLayer(0);
-		//sublayer1 = layer.getSubLayer(1);
-		/* To print lat/long of mouseover
-		layer.on('featureOver',function(e,latlng,pos,data){
-		  console.log(latlng[0], latlng[1])
-		});*
+function setupInteraction(layer, _levelEngaged, _visibility){			
+	//////////////////////////////////////////////////////
+	/* To print lat/long of mouseover
+	layer.on('featureOver',function(e,latlng,pos,data){
+	  console.log(latlng[0], latlng[1])
+	});*
 
+	/* To construct a rudimentary popup on click (check .html for #infowindow_template) */
+	cdb.vis.Vis.addInfowindow(map, layer, infowindowVars,{
+		'sanitizeTemplate':false
+	}).model.set({
+		'template' :  function(obj){
+			//!! important
+			//modify the object here before sending to templating engine
+			//lookup the classname
+			content = obj.content
+			windowContent = formatCoverageForInfowindow(content)
+			return _.template($('#infowindow_template').html())(windowContent);
+		}
+	});
 
+	/* To display a tooltip upon mouseover of map
+	var tooltip = layer.leafletMap.viz.addOverlay({
+		type: 'tooltip',
+		layer: layer,
+		template: '<div class="cartodb-tooltip-content-wrapper"><p>{{cov1}}</p></div>',
+		width: 200,
+		position: 'bottom|right',
+		fields: [{ cov1: 'cov1' }]
+	});
+	$('body').append(tooltip.render().el);
+	 */
 
+	//  console.log(layer.leafletmap)
+	//
+	/* To display an infobox within a leaflet control */
+	var infoBox = layer.leafletMap.viz.addOverlay( {
+	  type: 'infobox',
+	  layer: layer,
+		template: '<div class="cartodb-tooltip-content-wrapper"><p><span id="level1-set"></span></p></div>',
+	  // width: 75,
+	  position: 'top|right'
+	});
 
-		/* To construct a rudimentary popup on click (check .html for #infowindow_template) */
-		cdb.vis.Vis.addInfowindow(map, layer,infowindowVars,{
-            'sanitizeTemplate':false
-          }).model.set({
-            'template' :  function(obj){
-								//!! important
-                //modify the object here before sending to templating engine
-								//lookup the classname
-								content = obj.content
-								windowContent = formatCoverageForInfowindow(content)
-                return _.template($('#infowindow_template').html())(windowContent);
-              }
-            });
+	//render the box (no template features)
+	$('body').append(infoBox.render().el);
 
-		/* To display a tooltip upon mouseover of map
-		var tooltip = layer.leafletMap.viz.addOverlay({
-			type: 'tooltip',
-			layer: layer,
-			template: '<div class="cartodb-tooltip-content-wrapper"><p>{{cov1}}</p></div>',
-			width: 200,
-			position: 'bottom|right',
-			fields: [{ cov1: 'cov1' }]
-		});
-		$('body').append(tooltip.render().el);
-		 */
-
-		//  console.log(layer.leafletmap)
-		//
-		/* To display an infobox within a leaflet control */
-		var infoBox = layer.leafletMap.viz.addOverlay( {
-		  type: 'infobox',
-		  layer: layer,
-			template: '<div class="cartodb-tooltip-content-wrapper"><p><span id="level1-set"></span></p></div>',
-		  // width: 75,
-		  position: 'top|right'
-		});
-
-		//render the box (no template features)
-		$('body').append(infoBox.render().el);
-
-		//manually change the popup text on mouseover
-		//only way to actually manipulate the data in the mouse events
-		layer.bind('featureOver', function(e, latln, pxPos, data, layer){
-			level1 = getLevel1FromCode(data.cov1)
-			$("#level1-set").html(level1)
-		})
+	//manually change the popup text on mouseover
+	//only way to actually manipulate the data in the mouse events
+	layer.bind('featureOver', function(e, latln, pxPos, data, layer){
+		level1 = getLevel1FromCode(data.cov1)
+		$("#level1-set").html(level1)
+	})
 }
 
 // Sets everything up after pageload and map creation are complete
@@ -654,33 +664,19 @@ function dispatchLegendClick(classCode){
 	drawThisView(map.getBounds(), map.getZoom(), levelEngaged, level1Selected);
 }
 
+// called upon click of legend item 
 function switchLevel(_levelEngaged, _level1Selected){
 	cartoCSSRules = getPolyStyle("level"+_levelEngaged, _level1Selected);
 	if (_levelEngaged == "2"){
-		sublayer1.toggle();
+		sublayer2.show();
+		sublayer1.hide();
+		sublayer2.setCartoCSS(cartoCSSRules)
+		sublayer2.setInteraction(true)
 	}else{
-		sublayer2.toggle();
+		sublayer1.show();
+		sublayer2.hide();
 	}
-	bordner = cartodb.createLayer(map, {
-		user_name: 'sco-admin',
-		type: 'cartodb',
-		sublayers: [{type: "cartodb",
-			sql: 'SELECT * FROM final_coastal_polygons',
-			cartocss: cartoCSSRules,
-			interactivity: ['cov1','cov2']
-		}]
-	})
-	.addTo(map)
-	.done(function(layer) {
-		layer.setOpacity(layerOpacity.polygons);
-		setupInteraction(layer, levelEngaged);
-		$('#rangeSlider').slider().on('slide', function (ev) {
-			layerOpacity.polygons = this.value / 100;
-			layer.setOpacity(layerOpacity.polygons);
-		});
-	});
 }
-
 
 //////////////////// Stock code for enabling map queries against CARTO server
 var Map = cdb.core.View.extend({
