@@ -113,6 +113,8 @@ window.onload = function() {
 		center: [43.7844,-88.7879],
 		zoom: 7
 	});
+
+	
 	createStyles()
 	cartoCSSRules = getPolyStyle("level1");
 	// Promise for the first layer
@@ -143,10 +145,12 @@ window.onload = function() {
 			layer.setOpacity(layerOpacity.polygons);
 		});		
 	});
+		
+	// Add county layer
 	var cartoCSSCounty = "#layer { " +
 	  "polygon-fill: #374C70;" +
 	  "polygon-opacity: 0;" +
-	  "polygon-gamma: 0.5;" +
+	  //"polygon-gamma: 0.5;" +
 	  "line-color: #FFF;" +
 	  "line-width: 1;" +
 	  "line-opacity: 0.5;" +
@@ -158,11 +162,31 @@ window.onload = function() {
       sublayers: [{type: "cartodb",
 			sql: 'SELECT * FROM bordner_county_bnds',
 			cartocss: cartoCSSCounty,
-			//interactivity: ['cov1', 'cov2'],
-			layerIndex:1
+			layerIndex:0
 	}]
 	})
-	.addTo(map)
+	.addTo(map);
+	
+	// Add township layer
+	var cartoCSSTown = "#layer { " +
+	  "polygon-fill: #374C70;" +
+	  "polygon-opacity: 0;" +
+	  //"polygon-gamma: 0.5;" +
+	  "line-color: #FFF;" +
+	  "line-width: 0.5;" +
+	  "line-opacity: 0.5;" +
+	  "line-comp-op: soft-light;" +
+	"}"
+	counties = cartodb.createLayer(map, {
+      user_name: 'sco-admin',
+      type: 'cartodb',
+      sublayers: [{type: "cartodb",
+			sql: 'SELECT * FROM twpppoly',
+			cartocss: cartoCSSTown,
+			layerIndex:3
+	}]
+	})
+	.addTo(map);
 	setUpMap();
 };
 
