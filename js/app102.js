@@ -14,7 +14,8 @@ var level1Selected = "agriculture"
 var sublayer1;
 var sublayer2;
 var layerOpacity = {polygons:0.65};
-
+var counties;
+var townships;
 var infowindowVars = ['cov1','cov2', 'cov3', 'cov4', 'cov5',
 					'den1', 'den2', 'den3', 'den4', 'den5',
 					'pctcov1', 'pctcov2', 'pctcov3', 'pctcov4', 'pctcov5',
@@ -177,7 +178,7 @@ window.onload = function() {
 	  "line-opacity: 0.5;" +
 	  "line-comp-op: soft-light;" +
 	"}"
-	counties = cartodb.createLayer(map, {
+	townships = cartodb.createLayer(map, {
       user_name: 'sco-admin',
       type: 'cartodb',
       sublayers: [{type: "cartodb",
@@ -369,6 +370,8 @@ function setUpMap(){
 					'<span id="infoButtonIcon" class="button-icon-class glyphicon glyphicon-info-sign"></span></div></br>' +
 			  '<div data-toggle="tooltip" title="share" class="leaflet-bar leaflet-control leaflet-control-custom" id="shareButton" onClick="dispatchButtonClick(this.id)">' +
 					'<span id="shareButtonIcon" class="button-icon-class glyphicon glyphicon-share-alt"></span></div></br>' +
+			  '<div data-toggle="tooltip" title="layers" class="leaflet-bar leaflet-control leaflet-control-custom" id="layerButton" onClick="dispatchButtonClick(this.id)">' +
+					'<span id="shareButtonIcon" class="button-icon-class glyphicon glyphicon-sort"></span></div></br>' +
 			  '<div data-toggle="tooltip" title="legend" class="leaflet-bar leaflet-control leaflet-control-custom" id="legendButton" onClick="dispatchButtonClick(this.id)">' +
 					'<span id="legendButtonIcon" class="button-icon-class glyphicon glyphicon-option-horizontal"></span></div></br>' +
 			  '<div data-toggle="tooltip" title="layers" class="leaflet-bar leaflet-control leaflet-control-custom" id="layerListButton" onClick="dispatchButtonClick(this.id)">' +
