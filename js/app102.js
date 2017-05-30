@@ -143,6 +143,26 @@ window.onload = function() {
 			layer.setOpacity(layerOpacity.polygons);
 		});		
 	});
+	var cartoCSSCounty = "#layer { " +
+	  "polygon-fill: #374C70;" +
+	  "polygon-opacity: 0;" +
+	  "polygon-gamma: 0.5;" +
+	  "line-color: #FFF;" +
+	  "line-width: 1;" +
+	  "line-opacity: 0.5;" +
+	  "line-comp-op: soft-light;" +
+	"}"
+	counties = cartodb.createLayer(map, {
+      user_name: 'sco-admin',
+      type: 'cartodb',
+      sublayers: [{type: "cartodb",
+			sql: 'SELECT * FROM bordner_county_bnds',
+			cartocss: cartoCSSCounty,
+			//interactivity: ['cov1', 'cov2'],
+			layerIndex:1
+	}]
+	})
+	.addTo(map)
 	setUpMap();
 };
 
