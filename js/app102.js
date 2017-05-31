@@ -339,6 +339,58 @@ function setupInteraction(layer, _levelEngaged, _visibility){
 
 // Sets everything up after pageload and map creation are complete
 function setUpMap(){
+	// Create a custom control in bottom left of map, then add html for the four buttons that will exist within this control
+	map.addControl(new tabletCustomControl({position: "topleft"})); //Could also be: 'topleft', 'topright', 'bottomleft', 'bottomright'
+	$(".tablet-custom-control")
+		.attr("id", "tabletCustomControl")
+		.html('<div data-toggle="tooltip" title="info" class="leaflet-bar leaflet-control leaflet-control-custom" id="infoButton" onClick="dispatchButtonClick(this.id)">' +
+				'<span id="infoButtonIcon" class="button-icon-class glyphicon glyphicon-info-sign"></span>' +
+			'</div></br>' +
+			'<div data-toggle="tooltip" title="share" class="leaflet-bar leaflet-control leaflet-control-custom" id="shareButton" onClick="dispatchButtonClick(this.id)">' +
+				'<span id="shareButtonIcon" class="button-icon-class glyphicon glyphicon-share-alt">' +
+			'</div></br>' +
+			'<div data-toggle="tooltip" title="layers" class="leaflet-bar leaflet-control leaflet-control-custom" id="layerListButton" onClick="dispatchButtonClick(this.id)">' +
+				'<span id="layerListButtonIcon" class="button-icon-class glyphicon glyphicon-menu-hamburger">' +
+			'</div></br>' + 
+			'<div data-toggle="tooltip" title="legend" class="leaflet-bar leaflet-control leaflet-control-custom" id="legendButton" onClick="dispatchButtonClick(this.id)">' +
+				'<span id="legendButtonIcon" class="button-icon-class glyphicon glyphicon-option-horizontal">' +
+			'</div></br>' +
+			'<div class="leaflet-bar leaflet-control layer-list-holder-closed" id="layerListHolder"></div></br>')
+			
+	$("#layerListHolder")
+		.html('<div class="col-sm-2 layer-list-view transition-class" id="layerList">' +
+			'<div class="feature-type-radio-group">' +
+				'<div class="radio">' +
+					'<label><input type="radio" name="featureType" id="featurePolygons">Polygons</label>' +
+				'</div>' +
+				'<div class="radio">' +
+					'<label><input type="radio" name="featureType" id="featurePoints">Points</label>' +
+				'</div>' +
+				'<div class="radio">' +
+					'<label><input type="radio" name="featureType" id="featureLines">Lines</label>' +
+				'</div>' +
+			'</div>' +
+			'<div class="checkbox">' +
+				'<label><input type="checkbox" name="overlayType" id="overlay1">Overlay 1</label>' +
+			'</div>' +
+			'<div class="checkbox">' +
+				'<label><input type="checkbox" name="overlayType" id="overlay2">Overlay 2</label>' +
+			'</div>' +
+			'<div class="checkbox">' +
+				'<label><input type="checkbox" name="overlayType" id="overlay3">Overlay 3</label>' +
+			'</div>' +
+			'<div class="radio">' +
+				'<label><input type="radio" name="basemapType" id="basemapA">Basemap A</label>' +
+			'</div>' +
+			'<div class="radio">' +
+				'<label><input type="radio" name="basemapType" id="basemapB">Basemap B</label>' +
+			'</div>' +
+			'<div class="radio">' +
+				'<label><input type="radio" name="basemapType" id="basemapC">Basemap C</label>' +
+				'<input type="text" value="50" id="rangeSlider" data-slider-min="1" data-slider-max="100" data-slider-step="1" data-slider-value="65">' +
+			'</div>' +
+		'</div>')
+
 	$('input[name=featureType]').click(function(){ turnOnFeatureType(this.id) });
 	$('input[name=basemapType]').click(function(){ turnOnBasemap(this.id) });
 	$('input[name=overlayType]').click(function(){ turnOnOverlay(this.id) });
@@ -361,23 +413,7 @@ function setUpMap(){
 	// Fade-in the toc button and give it a click handler
 	$("#tocButton").addClass( "toc-button-unfade" );
 	$("#tocButton").click(function() { toggleTOC() });
-
-	// Create a custom control in bottom left of map, then add html for the four buttons that will exist within this control
-	map.addControl(new tabletCustomControl({position: "topleft"})); //Could also be: 'topleft', 'topright', 'bottomleft', 'bottomright'
-	$(".tablet-custom-control")
-		.attr("id", "tabletCustomControl")
-		.html('<div data-toggle="tooltip" title="info" class="leaflet-bar leaflet-control leaflet-control-custom" id="infoButton" onClick="dispatchButtonClick(this.id)">' +
-					'<span id="infoButtonIcon" class="button-icon-class glyphicon glyphicon-info-sign"></span></div></br>' +
-			  '<div data-toggle="tooltip" title="share" class="leaflet-bar leaflet-control leaflet-control-custom" id="shareButton" onClick="dispatchButtonClick(this.id)">' +
-					'<span id="shareButtonIcon" class="button-icon-class glyphicon glyphicon-share-alt"></span></div></br>' +
-			  '<div data-toggle="tooltip" title="layers" class="leaflet-bar leaflet-control leaflet-control-custom" id="layerButton" onClick="dispatchButtonClick(this.id)">' +
-					'<span id="shareButtonIcon" class="button-icon-class glyphicon glyphicon-sort"></span></div></br>' +
-			  '<div data-toggle="tooltip" title="legend" class="leaflet-bar leaflet-control leaflet-control-custom" id="legendButton" onClick="dispatchButtonClick(this.id)">' +
-					'<span id="legendButtonIcon" class="button-icon-class glyphicon glyphicon-option-horizontal"></span></div></br>' +
-			  '<div data-toggle="tooltip" title="layers" class="leaflet-bar leaflet-control leaflet-control-custom" id="layerListButton" onClick="dispatchButtonClick(this.id)">' +
-					'<span id="layerListButtonIcon" class="button-icon-class glyphicon glyphicon-menu-hamburger"></span></div></br>'
-		)
-
+		
 	// Engage Bootstrap-style tooltips
 	$('[data-toggle="tooltip"]').tooltip();
 
@@ -519,14 +555,18 @@ function transformToTablet(){
 function dispatchButtonClick(buttonClicked){
 	// If modal is not already open, then open it
 	if ($('.modal.in').length <= 0){
-		$( "#tocModal" ).modal();
-	}
-	// If the table of contents is collapsed and we are in tablet mode, then open it by toggleTOC()
-	if (($( "#toc" ).hasClass( "toc-view-closed" )) && (desktopMode == false)){
-		toggleTOC();
+		if ((desktopMode == true)&&(buttonClicked == "layerListButton")){
+			
+		}else{
+			$( "#tocModal" ).modal();
+			// If the table of contents is collapsed and we are in tablet mode, then open it by toggleTOC()
+			if (($( "#toc" ).hasClass( "toc-view-closed" )) && (desktopMode == false)){
+				toggleTOC();
+			}
+			modalAttachTOC();
+		}
 	}
 
-	modalAttachTOC();
 
 	// Specific button events...
 	switch(buttonClicked) {
@@ -537,8 +577,16 @@ function dispatchButtonClick(buttonClicked){
 			break;
 		case "layerListButton":
 			console.log("Layer List")
-			$( "#legend" ).addClass( "legend-off" );
-			$( "#layerList" ).removeClass( "layer-list-off" );
+			if ((desktopMode == true)&&(buttonClicked == "layerListButton")){
+				if ($( "#layerListHolder" ).hasClass( "layer-list-holder-closed" )){
+					$( "#layerListHolder" ).addClass( "layer-list-holder-open" ).removeClass( "layer-list-holder-closed" );
+				}else{
+					$( "#layerListHolder" ).addClass( "layer-list-holder-closed" ).removeClass( "layer-list-holder-open" );
+				}
+			}else{
+				$( "#legend" ).addClass( "legend-off" );
+				$( "#layerList" ).removeClass( "layer-list-off" );				
+			}
 			break;
 		case "infoButton":
 			console.log("Info")

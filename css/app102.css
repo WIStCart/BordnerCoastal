@@ -27,7 +27,7 @@ body{
 	.map-view{
 		height: 100vh !important;
 	}
-	#legendButton, #layerListButton{
+	#legendButton{
 		visibility: visible;
 	}
 	.toc-button{
@@ -80,11 +80,27 @@ body{
 	.map-view{
 		height: 80vh;
 	}
-	#legendButton, #layerListButton{
+	#legendButton{
 		visibility: hidden;
 	}
 	.toc-button{
 		visibility: visible;
+	}
+	#layerListHolder{
+	    position: relative;
+		top: -55px;
+		left: 20px;
+	}
+	.layer-list-holder-open{
+		width: 300px;
+		height: 500px;
+	}
+	.layer-list-holder-closed{
+		width: 0px;
+		height: 0px;
+	}
+	#layerList{
+		width: 100%;
 	}
 }
 
@@ -149,6 +165,7 @@ body{
 	padding-left:5px;
 	height: 100%;
 	overflow-y: auto;
+	min-height: 0px !important;
 }
 .level-toggle-view{
 	background-color: #e95d5f;
