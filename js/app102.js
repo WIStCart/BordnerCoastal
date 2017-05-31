@@ -114,8 +114,63 @@ window.onload = function() {
 		center: [43.7844,-88.7879],
 		zoom: 7
 	});
-
+		
+	// Add county layer
+	var cartoCSSCounty = "#layer { " +
+	  "polygon-fill: #374C70;" +
+	  "polygon-opacity: 0;" +
+	  //"polygon-gamma: 0.5;" +
+	  "line-color: #FFF;" +
+	  "line-width: 1;" +
+	  "line-opacity: 0.5;" +
+	  "line-comp-op: soft-light;" +
+	  "text-name: [county_nam];" +
+	  "text-face-name: 'Open Sans Regular';"+
+	  "text-size: 13;"+
+	  "text-fill: #fff;"+
+	  "text-halo-fill: #000000;"+
+	"}" 
 	
+	counties = cartodb.createLayer(map, {
+      user_name: 'sco-admin',
+      type: 'cartodb',
+      sublayers: [{type: "cartodb",
+			sql: 'SELECT * FROM bordner_county_bnds',
+			cartocss: cartoCSSCounty,
+			layerIndex:4
+	}]
+	})
+	.addTo(map);
+	
+	// Add township layer
+	var cartoCSSTown = "#layer { " +
+	  "polygon-fill: #374C70;" +
+	  "polygon-opacity: 0;" +
+	  //"polygon-gamma: 0.5;" +
+	  "line-color: #FFF;" +
+	  "line-width: 0.5;" +
+	  "line-opacity: 0.5;" +
+	  "line-comp-op: soft-light;" +
+	  "[zoom > 10]{" +
+		"text-name: [twp];" +
+		"text-face-name: 'Open Sans Regular';" +
+	    "text-size: 13;"+
+	    "text-fill: #fff;"+
+	    "text-halo-fill: #000000;"+
+	  "}"+
+	"}"
+	townships = cartodb.createLayer(map, {
+      user_name: 'sco-admin',
+      type: 'cartodb',
+      sublayers: [{type: "cartodb",
+			sql: 'SELECT * FROM twpppoly',
+			cartocss: cartoCSSTown,
+			layerIndex:3
+	}]
+	})
+	.addTo(map);
+	
+	// add bordner layer	
 	createStyles()
 	cartoCSSRules = getPolyStyle("level1");
 	// Promise for the first layer
@@ -146,48 +201,6 @@ window.onload = function() {
 			layer.setOpacity(layerOpacity.polygons);
 		});		
 	});
-		
-	// Add county layer
-	var cartoCSSCounty = "#layer { " +
-	  "polygon-fill: #374C70;" +
-	  "polygon-opacity: 0;" +
-	  //"polygon-gamma: 0.5;" +
-	  "line-color: #FFF;" +
-	  "line-width: 1;" +
-	  "line-opacity: 0.5;" +
-	  "line-comp-op: soft-light;" +
-	"}"
-	counties = cartodb.createLayer(map, {
-      user_name: 'sco-admin',
-      type: 'cartodb',
-      sublayers: [{type: "cartodb",
-			sql: 'SELECT * FROM bordner_county_bnds',
-			cartocss: cartoCSSCounty,
-			layerIndex:0
-	}]
-	})
-	.addTo(map);
-	
-	// Add township layer
-	var cartoCSSTown = "#layer { " +
-	  "polygon-fill: #374C70;" +
-	  "polygon-opacity: 0;" +
-	  //"polygon-gamma: 0.5;" +
-	  "line-color: #FFF;" +
-	  "line-width: 0.5;" +
-	  "line-opacity: 0.5;" +
-	  "line-comp-op: soft-light;" +
-	"}"
-	townships = cartodb.createLayer(map, {
-      user_name: 'sco-admin',
-      type: 'cartodb',
-      sublayers: [{type: "cartodb",
-			sql: 'SELECT * FROM twpppoly',
-			cartocss: cartoCSSTown,
-			layerIndex:3
-	}]
-	})
-	.addTo(map);
 	setUpMap();
 };
 
@@ -355,7 +368,7 @@ function setUpMap(){
 			'<div data-toggle="tooltip" title="legend" class="leaflet-bar leaflet-control leaflet-control-custom" id="legendButton" onClick="dispatchButtonClick(this.id)">' +
 				'<span id="legendButtonIcon" class="button-icon-class glyphicon glyphicon-option-horizontal">' +
 			'</div></br>' +
-			'<div class="leaflet-bar leaflet-control layer-list-holder-closed" id="layerListHolder"></div></br>')
+			'<div class="leaflet-bar leaflet-control layer-list-holder-closed transition-class" id="layerListHolder"></div></br>')
 			
 	$("#layerListHolder")
 		.html('<div class="col-sm-2 layer-list-view transition-class" id="layerList">' +
