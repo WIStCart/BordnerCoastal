@@ -1,31 +1,68 @@
+//////////////////////////////////////////
 TODO:
-1) Create overlays of townships, counties (and perhaps include the year of survey commencement on the counties somehow?)
-	- We may want to do this through CARTO instead of having to tile up a whole custom layer? 
-2) Search: for now we can target a conventional geocoder search (addresses, places). This was voiced to be a low priority for now.
-3) C$: In progress. Include a transparency slider that allows the user to control the opacity of the bordner layer (it was not determined where this should go or what it should look like, so feel free to brainstorm)
-4) SF: *DONE* Include descriptive attribute names for all attributes within the popup window (this will require a scrollbar). We want to use user friendly field names (i.e. "Density of Coverage 1" instead of "den1")
-5) CS: *DONE* Remove tooltips
-6) C$: Make the upper right infobox be dockable (undeterined if this should only display "cov1" or more attributes). We could consider removing it also. 
-7) SF: *DONE* Create a neatline at the bottom of the legend (to make it look like the legend doesnt sprout from your taskbar)
-8) C$: *DONE* Remove the gray transparent ribbon behind the legend labels, it distorts the legend colors.
-9) CS: Make the legend selector be a leaflet control button that pops out upon click. This will free the entire bottom up for the legend. **I think we might need to keep the point, line, poly toggle within the legend though.   
-10) Include "density1" as another layer that is mutually exclusive of the "cov1" layer. I'm not sure that this is expected/is low priority at this point.
-11) Implement an accordion effect for legend transition from level1 to level2 and vice versa. Do not ever remove the level1 bars, instead, squish them down to make room for the level2 classes of the selected level1.
-12) C$: *DONE* on for desktop/off for mobile. Turn the zoom control on again (especially for laptops) 
-13) C$: Implement a more granular color scheme for level1
-14) What to do when user is viewing below level 13. Tentatively target populating a non-dynamic legend with a level1/2 scheme. 
-
+1) Search: for now we can target a conventional geocoder search (addresses, places). This was voiced to be a low priority for now.
+2) Include "density1" as another layer that is mutually exclusive of the "cov1" layer. I'm not sure that this is expected/is low priority at this point.
+3) Implement an accordion effect for legend transition from level1 to level2 and vice versa. Do not ever remove the level1 bars, instead, squish them down to make room for the level2 classes of the selected level1.
+		*HV: Notes that the bars should never take up the entire legend area. We should try to make them a consistent size regardless of the # of classes being displayed.  
+4) What to do when user is viewing below level 13. Target populating a non-dynamic legend with a level1/2 scheme pulling from all classes collective coverage area.
+5) Alter township layer to also include sections 
+		*Label this layer similar to the labels used for http://maps.sco.wisc.edu/ControlFinder/ Such as: "T39N R6E"
+6) Create a class1 density layer (to be used as an overlay)
+7) Give names to the overlay layers:
+		Overlay 1 = labels (should be compatible with the aerial and streets basemaps)
+		Overlay 2 = Counties
+		Overlay 3 = PLSS (Township and Sections)
+		Overlay 4 = Class1 density
+8) Basemaps should include the following:
+		Basemap 1 = Streets (no labels and annotation, these are an overlay)
+		Basemap 2 = Aerial (no labels and annotation, these are an overlay)
+		Basemap 3 = WHAI Imagery (no labels and annotation, these are an overlay)
+9) Add multiple rows to the map click popup *if* Cov2, Cov3, Cov4 are populated.
+10) Don't use the same hue within a given class (No additional guidance on this aside from using the color bordner maps for inspiration) 
+		*Recommended to reconsider the colors altogether (with color bordner maps for inspiration)
+11) Within map click popups:
+		*Only display fields that are populated (for example density is only relevant to tree coverage)
+		*Remove the % value altogether, it isnt populated robustly enough to show
+		*Add additional rows to the popup if Cov1,Cov2,Cov3,Cov4 exist (as needed)
+		*Translate the density values into the following:
+			1 = "Good Stand Density"
+			2 = "Medium Stand Density"
+			3 = "Poor Stand Density"
+			4 = "Scattered Density"
+12) Add points/Lines (use an all, one, or none strategy). CS, check email for the data from MN, ask him for it if it cannot be found (i dont think it is in box). Note that this data only exists in the coastal counties, not the watershed.
+		* Will likely need to implement scale thresholds for features (cartoCSS will likely be enough to achieve this) so as to slowly reveal features as the user zooms in.
+		* note that there are some line features that fall on top of one another. We will need to choose symbology types that all ow the user to see both at the same time (such as varying line width, etc.).
+		* Use the bordner legend to make icons as .svg. We may be asked to give these color (as opposed to leaving them black) 
+13)	Make the mouseover box in upper right dockable
+14) Add neatline on top of legend (like the bottom neatline)
+15) Work with HV on formula for creating the bar height on a curve.
+//////////////////////////////////////////
 BUGS:
-1) CS: *DONE* Troubleshoot issues with level1/level2 toggle via legend (the legend occasionally gets stuck on one or the other). 
-2) Any latency should be considered - refactoring may be required.
-3) Point and line data?
+1) Any latency should be considered - refactoring may be required.
+2) Point and line data?
 	- Filter to all, none, or one.
-4) CS: *DONE* Bug with layer click.
-
+3) Double check the 0 values that come up in map click popups (should these be <Nulls>)
+4) It does not appear that level 2 is populating the map click popups 
+5) The ^ toggle is obfuscating someof the legend items when docked
+//////////////////////////////////////////
 DOWN THE ROAD:
 1) Locate me functionality - SCO, Jay.
 2) Stateful URL 
-3) Points/Lines (use an all, one, or none strategy)
-4) WHAI imagery
-5) Info/about pages, etc.
-6) Dictionary/key page for defining the classes better (seems lower priority right now)
+3) WHAI imagery
+4) Info/about pages, etc.
+5) Dictionary/key page for defining the classes better (seems lower priority right now)
+//////////////////////////////////////////
+COMPLETE:
+CS: *DONE* Bug with layer click.
+CS: *DONE* Troubleshoot issues with level1/level2 toggle via legend (the legend occasionally gets stuck on one or the other). 
+C$: *DONE* on for desktop/off for mobile. Turn the zoom control on again (especially for laptops) 
+C$: *DONE* Implement a more granular color scheme for level1
+SF: *DONE* Create a neatline at the bottom of the legend (to make it look like the legend doesnt sprout from your taskbar)
+C$: *DONE* Remove the gray transparent ribbon behind the legend labels, it distorts the legend colors.
+CS: *DONE* Make the legend selector be a leaflet control button that pops out upon click. This will free the entire bottom up for the legend. **I think we might need to keep the point, line, poly toggle within the legend though.  
+C$: *DONE* In progress. Include a transparency slider that allows the user to control the opacity of the bordner layer (it was not determined where this should go or what it should look like, so feel free to brainstorm)
+SF: *DONE* Include descriptive attribute names for all attributes within the popup window (this will require a scrollbar). We want to use user friendly field names (i.e. "Density of Coverage 1" instead of "den1")
+CS: *DONE* Remove tooltips
+C$: Make the upper right infobox be dockable (undeterined if this should only display "cov1" or more attributes). We could consider removing it also. 
+*DONE* Create overlays of townships, counties (and perhaps include the year of survey commencement on the counties somehow?)
+	- We may want to do this through CARTO instead of having to tile up a whole custom layer? 
