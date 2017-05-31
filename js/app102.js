@@ -16,6 +16,7 @@ var sublayer2;
 var layerOpacity = {polygons:0.65};
 var counties;
 var townships;
+var lines;
 var infowindowVars = ['cov1','cov2', 'cov3', 'cov4', 'cov5',
 					'den1', 'den2', 'den3', 'den4', 'den5',
 					'pctcov1', 'pctcov2', 'pctcov3', 'pctcov4', 'pctcov5',
@@ -166,6 +167,33 @@ window.onload = function() {
 			sql: 'SELECT * FROM twpppoly',
 			cartocss: cartoCSSTown,
 			layerIndex:3
+	}]
+	})
+	.addTo(map);
+	
+	// add bordner lines layer
+	var cartoCSSLines = "#layer { " +
+		  "line-color: #000000;"+
+		  "line-width: 1.5;"+
+		  "line-opacity: 1;"+
+		"[line_type='ARR']{"+
+		  "line-color: #e410dd;"+
+		  "line-width: 3;"+
+		  "line-opacity: 1;"+
+		"}"+
+		"[line_type='TL']{"+
+		  "line-color: #10e417;"+
+		  "line-width: 3;"+
+		  "line-opacity: 1;"+
+		"}"+
+	"}"
+	lines = cartodb.createLayer(map, {
+      user_name: 'sco-admin',
+      type: 'cartodb',
+      sublayers: [{type: "cartodb",
+			sql: 'SELECT * FROM final_coastal_lines',
+			cartocss: cartoCSSLines,
+			layerIndex: 5
 	}]
 	})
 	.addTo(map);
