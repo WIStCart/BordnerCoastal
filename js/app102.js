@@ -219,7 +219,7 @@ window.onload = function() {
 		layer.setInteraction(true);
 		setupSublayer(layer, 1, "visible");
 		setupSublayer(layer, 2, "hidden");
-		$('#rangeSlider').slider().on('slide', function (ev) {
+		$('#rangeSlider').slider().on('change', function (ev) {
 			ev.preventDefault();
 			layerOpacity.polygons = this.value / 100;
 			layer.setOpacity(layerOpacity.polygons);
@@ -465,6 +465,9 @@ function setUpMap(){
 			'<div class="checkbox">' +
 				'<label><input type="checkbox" name="overlayType" id="terrainOverlay">Terrain</label>' +
 			'</div>' +
+			'<div class="checkbox">' +
+				'<label><input type="checkbox" name="overlayType" id="class1Overlay" disabled>Class 1 Density</label>' +
+			'</div>' +
 			'<label class="legend-label">Basemap</label>' +
 			'<div class="radio">' +
 				'<label><input type="radio" name="basemapType" id="basemapA">Streets</label>' +
@@ -478,7 +481,7 @@ function setUpMap(){
 			"</div>" +
 			'<div class="col-xs-12">' +
 			'<label class="legend-label">Overlay Opacity</label>' +
-				'<input type="text" value="50" id="rangeSlider" data-slider-min="1" data-slider-max="100" data-slider-step="1" data-slider-value="65">' +
+				'<input type="text" value="50" id="rangeSlider" data-slider-min="0" data-slider-max="100" data-slider-step="1" data-slider-value="50" data-slider-ticks="[0, 100]" data-slider-ticks-labels="[0, 100]">' +
 				'</div>' +
 		'</div>')
 

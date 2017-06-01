@@ -94,7 +94,7 @@ body{
 	}
 	.layer-list-holder-open{
 		width: 120%;
-		height: 235px;
+		height: 275px;
 	}
 	.layer-list-holder-closed{
 		width: 0px;
@@ -457,8 +457,11 @@ td{
 .leaflet-search-control{
 	float: none!important;
 }
-#rangeSlider{
-	display: inline;
+.slider{
+	/*display: inline;*/
+	margin-left: 25px!important;
+	margin-right: 25px!important;
+	margin-top: 10px!important;
 }
 
 .legend-label{
