@@ -270,6 +270,21 @@ function getLevel1FromCode(code){
 	}
 }
 
+function translateDensity(den){
+	var denTranslate
+	if(den === 1){
+		denTranslate = "Good"
+	}else if (den === 2){
+		denTranslate = "Medium"
+	}else if (den === 3){
+		denTranslate = "Poor"
+	}else if (den === 4){
+		denTranslate = "Scattered"
+	}
+	console.log(den)
+	return denTranslate
+}
+
 function formatCoverageForInfowindow(content){
 	//prepare the data for templating in the infowindow
 	//not totally necessary but makes the template cleaner
@@ -281,7 +296,8 @@ function formatCoverageForInfowindow(content){
 			 density: content.data.den1,
 			 minDiameter: content.data.mindiam1,
 			 maxDiameter: content.data.maxdiam1,
-			 percentCover: content.data.pctcov1
+			 percentCover: content.data.pctcov1,
+			 densityTranslate : translateDensity(content.data.den1)
 		 },
 		 coverage2: {
 			 code: content.data.cov2,
@@ -289,7 +305,8 @@ function formatCoverageForInfowindow(content){
 			 density: content.data.den2,
 			 minDiameter: content.data.mindiam2,
 			 maxDiameter: content.data.maxdiam2,
-			 percentCover: content.data.pctcov2
+			 percentCover: content.data.pctcov2,
+			 densityTranslate : translateDensity(content.data.den2)
 		 },
 		 coverage3: {
 			 code: content.data.cov3,
@@ -297,7 +314,8 @@ function formatCoverageForInfowindow(content){
 			 density: content.data.den3,
 			 minDiameter: content.data.mindiam3,
 			 maxDiameter: content.data.maxdiam3,
-			 percentCover: content.data.pctcov3
+			 percentCover: content.data.pctcov3,
+			 densityTranslate: translateDensity(content.data.den3)
 		 },
 		 coverage4: {
 			 code: content.data.cov3,
@@ -305,7 +323,8 @@ function formatCoverageForInfowindow(content){
 			 density: content.data.den4,
 			 minDiameter: content.data.mindiam4,
 			 maxDiameter: content.data.maxdiam4,
-			 percentCover: content.data.pctcov4
+			 percentCover: content.data.pctcov4,
+			 densityTranslate: translateDensity(content.data.den4)
 		 },
 		 coverage5: {
 			 code: content.data.cov5,
@@ -313,7 +332,8 @@ function formatCoverageForInfowindow(content){
 			 density: content.data.den5,
 			 minDiameter: content.data.mindiam5,
 			 maxDiameter: content.data.maxdiam5,
-			 percentCover: content.data.pctcov5
+			 percentCover: content.data.pctcov5,
+			 densityTranslate : translateDensity(content.data.den5)
 		 }
 	}
 	return infowindowContent
@@ -323,11 +343,6 @@ function formatCoverageForInfowindow(content){
 // set up interaction upon map load or when level1 level2 is toggled
 function setupInteraction(layer, _levelEngaged, _visibility){
 	//////////////////////////////////////////////////////
-	/* To print lat/long of mouseover
-	layer.on('featureOver',function(e,latlng,pos,data){
-	  console.log(latlng[0], latlng[1])
-	});*
-
 	/* To construct a rudimentary popup on click (check .html for #infowindow_template) */
 	cdb.vis.Vis.addInfowindow(map, layer, infowindowVars,{
 		'sanitizeTemplate':false
@@ -342,20 +357,6 @@ function setupInteraction(layer, _levelEngaged, _visibility){
 		}
 	});
 
-	/* To display a tooltip upon mouseover of map
-	var tooltip = layer.leafletMap.viz.addOverlay({
-		type: 'tooltip',
-		layer: layer,
-		template: '<div class="cartodb-tooltip-content-wrapper"><p>{{cov1}}</p></div>',
-		width: 200,
-		position: 'bottom|right',
-		fields: [{ cov1: 'cov1' }]
-	});
-	$('body').append(tooltip.render().el);
-	 */
-
-	//  console.log(layer.leafletmap)
-	//
 	/* To display an infobox within a leaflet control */
 	var infoBox = layer.leafletMap.viz.addOverlay( {
 	  type: 'infobox',
@@ -504,7 +505,6 @@ function setUpMap(){
 	// Fade-in the toc button and give it a click handler
 	$("#tocButton").addClass( "toc-button-unfade" );
 	$("#tocButton").click(function(evt) { toggleTOC(evt) });
-	$("#close-toc").click(function(evt){toggleTOC(evt)})
 	// Engage Bootstrap-style tooltips
 	$('[data-toggle="tooltip"]').tooltip();
 
@@ -590,7 +590,7 @@ function turnOnOverlay(overlayCalled){
 
 // To dock/undock the table of contents from bottom
 function toggleTOC(evt){
-	evt.preventDefault();
+	// evt.preventDefault();
 	if ($( "#toc" ).hasClass( "toc-view-open" )){
 		$( ".level-1-label-text").removeClass( "shade-level-1-label-text" );
 		$( "#toc" ).removeClass( "toc-view-open" );
