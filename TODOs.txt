@@ -7,15 +7,6 @@ TODO:
 5) Alter township layer to also include sections 
 		*Label this layer similar to the labels used for http://maps.sco.wisc.edu/ControlFinder/ Such as: "T39N R6E"
 6) Create a class1 density layer (to be used as an overlay)
-7) (SF) Give names to the overlay layers:
-		Overlay 1 = labels (should be compatible with the aerial and streets basemaps)
-		Overlay 2 = Counties
-		Overlay 3 = PLSS (Township and Sections)
-		Overlay 4 = Class1 density
-8) (SF) Basemaps should include the following:
-		Basemap 1 = Streets (no labels and annotation, these are an overlay)
-		Basemap 2 = Aerial (no labels and annotation, these are an overlay)
-		Basemap 3 = WHAI Imagery (no labels and annotation, these are an overlay)
 9) Add multiple rows to the map click popup *if* Cov2, Cov3, Cov4 are populated.
 10) Don't use the same hue within a given class (No additional guidance on this aside from using the color bordner maps for inspiration) 
 		*Recommended to reconsider the colors altogether (with color bordner maps for inspiration)
@@ -33,7 +24,6 @@ TODO:
 		* note that there are some line features that fall on top of one another. We will need to choose symbology types that all ow the user to see both at the same time (such as varying line width, etc.).
 		* Use the bordner legend to make icons as .svg. We may be asked to give these color (as opposed to leaving them black) 
 13)	Make the mouseover box in upper right dockable
-14) Add neatline on top of legend (like the bottom neatline)
 15) Work with HV on formula for creating the bar height on a curve.
 //////////////////////////////////////////
 BUGS:
@@ -72,3 +62,14 @@ C$: Make the upper right infobox be dockable (undeterined if this should only di
 *DONE* Create overlays of townships, counties (and perhaps include the year of survey commencement on the counties somehow?)
 	- We may want to do this through CARTO instead of having to tile up a whole custom layer? 
 SF: *DONE*: Search: for now we can target a conventional geocoder search (addresses, places). This was voiced to be a low priority for now. (PR3)
+SF: *DONE (PR4)*: 7) 
+(SF) Give names to the overlay layers:
+			Overlay 1 = labels (should be compatible with the aerial and streets basemaps)
+			Overlay 2 = Counties
+			Overlay 3 = PLSS (Township and Sections)
+			Overlay 4 = Class1 density
+		8) (SF) Basemaps should include the following:
+			Basemap 1 = Streets (no labels and annotation, these are an overlay)
+			Basemap 2 = Aerial (no labels and annotation, these are an overlay)
+			Basemap 3 = WHAI Imagery (no labels and annotation, these are an overlay) 
+SF: *DONE*: 14) Add neatline on top of legend (like the bottom neatline)
