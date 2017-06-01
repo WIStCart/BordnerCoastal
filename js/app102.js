@@ -24,19 +24,14 @@ var infowindowVars = ['cov1','cov2', 'cov3', 'cov4', 'cov5',
 					 'maxdiam1','maxdiam2','maxdiam3','maxdiam4','maxdiam5' ]
 
 // Overlay definitions:
-var overlay1 = L.tileLayer('http://{s}.tile.stamen.com/toner-labels/{z}/{x}/{y}.png', {
+var labelsOverlay = L.tileLayer('http://{s}.tile.stamen.com/toner-labels/{z}/{x}/{y}.png', {
 	attribution: 'stamen toner labels'
 });
 
-var overlay2 = L.tileLayer('http://{s}.tiles.wmflabs.org/hillshading/{z}/{x}/{y}.png', {
+var terrainOverlay = L.tileLayer('http://{s}.tiles.wmflabs.org/hillshading/{z}/{x}/{y}.png', {
 	maxZoom: 15,
 	opacity: 1,
 	attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-});
-
-var overlay3 = 	L.tileLayer('http://maps.sco.wisc.edu/V1/bordner/03_WHAI_Tiles/00_Demo_Kewaunee/{z}/{x}/{y}.png', {
-	opacity: 0.4,
-	attribution: 'WHAI Finder'
 });
 
 // Basemap definitions:
@@ -48,18 +43,11 @@ var basemapB =  L.tileLayer('http://server.arcgisonline.com/ArcGIS/rest/services
 	attribution: 'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community'
 });
 
-/*var basemapC = L.tileLayer('http://stamen-tiles-{s}.a.ssl.fastly.net/terrain-background/{z}/{x}/{y}.{ext}', {
-	attribution: 'Map tiles by <a href="http://stamen.com">Stamen Design</a>, <a href="http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a> &mdash; Map data &copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>',
-	subdomains: 'abcd',
-	minZoom: 0,
-	maxZoom: 18,
-	ext: 'png'
-});*/
 
-var basemapC = L.tileLayer('https://tiles{s}.arcgis.com/tiles/n6uYoouQZW75n5WI/arcgis/rest/services/V2_RasterParcelOnly_2_20160929/MapServer/tile/{z}/{y}/{x}', {
-	attribution: 'V2 Statewide Parcels',
-	subdomains: '123'
-});
+// var basemapC = 	L.tileLayer('http://maps.sco.wisc.edu/V1/bordner/03_WHAI_Tiles/00_Demo_Kewaunee/{z}/{x}/{y}.png', {
+// 	opacity: 0.4,
+// 	attribution: 'WHAI Finder'
+// });
 
 // Create CartoCSS
 function getPolyStyle(level, level1Selected){
@@ -114,6 +102,7 @@ window.onload = function() {
 		cartodb_logo: false,
 		center: [43.7844,-88.7879],
 		zoom: 7,
+		minZoom:6
 	});
 
 	// Add county layer
@@ -132,7 +121,7 @@ window.onload = function() {
 	  "text-halo-fill: #000000;"+
 	"}"
 
-	counties = cartodb.createLayer(map, {
+	cartodb.createLayer(map, {
       user_name: 'sco-admin',
       type: 'cartodb',
       sublayers: [{type: "cartodb",
@@ -141,7 +130,10 @@ window.onload = function() {
 			layerIndex:4
 	}]
 	})
-	.addTo(map);
+	.addTo(map)
+	.done(function(layer){
+		counties = layer;
+	})
 
 	// Add township layer
 	var cartoCSSTown = "#layer { " +
@@ -160,7 +152,7 @@ window.onload = function() {
 	    "text-halo-fill: #000000;"+
 	  "}"+
 	"}"
-	townships = cartodb.createLayer(map, {
+	cartodb.createLayer(map, {
       user_name: 'sco-admin',
       type: 'cartodb',
       sublayers: [{type: "cartodb",
@@ -169,7 +161,10 @@ window.onload = function() {
 			layerIndex:3
 	}]
 	})
-	.addTo(map);
+	.addTo(map)
+	.done(function(layer){
+		townships = layer;
+	})
 
 	// add bordner lines layer
 	var cartoCSSLines = "#layer { " +
@@ -224,7 +219,8 @@ window.onload = function() {
 		layer.setInteraction(true);
 		setupSublayer(layer, 1, "visible");
 		setupSublayer(layer, 2, "hidden");
-		$('#rangeSlider').slider().on('slide', function (ev) {
+		$('#rangeSlider').slider().on('change', function (ev) {
+			ev.preventDefault();
 			layerOpacity.polygons = this.value / 100;
 			layer.setOpacity(layerOpacity.polygons);
 		});
@@ -380,6 +376,18 @@ function setupInteraction(layer, _levelEngaged, _visibility){
 	})
 
 	setupGeocoderSearch()
+
+	//disable mouse events when the table of contents is in use
+	$("#layerList").on('mouseover', function(){
+		map.dragging.disable();
+		map.touchZoom.disable();
+		map.doubleClickZoom.disable();
+	})
+	$("#layerList").on('mouseout', function(){
+		map.dragging.enable();
+		map.touchZoom.enable();
+		map.doubleClickZoom.enable();
+	})
 }
 
 function setupGeocoderSearch(){
@@ -428,7 +436,11 @@ function setUpMap(){
 		)
 
 	$("#layerListHolder")
-		.html('<div class="col-sm-2 layer-list-view transition-class" id="layerList">' +
+		.html(
+			'<div class="layer-list-view transition-class row" id="layerList">' +
+		'<h5>Legend</h5>' +
+		'<div class="col-xs-12">' +
+		'<label class="legend-label">Feature Type</label>' +
 			'<div class="feature-type-radio-group">' +
 				'<div class="radio">' +
 					'<label><input type="radio" name="featureType" id="featurePolygons">Polygons</label>' +
@@ -440,25 +452,34 @@ function setUpMap(){
 					'<label><input type="radio" name="featureType" id="featureLines">Lines</label>' +
 				'</div>' +
 			'</div>' +
+			'<label class="legend-label">Overlays</label>' +
 			'<div class="checkbox">' +
-				'<label><input type="checkbox" name="overlayType" id="overlay1">Overlay 1</label>' +
-			'</div>' +
-			'<div class="checkbox">' +
-				'<label><input type="checkbox" name="overlayType" id="overlay2">Overlay 2</label>' +
+				'<label><input type="checkbox" name="overlayType" id="labelsOverlay">Labels</label>' +
 			'</div>' +
 			'<div class="checkbox">' +
-				'<label><input type="checkbox" name="overlayType" id="overlay3">Overlay 3</label>' +
+				'<label><input type="checkbox" name="overlayType" id="counties" checked>Counties</label>' +
+			'</div>' +
+			'<div class="checkbox">' +
+				'<label><input type="checkbox" name="overlayType" id="townships" checked>PLSS</label>' +
+			'</div>' +
+			'<div class="checkbox">' +
+				'<label><input type="checkbox" name="overlayType" id="class1Overlay" disabled>Class 1 Density</label>' +
+			'</div>' +
+			'<label class="legend-label">Basemap</label>' +
+			'<div class="radio">' +
+				'<label><input type="radio" name="basemapType" id="basemapA">Streets</label>' +
 			'</div>' +
 			'<div class="radio">' +
-				'<label><input type="radio" name="basemapType" id="basemapA">Basemap A</label>' +
+				'<label><input type="radio" name="basemapType" id="basemapB">Satellite</label>' +
 			'</div>' +
 			'<div class="radio">' +
-				'<label><input type="radio" name="basemapType" id="basemapB">Basemap B</label>' +
+				'<label><input type="radio" name="basemapType" id="basemapC" disabled>Historic Imagery</label>' +
 			'</div>' +
-			'<div class="radio">' +
-				'<label><input type="radio" name="basemapType" id="basemapC">Basemap C</label>' +
-				'<input type="text" value="50" id="rangeSlider" data-slider-min="1" data-slider-max="100" data-slider-step="1" data-slider-value="65">' +
-			'</div>' +
+			"</div>" +
+			'<div class="col-xs-12">' +
+			'<label class="legend-label">Overlay Opacity</label>' +
+				'<input type="text" value="50" id="rangeSlider" data-slider-min="0" data-slider-max="100" data-slider-step="1" data-slider-value="50" data-slider-ticks="[0, 100]" data-slider-ticks-labels="[0, 100]">' +
+				'</div>' +
 		'</div>')
 
 	$('input[name=featureType]').click(function(){ turnOnFeatureType(this.id) });
@@ -482,8 +503,8 @@ function setUpMap(){
 
 	// Fade-in the toc button and give it a click handler
 	$("#tocButton").addClass( "toc-button-unfade" );
-	$("#tocButton").click(function() { toggleTOC() });
-
+	$("#tocButton").click(function(evt) { toggleTOC(evt) });
+	$("#close-toc").click(function(evt){toggleTOC(evt)})
 	// Engage Bootstrap-style tooltips
 	$('[data-toggle="tooltip"]').tooltip();
 
@@ -557,6 +578,7 @@ function turnOnBasemap(basemapCalled){
 
 // To turn on the appropriate basemap, note, the radio button's id must match the basemap's variable name
 function turnOnOverlay(overlayCalled){
+	console.log(overlayCalled)
 	if (map.hasLayer(window[overlayCalled])){
 		map.removeLayer(window[overlayCalled]);
 	}else{
@@ -565,8 +587,9 @@ function turnOnOverlay(overlayCalled){
 }
 
 // To dock/undock the table of contents from bottom
-function toggleTOC(){
-	if ($( "#toc" ).hasClass( "toc-view-open" )){ //is closed
+function toggleTOC(evt){
+	evt.preventDefault();
+	if ($( "#toc" ).hasClass( "toc-view-open" )){
 		$( ".level-1-label-text").removeClass( "shade-level-1-label-text" );
 		$( "#toc" ).removeClass( "toc-view-open" );
 		$( "#toc" ).addClass( "toc-view-closed" );
@@ -583,7 +606,6 @@ function toggleTOC(){
 		if (desktopMode){
 			$( ".level-1-label-text").addClass( "shade-level-1-label-text" );
 		}
-					//the interface is open
 		$( "#toc" ).addClass( "toc-view-open" );
 		$( "#toc" ).removeClass( "toc-view-closed" );
 		$( "#map" ).addClass( "map-view-toc" );
@@ -651,8 +673,10 @@ function dispatchButtonClick(buttonClicked){
 			if ((desktopMode == true)&&(buttonClicked == "layerListButton")){
 				if ($( "#layerListHolder" ).hasClass( "layer-list-holder-closed" )){
 					$( "#layerListHolder" ).addClass( "layer-list-holder-open" ).removeClass( "layer-list-holder-closed" );
+					$("#geocodeButton").css({'visibility': 'hidden'});
 				}else{
 					$( "#layerListHolder" ).addClass( "layer-list-holder-closed" ).removeClass( "layer-list-holder-open" );
+					$("#geocodeButton").css({'visibility': 'visible'});
 				}
 			}else{
 				$( "#legend" ).addClass( "legend-off" );
