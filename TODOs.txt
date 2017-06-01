@@ -1,6 +1,5 @@
 //////////////////////////////////////////
 TODO:
-1) Search: for now we can target a conventional geocoder search (addresses, places). This was voiced to be a low priority for now.
 2) Include "density1" as another layer that is mutually exclusive of the "cov1" layer. I'm not sure that this is expected/is low priority at this point.
 3) Implement an accordion effect for legend transition from level1 to level2 and vice versa. Do not ever remove the level1 bars, instead, squish them down to make room for the level2 classes of the selected level1.
 		*HV: Notes that the bars should never take up the entire legend area. We should try to make them a consistent size regardless of the # of classes being displayed.  
@@ -72,3 +71,4 @@ CS: *DONE* Remove tooltips
 C$: Make the upper right infobox be dockable (undeterined if this should only display "cov1" or more attributes). We could consider removing it also. 
 *DONE* Create overlays of townships, counties (and perhaps include the year of survey commencement on the counties somehow?)
 	- We may want to do this through CARTO instead of having to tile up a whole custom layer? 
+SF: *DONE*: Search: for now we can target a conventional geocoder search (addresses, places). This was voiced to be a low priority for now. (PR3)
