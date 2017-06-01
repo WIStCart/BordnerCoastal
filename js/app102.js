@@ -405,8 +405,8 @@ function setupGeocoderSearch(){
 		$(".text").show();
 	})
 	$("#geocodeButton").on("mouseout", function(){
-		$(this).width("100%")
-		$(".cartodb-searchbox").width('100%')
+		$(this).width("28px")
+		$(".cartodb-searchbox").width('28px')
 		$('.text').val("")
 		$(".text").hide();
 	})
@@ -432,13 +432,13 @@ function setUpMap(){
 			'</div></br>' +
 			'<div data-toggle="tooltip" title="search" class="leaflet-bar leaflet-control leaflet-control-custom leaflet-search-control" id="geocodeButton">' +
 			'</div></br>' +
-			'<div class="leaflet-bar leaflet-control layer-list-holder-closed transition-class" id="layerListHolder"></div></br>'
+			'<div class="leaflet-bar leaflet-control layer-list-holder-closed transition-class closed" id="layerListHolder"></div></br>'
 		)
 
 	$("#layerListHolder")
 		.html(
 			'<div class="layer-list-view transition-class row" id="layerList">' +
-		'<h5>Legend</h5>' +
+		'<h5>Table of Contents</h5>' +
 		'<div class="col-xs-12">' +
 		'<label class="legend-label">Feature Type</label>' +
 			'<div class="feature-type-radio-group">' +
@@ -519,6 +519,8 @@ function setUpMap(){
 	map.on('moveend', function() {
 		drawThisView(map.getBounds(), map.getZoom(), levelEngaged, level1Selected);
 	});
+
+	$("#layerList").addClass("closed")
 
 
 	// Done, tell the console!
@@ -669,14 +671,14 @@ function dispatchButtonClick(buttonClicked){
 			$( "#layerList" ).addClass( "layer-list-off" );
 			break;
 		case "layerListButton":
-			console.log("Layer List")
+
 			if ((desktopMode == true)&&(buttonClicked == "layerListButton")){
-				if ($( "#layerListHolder" ).hasClass( "layer-list-holder-closed" )){
-					$( "#layerListHolder" ).addClass( "layer-list-holder-open" ).removeClass( "layer-list-holder-closed" );
-					$("#geocodeButton").css({'visibility': 'hidden'});
+				if ($( "#layerList" ).hasClass( "open" )){
+					$("#layerList").addClass('closed').removeClass('open')
+					$("#layerListHolder").hide();
 				}else{
-					$( "#layerListHolder" ).addClass( "layer-list-holder-closed" ).removeClass( "layer-list-holder-open" );
-					$("#geocodeButton").css({'visibility': 'visible'});
+					$("#layerList").addClass('open').removeClass('closed')
+					$("#layerListHolder").show();
 				}
 			}else{
 				$( "#legend" ).addClass( "legend-off" );
