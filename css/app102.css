@@ -337,7 +337,7 @@ input:checked + .slider:before {
 /*Aligns zoom controls with other custom controls*/
 .leaflet-control-zoom{
 	margin-left: 20px !important;
-	
+
 }
 
 /*Matches zoom control color to other control colors*/
@@ -445,4 +445,12 @@ th{
 td{
 	padding-left: 25px!important;
 	text-align: left;
+}
+
+.cartodb-searchbox{
+	float: none!important;
+}
+
+.leaflet-search-control{
+	float: none!important;
 }
