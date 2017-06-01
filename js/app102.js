@@ -113,9 +113,9 @@ window.onload = function() {
 		zoomControl: true,
 		cartodb_logo: false,
 		center: [43.7844,-88.7879],
-		zoom: 7
+		zoom: 7,
 	});
-		
+
 	// Add county layer
 	var cartoCSSCounty = "#layer { " +
 	  "polygon-fill: #374C70;" +
@@ -130,8 +130,8 @@ window.onload = function() {
 	  "text-size: 13;"+
 	  "text-fill: #fff;"+
 	  "text-halo-fill: #000000;"+
-	"}" 
-	
+	"}"
+
 	counties = cartodb.createLayer(map, {
       user_name: 'sco-admin',
       type: 'cartodb',
@@ -142,7 +142,7 @@ window.onload = function() {
 	}]
 	})
 	.addTo(map);
-	
+
 	// Add township layer
 	var cartoCSSTown = "#layer { " +
 	  "polygon-fill: #374C70;" +
@@ -170,7 +170,7 @@ window.onload = function() {
 	}]
 	})
 	.addTo(map);
-	
+
 	// add bordner lines layer
 	var cartoCSSLines = "#layer { " +
 		  "line-color: #000000;"+
@@ -197,8 +197,8 @@ window.onload = function() {
 	}]
 	})
 	.addTo(map);
-	
-	// add bordner layer	
+
+	// add bordner layer
 	createStyles()
 	cartoCSSRules = getPolyStyle("level1");
 	// Promise for the first layer
@@ -227,20 +227,22 @@ window.onload = function() {
 		$('#rangeSlider').slider().on('slide', function (ev) {
 			layerOpacity.polygons = this.value / 100;
 			layer.setOpacity(layerOpacity.polygons);
-		});		
+		});
 	});
 	setUpMap();
 };
 
-// function for setting up the two sublayers - will turn off the sublayer if it is "hidden" 
-function setupSublayer(layer, _levelEngaged, _visibility){	
+// function for setting up the two sublayers - will turn off the sublayer if it is "hidden"
+function setupSublayer(layer, _levelEngaged, _visibility){
 	window["sublayer" + _levelEngaged] = layer.getSubLayer(_levelEngaged - 1);
 	if (_visibility == "hidden"){
 		window["sublayer" + _levelEngaged].hide();
 	}else{
 		setupInteraction(layer, _levelEngaged, _visibility)
 	}
-}	
+}
+
+
 
 function lookupClassFromCode(code){
 	//get the object metadata corresponding to the cover code
@@ -323,7 +325,7 @@ function formatCoverageForInfowindow(content){
 
 
 // set up interaction upon map load or when level1 level2 is toggled
-function setupInteraction(layer, _levelEngaged, _visibility){			
+function setupInteraction(layer, _levelEngaged, _visibility){
 	//////////////////////////////////////////////////////
 	/* To print lat/long of mouseover
 	layer.on('featureOver',function(e,latlng,pos,data){
@@ -376,6 +378,10 @@ function setupInteraction(layer, _levelEngaged, _visibility){
 		level1 = getLevel1FromCode(data.cov1)
 		$("#level1-set").html(level1)
 	})
+
+	var v = cdb.vis.Overlay.create("search", map.viz, {})
+	v.show();
+	$("#search").append(v.render().el)
 }
 
 // Sets everything up after pageload and map creation are complete
@@ -392,12 +398,17 @@ function setUpMap(){
 			'</div></br>' +
 			'<div data-toggle="tooltip" title="layers" class="leaflet-bar leaflet-control leaflet-control-custom" id="layerListButton" onClick="dispatchButtonClick(this.id)">' +
 				'<span id="layerListButtonIcon" class="button-icon-class glyphicon glyphicon-menu-hamburger">' +
-			'</div></br>' + 
+			'</div></br>' +
 			'<div data-toggle="tooltip" title="legend" class="leaflet-bar leaflet-control leaflet-control-custom" id="legendButton" onClick="dispatchButtonClick(this.id)">' +
 				'<span id="legendButtonIcon" class="button-icon-class glyphicon glyphicon-option-horizontal">' +
 			'</div></br>' +
-			'<div class="leaflet-bar leaflet-control layer-list-holder-closed transition-class" id="layerListHolder"></div></br>')
-			
+			// '<div data-toggle="tooltip" title="search" class="leaflet-bar leaflet-control leaflet-control-custom" id="geocodeButton" onClick="dispatchButtonClick(this.id)">' +
+			// 	'<span id="legendButtonIcon" class="button-icon-class glyphicon glyphicon glyphicon-globe">' +
+			// '</div></br>' +
+			'<div id="search"></div>' + //search bar goes in here and
+			'<div class="leaflet-bar leaflet-control layer-list-holder-closed transition-class" id="layerListHolder"></div></br>'
+		)
+
 	$("#layerListHolder")
 		.html('<div class="col-sm-2 layer-list-view transition-class" id="layerList">' +
 			'<div class="feature-type-radio-group">' +
@@ -454,7 +465,7 @@ function setUpMap(){
 	// Fade-in the toc button and give it a click handler
 	$("#tocButton").addClass( "toc-button-unfade" );
 	$("#tocButton").click(function() { toggleTOC() });
-		
+
 	// Engage Bootstrap-style tooltips
 	$('[data-toggle="tooltip"]').tooltip();
 
@@ -597,7 +608,7 @@ function dispatchButtonClick(buttonClicked){
 	// If modal is not already open, then open it
 	if ($('.modal.in').length <= 0){
 		if ((desktopMode == true)&&(buttonClicked == "layerListButton")){
-			
+
 		}else{
 			$( "#tocModal" ).modal();
 			// If the table of contents is collapsed and we are in tablet mode, then open it by toggleTOC()
@@ -626,7 +637,7 @@ function dispatchButtonClick(buttonClicked){
 				}
 			}else{
 				$( "#legend" ).addClass( "legend-off" );
-				$( "#layerList" ).removeClass( "layer-list-off" );				
+				$( "#layerList" ).removeClass( "layer-list-off" );
 			}
 			break;
 		case "infoButton":
@@ -636,6 +647,9 @@ function dispatchButtonClick(buttonClicked){
 		case "shareButton":
 			console.log("Share")
 			configInfoShareModal();
+			break;
+		case "geocodeButton":
+			$("#search").show();
 			break;
 		default:
 			console.log("unidentified button click")
@@ -800,7 +814,7 @@ function dispatchLegendClick(classCode){
 	drawThisView(map.getBounds(), map.getZoom(), levelEngaged, level1Selected);
 }
 
-// called upon click of legend item 
+// called upon click of legend item
 function switchLevel(_levelEngaged, _level1Selected){
 	cartoCSSRules = getPolyStyle("level"+_levelEngaged, _level1Selected);
 	if (_levelEngaged == "2"){
@@ -836,10 +850,11 @@ var Map = cdb.core.View.extend({
 
 	_initMap: function(data) {
 	  var self = this;
-	  cartodb.createVis(this.$el, data.vizjson)
+	  cartodb.createVis(this.$el, data.vizjson, {search: true})
 		.done(function(vis, layers) {
 		  self.layers = layers[1];
 		  self.map = vis.getNativeMap();
+			var v = cdb.vis.Overlay.create('search', map.viz, {});
 		});
 	},
 
