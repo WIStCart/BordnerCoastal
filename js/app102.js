@@ -463,9 +463,6 @@ function setUpMap(){
 				'<label><input type="checkbox" name="overlayType" id="townships" checked>PLSS</label>' +
 			'</div>' +
 			'<div class="checkbox">' +
-				'<label><input type="checkbox" name="overlayType" id="terrainOverlay">Terrain</label>' +
-			'</div>' +
-			'<div class="checkbox">' +
 				'<label><input type="checkbox" name="overlayType" id="class1Overlay" disabled>Class 1 Density</label>' +
 			'</div>' +
 			'<label class="legend-label">Basemap</label>' +
