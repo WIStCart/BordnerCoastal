@@ -673,8 +673,10 @@ function dispatchButtonClick(buttonClicked){
 			if ((desktopMode == true)&&(buttonClicked == "layerListButton")){
 				if ($( "#layerListHolder" ).hasClass( "layer-list-holder-closed" )){
 					$( "#layerListHolder" ).addClass( "layer-list-holder-open" ).removeClass( "layer-list-holder-closed" );
+					$("#geocodeButton").css({'visibility': 'hidden'});
 				}else{
 					$( "#layerListHolder" ).addClass( "layer-list-holder-closed" ).removeClass( "layer-list-holder-open" );
+					$("#geocodeButton").css({'visibility': 'visible'});
 				}
 			}else{
 				$( "#legend" ).addClass( "legend-off" );
