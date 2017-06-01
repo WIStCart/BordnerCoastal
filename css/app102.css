@@ -54,9 +54,10 @@ body{
 		left: -5px;
 	}
 	.layer-list-view{
-	    padding-left: 50px !important;
+	  padding-left: 50px !important;
 		padding-top: 12px;
-		height: 300% !important;
+		height: 500% !important;
+		overflow-y: auto!important;
 	}
 }
 
@@ -88,19 +89,19 @@ body{
 	}
 	#layerListHolder{
 	    position: relative;
-		top: -55px;
-		left: 20px;
+		top: -90px;
+		left: 12px;
 	}
 	.layer-list-holder-open{
-		width: 239px;
-		height: 191px;
+		width: 120%;
+		height: 235px;
 	}
 	.layer-list-holder-closed{
 		width: 0px;
 		height: 0px;
 	}
 	#layerList{
-		width: 100%;
+		width: 120%;
 	}
 }
 
@@ -162,9 +163,11 @@ body{
 /* toc elements  */
 .layer-list-view{
 	background-color: #2c5875;
+	border-radius: 5px;
 	padding-left:5px;
-	height: 100%;
-	overflow-y: auto;
+	height: 150%;
+	overflow-y: hidden;
+	overflow-x: hidden;
 	min-height: 0px !important;
 }
 .level-toggle-view{
@@ -453,4 +456,18 @@ td{
 
 .leaflet-search-control{
 	float: none!important;
+}
+#rangeSlider{
+	display: inline;
+}
+
+.legend-label{
+	padding-top: 10px;
+	margin-bottom: 0px;
+}
+
+#close-toc{
+	position: relative;
+	top: 0px;
+	right: 0px;
 }
