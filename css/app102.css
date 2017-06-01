@@ -447,6 +447,10 @@ td{
 	text-align: left;
 }
 
-#search{
-	z-index: 100000000000;
+.cartodb-searchbox{
+	float: none!important;
+}
+
+.leaflet-search-control{
+	float: none!important;
 }

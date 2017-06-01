@@ -379,9 +379,29 @@ function setupInteraction(layer, _levelEngaged, _visibility){
 		$("#level1-set").html(level1)
 	})
 
+	setupGeocoderSearch()
+}
+
+function setupGeocoderSearch(){
+	//render the template
 	var v = cdb.vis.Overlay.create("search", map.viz, {})
 	v.show();
-	$("#search").append(v.render().el)
+	$("#geocodeButton").html(v.render().el)
+	//jquery magic to make it look nicer
+	$("geocodeButton").width('100%');
+	$(".cartodb-searchbox").width('100%');
+	$(".text").hide();
+	$("#geocodeButton").on('mouseover', function(){
+		$(this).width("200%")
+		$(".cartodb-searchbox").width('200%');
+		$(".text").show();
+	})
+	$("#geocodeButton").on("mouseout", function(){
+		$(this).width("100%")
+		$(".cartodb-searchbox").width('100%')
+		$('.text').val("")
+		$(".text").hide();
+	})
 }
 
 // Sets everything up after pageload and map creation are complete
@@ -402,10 +422,8 @@ function setUpMap(){
 			'<div data-toggle="tooltip" title="legend" class="leaflet-bar leaflet-control leaflet-control-custom" id="legendButton" onClick="dispatchButtonClick(this.id)">' +
 				'<span id="legendButtonIcon" class="button-icon-class glyphicon glyphicon-option-horizontal">' +
 			'</div></br>' +
-			// '<div data-toggle="tooltip" title="search" class="leaflet-bar leaflet-control leaflet-control-custom" id="geocodeButton" onClick="dispatchButtonClick(this.id)">' +
-			// 	'<span id="legendButtonIcon" class="button-icon-class glyphicon glyphicon glyphicon-globe">' +
-			// '</div></br>' +
-			'<div id="search"></div>' + //search bar goes in here and
+			'<div data-toggle="tooltip" title="search" class="leaflet-bar leaflet-control leaflet-control-custom leaflet-search-control" id="geocodeButton">' +
+			'</div></br>' +
 			'<div class="leaflet-bar leaflet-control layer-list-holder-closed transition-class" id="layerListHolder"></div></br>'
 		)
 
@@ -480,6 +498,7 @@ function setUpMap(){
 	map.on('moveend', function() {
 		drawThisView(map.getBounds(), map.getZoom(), levelEngaged, level1Selected);
 	});
+
 
 	// Done, tell the console!
 	console.log("setUpMap() complete. desktopMode = " + desktopMode)
@@ -649,7 +668,6 @@ function dispatchButtonClick(buttonClicked){
 			configInfoShareModal();
 			break;
 		case "geocodeButton":
-			$("#search").show();
 			break;
 		default:
 			console.log("unidentified button click")
