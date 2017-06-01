@@ -7,12 +7,12 @@ TODO:
 5) Alter township layer to also include sections 
 		*Label this layer similar to the labels used for http://maps.sco.wisc.edu/ControlFinder/ Such as: "T39N R6E"
 6) Create a class1 density layer (to be used as an overlay)
-7) Give names to the overlay layers:
+7) (SF) Give names to the overlay layers:
 		Overlay 1 = labels (should be compatible with the aerial and streets basemaps)
 		Overlay 2 = Counties
 		Overlay 3 = PLSS (Township and Sections)
 		Overlay 4 = Class1 density
-8) Basemaps should include the following:
+8) (SF) Basemaps should include the following:
 		Basemap 1 = Streets (no labels and annotation, these are an overlay)
 		Basemap 2 = Aerial (no labels and annotation, these are an overlay)
 		Basemap 3 = WHAI Imagery (no labels and annotation, these are an overlay)
