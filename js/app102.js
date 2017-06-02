@@ -919,32 +919,87 @@ function drawPolygonHistogram(data, _levelEngaged, el){
 		.attr('class', 'y axis')
 		.call(yAxis)
 
+	//add a background rectange to listen for click events
+	svg.selectAll("background")
+		.data(summary)
+		.enter()
+			.append('rect')
+			.attr('class', function(d){ return "background " + d.type.split(" ").join("_")})
+			.style('fill', function(d){return d.color})
+			.style('fill-opacity', 0.15)
+			.attr('x', function(d){ return xScale(d.type)})
+			.attr('width', xScale.rangeBand())
+			.attr('y', 0)
+			.attr('height', height)
+			.on('click', function(d){
+				level1Selected = d.type.toLowerCase()
+				dispatchLegendClick(level1Selected)
+			})
+			//change colors on hover
+			.on('mouseover', function(d){
+				if (_levelEngaged == 1){
+					var self = d3.select(this)
+					//set old color so we can recover it
+					var oldColor = self.style('fill')
+					self.attr('data-fill', oldColor)
+					var newColor = shadeRGBColor(oldColor, -0.25)
+					self.style('fill', newColor)
+					d3.selectAll("." + d.type.split(" ").join("_")).style('fill', newColor)
+				}
+				//make taller
+				// self.attr('y', 0)
+				// self.attr('height', height)
+			})
+			.on('mouseout', function(d){
+				if (_levelEngaged == 1){
+					var self = d3.select(this)
+					var oldColor = self.attr('data-fill')
+					self.style('fill', oldColor)
+				 d3.selectAll("." + d.type.split(" ").join("_")).style('fill', oldColor)
+				}
+			})
+
+
+			//these are the data-driven bars proportional to the area in the screen
 	svg.selectAll('bar')
 		.data(summary)
 		.enter().append('rect')
+		.attr('class', function(d){ return "background " + d.type.split(" ").join("_")})
 		.style('fill', function(d){return d.color})
 		.attr('x', function(d){ return xScale(d.type)})
 		.attr('width', xScale.rangeBand())
-		.attr('y', function(d){return yScale(d.area / polygonLegendFactor)})
-		.attr('height', function(d){return height - yScale(d.area / polygonLegendFactor)})
-		.on('click', function(d){
-			level1Selected = d.type.toLowerCase()
-			dispatchLegendClick(level1Selected)
-		})
-		//change colors on hover
-		.on('mouseover', function(d){
-			var self = d3.select(this)
-			//set old color so we can recover it
-			var oldColor = self.style('fill')
-			self.attr('data-fill', oldColor)
-			var newColor = shadeRGBColor(oldColor, 0.50)
-			self.style('fill', newColor)
-		})
-		.on('mouseout', function(d){
-			var self = d3.select(this)
-			var oldColor = self.attr('data-fill')
-			self.style('fill', oldColor)
-		})
+		.attr('y', function(d){
+			var scaledY = yScale(d.area / polygonLegendFactor);
+			return scaledY})
+		.attr('height', function(d){
+			var scaledHeight = height - yScale(d.area / polygonLegendFactor)
+			return scaledHeight})
+			.on('click', function(d){
+				level1Selected = d.type.toLowerCase()
+				dispatchLegendClick(level1Selected)
+			})
+			//change colors on hover
+			.on('mouseover', function(d){
+				if (_levelEngaged == 1){
+					var self = d3.select(this)
+					//set old color so we can recover it
+					var oldColor = self.style('fill')
+					self.attr('data-fill', oldColor)
+					var newColor = shadeRGBColor(oldColor, -0.25)
+					d3.selectAll("." + d.type.split(" ").join("_")).style('fill', newColor)
+				}
+				//make taller
+				// self.attr('y', 0)
+				// self.attr('height', height)
+			})
+			.on('mouseout', function(d){
+				if (_levelEngaged == 1){
+					var self = d3.select(this)
+					var oldColor = self.attr('data-fill')
+				  d3.selectAll("." + d.type.split(" ").join("_")).style('fill', oldColor)
+				}
+			})
+
 
 	svg.append('text')
 		.attr('transform', 'rotate(-90)')
