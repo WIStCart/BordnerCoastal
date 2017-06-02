@@ -25,6 +25,7 @@ var infowindowVars = ['cov1','cov2', 'cov3', 'cov4', 'cov5',
 					 'maxdiam1','maxdiam2','maxdiam3','maxdiam4','maxdiam5' ]
 var polygonLegend; //svg polygon legend
 var level1Colors;
+var level2Colors;
 var polygonLegendFactor = 1e6;
 // Overlay definitions:
 var labelsOverlay = L.tileLayer('http://{s}.tile.stamen.com/toner-labels/{z}/{x}/{y}.png', {
@@ -64,15 +65,17 @@ function getPolyStyle(level, level1Selected){
 			style += thisStyle;
 		}
 	}else{
+		console.log(level1Selected)
 		style = "#layer{polygon-fill: #DDDDDD;polygon-opacity: 0;";
 		for(var i = 0; i < classes.length; i++) {
-			if (level1Selected == classes[i].level1) {
+			if (level1Selected == classes[i].level1var) {
 				var thisStyle = "[cov1='"+classes[i].code+"']{polygon-fill: "+classes[i].color2+";polygon-opacity:1;}";
 				style += thisStyle;
 			}
 		}
 	}
 	style += "}";
+	console.log(style)
 	return style;
 };
 
@@ -96,6 +99,15 @@ function makeLevel1ColorList(){
 	//all colors should be the same within a level 1
 	colors = _.map(grouped, function(g, key){
 		return {level1: key, color: g[0].color1}
+	})
+	return colors
+}
+function makeLevel2ColorList(){
+	//not efficient :(
+	var grouped = _.groupBy(tempClasses2.classes, "level2")
+	//all colors should be the same within a level 1
+	colors = _.map(grouped, function(g, key){
+		return {level2: key, color: g[0].color2}
 	})
 	return colors
 }
@@ -401,7 +413,9 @@ function setupInteraction(layer, _levelEngaged, _visibility){
 		map.touchZoom.enable();
 		map.doubleClickZoom.enable();
 	})
+	//make lists of color for using in the legend later
 	level1Colors = makeLevel1ColorList();
+	level2Colors = makeLevel2ColorList();
 } //end setup interaction
 
 function setupGeocoderSearch(){
@@ -806,21 +820,13 @@ function drawThisView(boundsIn, zoomIn, _levelEngaged, _level1Selected){
 		//var _levelEngaged = "1"
 		if ((zoomIn >= 13) && (legendType === "polygons")){
 			if (_levelEngaged == "1"){
+				//if overview (level1) do this
 				var cartoQuery = "SELECT cov1, area FROM final_coastal_polygons WHERE the_geom && ST_SetSRID(ST_MakeBox2D(ST_Point(" +
 					String(boundsIn._northEast.lng)+","+String(boundsIn._northEast.lat)+"), ST_Point(" +
 					String(boundsIn._southWest.lng)+","+String(boundsIn._southWest.lat)+")), 4326) ORDER BY cov1 DESC"
 			}else{
-
-				var classesSelected = "";
-				var countClasses = 0;
-				var operatorInclusion = ""
-				jQuery.each(level1Membership[_level1Selected], function(i, val) {
-					if (countClasses == 1){
-						operatorInclusion = " OR "
-					}
-					classesSelected = classesSelected + operatorInclusion + "(cov1 = '" + val.code + "')"
-					countClasses++;
-				})
+				//detailed view of sing class
+			classesSelected = getLevel1MemberSearch(_level1Selected)
 				var cartoQuery = "SELECT cov1, area FROM final_coastal_polygons WHERE (" + classesSelected +
 					") AND the_geom && ST_SetSRID(ST_MakeBox2D(ST_Point(" +
 					String(boundsIn._northEast.lng)+","+String(boundsIn._northEast.lat)+"), ST_Point(" +
@@ -843,12 +849,26 @@ function drawThisView(boundsIn, zoomIn, _levelEngaged, _level1Selected){
 }
 
 
-var superscript = "⁰¹²³⁴⁵⁶⁷⁸⁹"
-var formatPower = function(d) { return (d + "").split("").map(function(c) { return superscript[c]; }).join(""); };
+function getLevel1MemberSearch(_level1Selected){
+	//get all of the cov1 codes that fall within the level1 label
+	var classesSelected = "";
+	var countClasses = 0;
+	var operatorInclusion = ""
+	jQuery.each(level1Membership[_level1Selected], function(i, val) {
+		if (countClasses == 1){
+			operatorInclusion = " OR "
+		}
+		classesSelected = classesSelected + operatorInclusion + "(cov1 = '" + val.code + "')"
+		countClasses++;
+	})
+	return classesSelected
+}
+
 
 
 function drawPolygonHistogram(data, _levelEngaged, el){
-	var summary = summarizeAreas(data);
+	var summary = summarize(data, _levelEngaged)
+
 	console.log(summary)
 	var width = $(el).width();
 	var height = $(el).height();
@@ -902,34 +922,59 @@ function drawPolygonHistogram(data, _levelEngaged, el){
 		.attr('width', xScale.rangeBand())
 		.attr('y', function(d){return yScale(d.area / polygonLegendFactor)})
 		.attr('height', function(d){return height - yScale(d.area / polygonLegendFactor)})
+		.on('click', function(d){
+			level1Selected = d.type.toLowerCase()
+			dispatchLegendClick(level1Selected)
+		})
 
 
 }
 
 function getColor1FromLevel1(level1){
-	which = _.where(level1Colors, {level1: level1})[0]
+	var which = _.where(level1Colors, {level1: level1})[0]
+	return which.color
+}
+
+function getLevel2FromCode(code){
+		//get the level one feature type from the cover code
+	try{
+		covClass = lookupClassFromCode(code);
+		return covClass.level2
+	}catch(err){
+		return "Other"
+	}
+}
+
+function getColor2FromLevel2(level2){
+	var which = _.where(level2Colors, {level2: level2})[0]
 	return which.color
 }
 
 
-
-function summarizeAreas(data){
+function summarize(data, level){
+	if (level == 1){
+		var colorFn = getColor1FromLevel1;
+		var prop = "level1"
+		var accessor = getLevel1FromCode
+	}else if (level==2){
+		var colorFn = getColor2FromLevel2;
+		var prop = "level2"
+		var accessor = getLevel2FromCode;
+	}
 	var mapped = _.map(data.rows, function(d){
-		d.level1 = getLevel1FromCode(d.cov1)
+		d[prop] = accessor(d.cov1)
 		return d
 	})
-	var grouped = _.groupBy(mapped, 'level1')
+	var grouped = _.groupBy(mapped, prop)
 	var summed = _.map(grouped, function(g, key){
-		return {type: key, color: getColor1FromLevel1(key), area : _(g).reduce(function(m, x){ return m + x.area;}, 0)}
+		return {type: key, color: colorFn(key), area : _(g).reduce(function(m, x){ return m + x.area;}, 0)}
 	})
 	var sorted = _.sortBy(summed, "area")
 	return sorted
 }
 
 
-
-function dispatchLegendClick(classCode){
-	level1Selected = classConfigs[classCode.replace("div_", "")].level1var;
+function dispatchLegendClick(level1Selected){
 	if (levelEngaged == "1"){
 		levelEngaged = "2";
 	}else{
@@ -959,7 +1004,7 @@ function drawPointLegend(){
 // called upon click of legend item
 function switchLevel(_levelEngaged, _level1Selected){
 	cartoCSSRules = getPolyStyle("level"+_levelEngaged, _level1Selected);
-	if (_levelEngaged == "2"){
+	if (_levelEngaged == 2){
 		sublayer2.show();
 		sublayer1.hide();
 		sublayer2.setCartoCSS(cartoCSSRules)
