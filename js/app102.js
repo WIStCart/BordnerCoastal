@@ -14,6 +14,7 @@ var level1Selected = "agriculture"
 var sublayer1;
 var sublayer2;
 var layerOpacity = {polygons:0.65};
+var legendType = "polygons";
 var counties;
 var townships;
 var lines;
@@ -22,7 +23,9 @@ var infowindowVars = ['cov1','cov2', 'cov3', 'cov4', 'cov5',
 					'pctcov1', 'pctcov2', 'pctcov3', 'pctcov4', 'pctcov5',
 					'mindiam1','mindiam2','mindiam3','mindiam4','mindiam5',
 					 'maxdiam1','maxdiam2','maxdiam3','maxdiam4','maxdiam5' ]
-
+var polygonLegend; //svg polygon legend
+var level1Colors;
+var polygonLegendFactor = 1e6;
 // Overlay definitions:
 var labelsOverlay = L.tileLayer('http://{s}.tile.stamen.com/toner-labels/{z}/{x}/{y}.png', {
 	attribution: 'stamen toner labels'
@@ -88,6 +91,18 @@ function createStyles(){
 	console.log(level1Membership)
 };
 
+function makeLevel1ColorList(){
+	//not efficient :(
+	var colors = {};
+	for (var i=0; i < tempClasses2.classes.length; i++){
+
+		type = tempClasses2.classes[i].level1
+		color = tempClasses2.classes[i].color2
+		colors[type] = color
+	}
+	return colors
+}
+
 // Helper function to turn a title into a valid variable (i.e. "Lowland Coniferous Forest" to "lowland_coniferous_forest")
 function makeVariableFromString(stringIn){
 	var stringOut = stringIn.replace(/\s/g, "_").replace(/[(),.?]/g, "").toLowerCase(); // 1 replace whitespace with _ 2) replace (),.? with nothing 3) set to lowercase
@@ -102,7 +117,8 @@ window.onload = function() {
 		cartodb_logo: false,
 		center: [43.7844,-88.7879],
 		zoom: 7,
-		minZoom:6
+		minZoom:6,
+		maxZoom: 18
 	});
 
 	// Add county layer
@@ -256,7 +272,7 @@ function getNameFromCode(code){
 	}catch(err){
 		//covClass might be undefined
 		//if the code is null
-		return undefined
+		return "Other"
 	}
 }
 
@@ -266,7 +282,7 @@ function getLevel1FromCode(code){
 		covClass = lookupClassFromCode(code);
 		return covClass.level1
 	}catch(err){
-		return undefined
+		return "Other"
 	}
 }
 
@@ -281,7 +297,6 @@ function translateDensity(den){
 	}else if (den === 4){
 		denTranslate = "Scattered"
 	}
-	console.log(den)
 	return denTranslate
 }
 
@@ -389,7 +404,8 @@ function setupInteraction(layer, _levelEngaged, _visibility){
 		map.touchZoom.enable();
 		map.doubleClickZoom.enable();
 	})
-}
+	level1Colors = makeLevel1ColorList();
+} //end setup interaction
 
 function setupGeocoderSearch(){
 	//render the template
@@ -509,7 +525,7 @@ function setUpMap(){
 	$('[data-toggle="tooltip"]').tooltip();
 
 	// Make a demonstration legend
-	demoLegend();
+	// demoLegend();
 
 	// call jsMediaQuery to handle tablet/mobile thresholds upon screen resize, then call it once to configure the initial view
 	$(window).resize(jsMediaQuery);
@@ -552,18 +568,22 @@ function turnOnFeatureType(featureTypeCalled){
 			$("#polygonLegendHolder").removeClass( "legend-holder-hidden" )
 			$("#lineLegendHolder").addClass( "legend-holder-hidden" )
 			$("#pointLegendHolder").addClass( "legend-holder-hidden" )
+			legendType = "polygons";
+			setupPolygonHistogram();
 			break;
 		case "featureLines":
 			console.log("feature lines called")
 			$("#lineLegendHolder").removeClass( "legend-holder-hidden" )
 			$("#polygonLegendHolder").addClass( "legend-holder-hidden" )
 			$("#pointLegendHolder").addClass( "legend-holder-hidden" )
+			legendType = "lines"
 			break;
 		case "featurePoints":
 			console.log("feature points called")
 			$("#pointLegendHolder").removeClass( "legend-holder-hidden" )
 			$("#lineLegendHolder").addClass( "legend-holder-hidden" )
 			$("#polygonLegendHolder").addClass( "legend-holder-hidden" )
+			legendType = "points"
 			break;
 		default:
 			console.log("unidentified feature type called")
@@ -788,12 +808,13 @@ function drawThisView(boundsIn, zoomIn, _levelEngaged, _level1Selected){
 		// level1 = (Deciduous)
 		// level2 = (Scrub Oak)
 		//var _levelEngaged = "1"
-		if (zoomIn >= 13){
+		if ((zoomIn >= 13) && (legendType === "polygons")){
 			if (_levelEngaged == "1"){
-				var cartoQuery = "SELECT * FROM final_coastal_polygons WHERE the_geom && ST_SetSRID(ST_MakeBox2D(ST_Point(" +
+				var cartoQuery = "SELECT cov1, area FROM final_coastal_polygons WHERE the_geom && ST_SetSRID(ST_MakeBox2D(ST_Point(" +
 					String(boundsIn._northEast.lng)+","+String(boundsIn._northEast.lat)+"), ST_Point(" +
 					String(boundsIn._southWest.lng)+","+String(boundsIn._southWest.lat)+")), 4326) ORDER BY cov1 DESC"
 			}else{
+
 				var classesSelected = "";
 				var countClasses = 0;
 				var operatorInclusion = ""
@@ -804,7 +825,7 @@ function drawThisView(boundsIn, zoomIn, _levelEngaged, _level1Selected){
 					classesSelected = classesSelected + operatorInclusion + "(cov1 = '" + val.code + "')"
 					countClasses++;
 				})
-				var cartoQuery = "SELECT * FROM final_coastal_polygons WHERE (" + classesSelected +
+				var cartoQuery = "SELECT cov1, area FROM final_coastal_polygons WHERE (" + classesSelected +
 					") AND the_geom && ST_SetSRID(ST_MakeBox2D(ST_Point(" +
 					String(boundsIn._northEast.lng)+","+String(boundsIn._northEast.lat)+"), ST_Point(" +
 					String(boundsIn._southWest.lng)+","+String(boundsIn._southWest.lat)+")), 4326) ORDER BY cov1 DESC"
@@ -813,39 +834,142 @@ function drawThisView(boundsIn, zoomIn, _levelEngaged, _level1Selected){
 			sql.execute(cartoQuery)
 				.done(function(data) {
 					$("#polygonLegendHolder").empty();
-					var cov1Classes = {}
-					var grouped = _.groupBy(data.rows, function(num){ // http://underscorejs.org/
-						return classConfigs[num.cov1]["level" + _levelEngaged + "var"];
-					});
-					jQuery.each(grouped, function(i, val) {
-						var collectiveVal = 0;
-						jQuery.each(val, function(j, val2) {
-							collectiveVal += val2.shape_area;
-						})
-						var hexColor = "#f545e9" // default to hot pink
-						if (classConfigs[val[0].cov1]){
-							hexColor = classConfigs[val[0].cov1]["color" + _levelEngaged]
-						}
-						cov1Classes[i] = {"cov1": val[0].cov1, "groupSize": Math.round(collectiveVal) , "hex": hexColor }
-					})
-					var max = _.max(cov1Classes,  function(num){ return num.groupSize; })
-					var cov1Classes = _.indexBy(cov1Classes, 'groupSize')
-					var countKey = 0;
-					var widthInPercent = (100 / Object.keys(cov1Classes).length)
-					_.each(cov1Classes, function(value){
-						featurePct = (value.groupSize / max.groupSize) * 100
-						$("#polygonLegendHolder").append('<div class="histogram-div"; style="height:' + String(featurePct) + '%; width:'+ widthInPercent +'%; left:'
-						+ (countKey * widthInPercent) + '%; background-color:' + value.hex + ';" id="div_'+ value.cov1 +'" onClick="dispatchLegendClick(this.id)">'
-						+ '<div style="background-color:' + value.hex + ';" class="level-1-label-text rotate-text shade-level-1-label-text transition-class">' + classConfigs[value.cov1]["level" + _levelEngaged] + '</div></div>')
-						countKey++;
-					});
-					createWordCloud("#pointLegendHolder", cov1Classes, _levelEngaged);
+					drawPolygonHistogram(data, _levelEngaged, "#polygonLegendHolder");
+					// var cov1Classes = {}
+					// var grouped = _.groupBy(data.rows, function(num){ // http://underscorejs.org/
+					// 	return classConfigs[num.cov1]["level" + _levelEngaged + "var"];
+					// });
+					// jQuery.each(grouped, function(i, val) {
+					// 	var collectiveVal = 0;
+					// 	jQuery.each(val, function(j, val2) {
+					// 		collectiveVal += val2.shape_area;
+					// 	})
+					// 	var hexColor = "#f545e9" // default to hot pink
+					// 	if (classConfigs[val[0].cov1]){
+					// 		hexColor = classConfigs[val[0].cov1]["color" + _levelEngaged]
+					// 	}
+					// 	cov1Classes[i] = {"cov1": val[0].cov1, "groupSize": Math.round(collectiveVal) , "hex": hexColor }
+					// })
+					// var max = _.max(cov1Classes,  function(num){ return num.groupSize; })
+					// var cov1Classes = _.indexBy(cov1Classes, 'groupSize')
+					// var countKey = 0;
+					// var widthInPercent = (100 / Object.keys(cov1Classes).length)
+					// // _.each(cov1Classes, function(value){
+					// 	featurePct = (value.groupSize / max.groupSize) * 100
+					// 	$("#polygonLegendHolder").append('<div class="histogram-div"; style="height:' + String(featurePct) + '%; width:'+ widthInPercent +'%; left:'
+					// 	+ (countKey * widthInPercent) + '%; background-color:' + value.hex + ';" id="div_'+ value.cov1 +'" onClick="dispatchLegendClick(this.id)">'
+					// 	+ '<div style="background-color:' + value.hex + ';" class="level-1-label-text rotate-text shade-level-1-label-text transition-class">' + classConfigs[value.cov1]["level" + _levelEngaged] + '</div></div>')
+					// 	countKey++;
+					// });
+					// createWordCloud("#pointLegendHolder", cov1Classes, _levelEngaged);
 				})
 				.error(function(errors) {
 					console.log("errors:" + errors);
 				})
+		}else{
+			//zoom < 13
+
+			$("#polygonLegendHolder").html("Zoom in for a histogram of land cover frequencies")
 		}
 }
+
+
+var superscript = "⁰¹²³⁴⁵⁶⁷⁸⁹"
+var formatPower = function(d) { return (d + "").split("").map(function(c) { return superscript[c]; }).join(""); };
+
+function setupPolygonHistogram(){
+	// var width = $(el).width();
+	// var height = $(el).height();
+	//
+	// //dimension setup
+	// var margins = {top: 20, left: 20, right: 20, bottom: 70}
+	// height = height - margins.top - margins.bottom;
+	// width = width - margins.left - margins.right;
+	//
+	// //axes setup
+	// x =
+}
+
+function drawPolygonHistogram(data, _levelEngaged, el){
+	var summary = summarizeAreas(data);
+	console.log(summary)
+	var width = $(el).width();
+	var height = $(el).height();
+
+	//dimension setup
+	var margins = {top: 20, left: 50, right: 30, bottom: 30}
+	height = height - margins.top - margins.bottom;
+	width = width - margins.left - margins.right;
+
+	//axes setup
+	var xScale = d3.scale.ordinal().rangeRoundBands([0, width], 0.05)
+	var yScale = d3.scale.linear().range([height, 0])
+
+	var xAxis = d3.svg.axis()
+		.scale(xScale)
+		.orient('bottom')
+
+	var yAxis = d3.svg.axis()
+		.scale(yScale)
+		.orient('left')
+
+	var svg = d3.select(el)
+		.append('svg')
+		.attr('width', width + margins.left + margins.right)
+		.attr('height', height + margins.top + margins.bottom)
+		.append('g')
+			.attr('transform', "translate(" + margins.left + "," + margins.top + ")")
+
+	xScale.domain(summary.map(function(d){return d.type }))
+	yScale.domain([0, d3.max(summary, function(d){ return d.area / polygonLegendFactor})])
+
+	svg.append("g")
+		.attr("class", " x axis")
+		.attr("transform", "translate(0," + height + ")")
+		.call(xAxis)
+		// .selectAll("text")
+		// .style("text-anchor", "end")
+		// .attr("dx", "-.8em")
+		// .attr("dy", "-.55em")
+		// // .attr("transform", "rotate(-45)" );
+
+
+	svg.append("g")
+		.attr('class', 'y axis')
+		.call(yAxis)
+	svg.selectAll('bar')
+		.data(summary)
+		.enter().append('rect')
+		.style('fill', function(d){return d.color})
+		.attr('x', function(d){ return xScale(d.type)})
+		.attr('width', xScale.rangeBand())
+		.attr('y', function(d){return yScale(d.area / polygonLegendFactor)})
+		.attr('height', function(d){return height - yScale(d.area / polygonLegendFactor)})
+
+
+}
+
+function getColor1FromLevel1(level1){
+	color = level1Colors[level1]
+	return color
+}
+
+
+
+function summarizeAreas(data){
+	var mapped = _.map(data.rows, function(d){
+		d.level1 = getLevel1FromCode(d.cov1)
+		return d
+	})
+	var grouped = _.groupBy(mapped, 'level1')
+	var summed = _.map(grouped, function(g, key){
+		return {type: key, color: getColor1FromLevel1(key), area : _(g).reduce(function(m, x){ return m + x.area;}, 0)}
+	})
+	var sorted = _.sortBy(summed, "area")
+	return sorted
+}
+
+
 
 function dispatchLegendClick(classCode){
 	level1Selected = classConfigs[classCode.replace("div_", "")].level1var;
@@ -855,7 +979,24 @@ function dispatchLegendClick(classCode){
 		levelEngaged = "1";
 	}
 	switchLevel(levelEngaged, level1Selected);
-	drawThisView(map.getBounds(), map.getZoom(), levelEngaged, level1Selected);
+	if (legendType == "polygons"){
+			drawThisView(map.getBounds(), map.getZoom(), levelEngaged, level1Selected);
+	}else if (legendType == "lines"){
+		drawLineLegend();
+	}else if(legendType == "points"){
+		drawPointLegend();
+	}else{
+		console.log("Unknown legend type...")
+	}
+
+}
+
+function drawLineLegend(){
+	//TODO
+}
+
+function drawPointLegend(){
+	//TODO
 }
 
 // called upon click of legend item
