@@ -74,7 +74,7 @@ function getPolyStyle(level, level1Selected){
 			}
 		}
 	}
-	console.log(style)
+	// console.log(style)
 	style += "}";
 	return style;
 };
@@ -832,7 +832,7 @@ function drawThisView(boundsIn, zoomIn, _levelEngaged, _level1Selected){
 					String(boundsIn._southWest.lng)+","+String(boundsIn._southWest.lat)+")), 4326) ORDER BY cov1 DESC"
 
 			}
-			console.log(cartoQuery)
+			// console.log(cartoQuery)
 			sql.execute(cartoQuery)
 				.done(function(data) {
 					$("#polygonLegendHolder").empty();
@@ -865,17 +865,23 @@ function getLevel1MemberSearch(_level1Selected){
 	return classesSelected
 }
 
+function shadeRGBColor(color, percent) {
+	//https://stackoverflow.com/questions/5560248/programmatically-lighten-or-darken-a-hex-color-or-rgb-and-blend-colors
+    var f=color.split(","),t=percent<0?0:255,p=percent<0?percent*-1:percent,R=parseInt(f[0].slice(4)),G=parseInt(f[1]),B=parseInt(f[2]);
+    return "rgb("+(Math.round((t-R)*p)+R)+","+(Math.round((t-G)*p)+G)+","+(Math.round((t-B)*p)+B)+")";
+}
+
 
 
 function drawPolygonHistogram(data, _levelEngaged, el){
 	var summary = summarize(data, _levelEngaged)
 
-	console.log(summary)
+	// console.log(summary)
 	var width = $(el).width();
 	var height = $(el).height();
 
 	//dimension setup
-	var margins = {top: 20, left: 50, right: 30, bottom: 30}
+	var margins = {top: 20, left: 75, right: 30, bottom: 30}
 	height = height - margins.top - margins.bottom;
 	width = width - margins.left - margins.right;
 
@@ -899,16 +905,20 @@ function drawPolygonHistogram(data, _levelEngaged, el){
 			.attr('transform', "translate(" + margins.left + "," + margins.top + ")")
 
 	xScale.domain(summary.map(function(d){return d.type }))
-	yScale.domain([0, d3.max(summary, function(d){ return d.area / polygonLegendFactor})])
+	yScale.domain([0.1, d3.max(summary, function(d){return d.area / polygonLegendFactor})])
+
 
 	svg.append("g")
 		.attr("class", " x axis")
 		.attr("transform", "translate(0," + height + ")")
 		.call(xAxis)
+		.selectAll(".tick text")
+			.call(wrap, xScale.rangeBand())
 
 	svg.append("g")
 		.attr('class', 'y axis')
 		.call(yAxis)
+
 	svg.selectAll('bar')
 		.data(summary)
 		.enter().append('rect')
@@ -921,6 +931,28 @@ function drawPolygonHistogram(data, _levelEngaged, el){
 			level1Selected = d.type.toLowerCase()
 			dispatchLegendClick(level1Selected)
 		})
+		//change colors on hover
+		.on('mouseover', function(d){
+			var self = d3.select(this)
+			//set old color so we can recover it
+			var oldColor = self.style('fill')
+			self.attr('data-fill', oldColor)
+			var newColor = shadeRGBColor(oldColor, 0.50)
+			self.style('fill', newColor)
+		})
+		.on('mouseout', function(d){
+			var self = d3.select(this)
+			var oldColor = self.attr('data-fill')
+			self.style('fill', oldColor)
+		})
+
+	svg.append('text')
+		.attr('transform', 'rotate(-90)')
+		.attr('y', 0-margins.left)
+		.attr('x', 0 - (height / 2))
+		.attr('dy', "1em")
+		.attr('text-anchor', 'middle')
+		.text("Square Kilometers")
 }
 
 function getColor1FromLevel1(level1){
@@ -967,6 +999,33 @@ function summarize(data, level){
 }
 
 
+
+function wrap(text, width) {
+	//https://bl.ocks.org/mbostock/7555321
+  text.each(function() {
+    var text = d3.select(this),
+        words = text.text().split(/\s+/).reverse(),
+        word,
+        line = [],
+        lineNumber = 0,
+        lineHeight = 1.1, // ems
+        y = text.attr("y"),
+        dy = parseFloat(text.attr("dy")),
+        tspan = text.text(null).append("tspan").attr("x", 0).attr("y", y).attr("dy", dy + "em");
+    while (word = words.pop()) {
+      line.push(word);
+      tspan.text(line.join(" "));
+      if (tspan.node().getComputedTextLength() > width) {
+        line.pop();
+        tspan.text(line.join(" "));
+        line = [word];
+        tspan = text.append("tspan").attr("x", 0).attr("y", y).attr("dy", ++lineNumber * lineHeight + dy + "em").text(word);
+      }
+    }
+  });
+}
+
+
 function dispatchLegendClick(level1Selected){
 	if (levelEngaged == "1"){
 		levelEngaged = "2";
@@ -994,6 +1053,21 @@ function drawPointLegend(){
 	//TODO
 }
 
+function displayLevel1Label(level1Selected){
+	//display the selected level one so the user knows there was some change
+	$("#level1Label").html(titleCase(level1Selected))
+
+	//figure out positioning
+	var boxHeight = $("#polygonLegendHolder").height();
+	$("#level1Label").css({'bottom': (boxHeight + 13) + "px", 'left': 0+'px'})
+	$("#level1Label").show();
+}
+
+function hideLevel1Label(){
+	$("#level1Label").html("")
+	$("#level1Label").hide()
+}
+
 // called upon click of legend item
 function switchLevel(_levelEngaged, _level1Selected){
 	cartoCSSRules = getPolyStyle("level"+_levelEngaged, _level1Selected);
@@ -1002,9 +1076,11 @@ function switchLevel(_levelEngaged, _level1Selected){
 		sublayer1.hide();
 		sublayer2.setCartoCSS(cartoCSSRules)
 		sublayer2.setInteraction(true)
+		displayLevel1Label(_level1Selected)
 	}else{
 		sublayer1.show();
 		sublayer2.hide();
+		hideLevel1Label();
 	}
 }
 
@@ -1163,4 +1239,13 @@ function createWordCloud(hashedDivID, tempC, _drawLevel){
 		  .text(function(d) { return d.key; });
 	}
 	d3.layout.cloud().stop();
+}
+
+function titleCase(str) {
+  var newstr = str.split(" ");
+  for(i=0;i<newstr.length;i++){
+    newstr[i] = newstr[i].charAt(0).toUpperCase() + newstr[i].substring(1).toLowerCase();
+  }
+   newstr = newstr.join(" ");
+   return newstr;
 }
