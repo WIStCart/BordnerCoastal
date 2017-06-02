@@ -308,55 +308,55 @@ function translateDensity(den){
 	return denTranslate
 }
 
-function formatCoverageForInfowindow(content){
+function formatCoverageForInfowindow(data){
 	//prepare the data for templating in the infowindow
 	//not totally necessary but makes the template cleaner
 	//essential --  get the name for the coverage type here
 	infowindowContent = {
 		 coverage1: {
-			 code: content.data.cov1,
-			 name: getNameFromCode(content.data.cov1),
-			 density: content.data.den1,
-			 minDiameter: content.data.mindiam1,
-			 maxDiameter: content.data.maxdiam1,
-			 percentCover: content.data.pctcov1,
-			 densityTranslate : translateDensity(content.data.den1)
+			 code: data.cov1,
+			 name: getNameFromCode(data.cov1),
+			 density:data.den1,
+			 minDiameter: data.mindiam1,
+			 maxDiameter: data.maxdiam1,
+			 percentCover: data.pctcov1,
+			 densityTranslate : translateDensity(data.den1)
 		 },
 		 coverage2: {
-			 code: content.data.cov2,
-			 name: getNameFromCode(content.data.cov2),
-			 density: content.data.den2,
-			 minDiameter: content.data.mindiam2,
-			 maxDiameter: content.data.maxdiam2,
-			 percentCover: content.data.pctcov2,
-			 densityTranslate : translateDensity(content.data.den2)
+			 code: data.cov2,
+			 name: getNameFromCode(data.cov2),
+			 density: data.den2,
+			 minDiameter:data.mindiam2,
+			 maxDiameter: data.maxdiam2,
+			 percentCover: data.pctcov2,
+			 densityTranslate : translateDensity(data.den2)
 		 },
 		 coverage3: {
-			 code: content.data.cov3,
-			 name: getNameFromCode(content.data.cov3),
-			 density: content.data.den3,
-			 minDiameter: content.data.mindiam3,
-			 maxDiameter: content.data.maxdiam3,
-			 percentCover: content.data.pctcov3,
-			 densityTranslate: translateDensity(content.data.den3)
+			 code:data.cov3,
+			 name: getNameFromCode(data.cov3),
+			 density: data.den3,
+			 minDiameter: data.mindiam3,
+			 maxDiameter: data.maxdiam3,
+			 percentCover: data.pctcov3,
+			 densityTranslate: translateDensity(data.den3)
 		 },
 		 coverage4: {
-			 code: content.data.cov3,
-			 name: getNameFromCode(content.data.cov4),
-			 density: content.data.den4,
-			 minDiameter: content.data.mindiam4,
-			 maxDiameter: content.data.maxdiam4,
-			 percentCover: content.data.pctcov4,
-			 densityTranslate: translateDensity(content.data.den4)
+			 code: data.cov3,
+			 name: getNameFromCode(data.cov4),
+			 density: data.den4,
+			 minDiameter: data.mindiam4,
+			 maxDiameter: data.maxdiam4,
+			 percentCover: data.pctcov4,
+			 densityTranslate: translateDensity(data.den4)
 		 },
 		 coverage5: {
-			 code: content.data.cov5,
-			 name: getNameFromCode(content.data.cov5),
-			 density: content.data.den5,
-			 minDiameter: content.data.mindiam5,
-			 maxDiameter: content.data.maxdiam5,
-			 percentCover: content.data.pctcov5,
-			 densityTranslate : translateDensity(content.data.den5)
+			 code: data.cov5,
+			 name: getNameFromCode(data.cov5),
+			 density: data.den5,
+			 minDiameter: data.mindiam5,
+			 maxDiameter: data.maxdiam5,
+			 percentCover: data.pctcov5,
+			 densityTranslate : translateDensity(data.den5)
 		 }
 	}
 	return infowindowContent
@@ -375,10 +375,28 @@ function setupInteraction(layer, _levelEngaged, _visibility){
 			//modify the object here before sending to templating engine
 			//lookup the classname
 			content = obj.content
-			windowContent = formatCoverageForInfowindow(content)
+			windowContent = formatCoverageForInfowindow(content.data)
 			return _.template($('#infowindow_template').html())(windowContent);
 		}
 	});
+
+
+
+	layer.bind('featureClick', function(e, latln, pxPos, data, layer){
+		//hide the feature if it's been filtered out
+		if (+levelEngaged == 2){
+			level1key = level1Selected.split(" ").join("_")
+			level1Members = level1Membership[level1Selected]
+			level1MemberCodes = _.map(level1Members, function(d){return d.code})
+			isAMember = _.contains(level1MemberCodes, data.cov1)
+			if (!isAMember){
+				$(".cartodb-infowindow").hide()
+			}else{
+				$(".cartodb-infowindow").show();
+			}
+		}
+	})
+
 
 	/* To display an infobox within a leaflet control */
 	var infoBox = layer.leafletMap.viz.addOverlay( {
