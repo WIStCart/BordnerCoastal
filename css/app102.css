@@ -505,3 +505,16 @@ td{
 	left: 10px;
 	display: none;
 }
+
+#legend-back{
+	display: none;
+	font: 14px sans-serif;
+	color: white;
+	fill: white;
+	text-shadow: black 0.1em 0.1em 0.2em;
+	cursor: pointer;
+}
+
+#legend-back:hover{
+	color: cyan;
+}

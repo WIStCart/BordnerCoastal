@@ -415,6 +415,13 @@ function setupInteraction(layer, _levelEngaged, _visibility){
 	//make lists of color for using in the legend later
 	level1Colors = makeLevel1ColorList();
 	level2Colors = makeLevel2ColorList();
+
+	//setup legend navigation
+	$("#legend-back").click(function(d){
+		dispatchLegendClick(undefined)
+	})
+
+
 } //end setup interaction
 
 function setupGeocoderSearch(){
@@ -872,13 +879,12 @@ function shadeRGBColor(color, percent) {
 }
 
 
-
 function drawPolygonHistogram(data, _levelEngaged, el){
 	var summary = summarize(data, _levelEngaged)
 
 	// console.log(summary)
 	var width = $(el).width();
-	var height = $(el).height();
+	var height = $(el).height() - 15;
 
 	//dimension setup
 	var margins = {top: 20, left: 75, right: 30, bottom: 30}
@@ -933,7 +939,9 @@ function drawPolygonHistogram(data, _levelEngaged, el){
 			.attr('height', height)
 			.on('click', function(d){
 				level1Selected = d.type.toLowerCase()
-				dispatchLegendClick(level1Selected)
+				if (_levelEngaged == 1){
+						dispatchLegendClick(level1Selected)
+				}
 			})
 			//change colors on hover
 			.on('mouseover', function(d){
@@ -976,7 +984,9 @@ function drawPolygonHistogram(data, _levelEngaged, el){
 			return scaledHeight})
 			.on('click', function(d){
 				level1Selected = d.type.toLowerCase()
-				dispatchLegendClick(level1Selected)
+				if (_levelEngaged == 1){
+						dispatchLegendClick(level1Selected)
+				}
 			})
 			//change colors on hover
 			.on('mouseover', function(d){
@@ -988,9 +998,6 @@ function drawPolygonHistogram(data, _levelEngaged, el){
 					var newColor = shadeRGBColor(oldColor, -0.25)
 					d3.selectAll("." + d.type.split(" ").join("_")).style('fill', newColor)
 				}
-				//make taller
-				// self.attr('y', 0)
-				// self.attr('height', height)
 			})
 			.on('mouseout', function(d){
 				if (_levelEngaged == 1){
@@ -1007,6 +1014,8 @@ function drawPolygonHistogram(data, _levelEngaged, el){
 		.attr('x', 0 - (height / 2))
 		.attr('dy', "1em")
 		.attr('text-anchor', 'middle')
+		.attr('fill', 'white')
+		.attr('text-shadow', 'black 0.1em 0.1em 0.2em')
 		.text("Square Kilometers")
 }
 
@@ -1047,7 +1056,10 @@ function summarize(data, level){
 	})
 	var grouped = _.groupBy(mapped, prop)
 	var summed = _.map(grouped, function(g, key){
-		return {type: key, color: colorFn(key), area : _(g).reduce(function(m, x){ return m + x.area;}, 0)}
+		var item =  {type: key, color: colorFn(key), area : _(g).reduce(function(m, x){ return m + x.area;}, 0)}
+		if (item.area > 0){
+			return item
+		}
 	})
 	var sorted = _.sortBy(summed, "area")
 	return sorted
@@ -1083,21 +1095,16 @@ function wrap(text, width) {
 
 function dispatchLegendClick(level1Selected){
 	if (levelEngaged == "1"){
+		//go from level one to level 2
 		levelEngaged = "2";
+		$("#legend-back").show();
 	}else{
+		//go from level 2 to level 1
 		levelEngaged = "1";
+		$("#legend-back").hide()
 	}
 	switchLevel(levelEngaged, level1Selected);
-	if (legendType == "polygons"){
-			drawThisView(map.getBounds(), map.getZoom(), levelEngaged, level1Selected);
-	}else if (legendType == "lines"){
-		drawLineLegend();
-	}else if(legendType == "points"){
-		drawPointLegend();
-	}else{
-		console.log("Unknown legend type...")
-	}
-
+	drawThisView(map.getBounds(), map.getZoom(), levelEngaged, level1Selected);
 }
 
 function drawLineLegend(){
