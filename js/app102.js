@@ -58,7 +58,6 @@ function getPolyStyle(level, level1Selected){
 
 	//Beginning part of the cartocss style
 	style = "#layer{polygon-fill: #DDDDDD;polygon-opacity:1;";
-	console.log()
 	if (level =="level1"){
 		for(var i = 0; i < classes.length; i++) {
 			var thisStyle = "[cov1='"+classes[i].code+"']{polygon-fill: "+classes[i].color1+";}";
@@ -67,7 +66,7 @@ function getPolyStyle(level, level1Selected){
 	}else{
 		style = "#layer{polygon-fill: #DDDDDD;polygon-opacity: 0;";
 		for(var i = 0; i < classes.length; i++) {
-			if (level1Selected == classes[i].level1var) {
+			if (level1Selected == classes[i].level1) {
 				var thisStyle = "[cov1='"+classes[i].code+"']{polygon-fill: "+classes[i].color2+";polygon-opacity:1;}";
 				style += thisStyle;
 			}
@@ -93,13 +92,11 @@ function createStyles(){
 
 function makeLevel1ColorList(){
 	//not efficient :(
-	var colors = {};
-	for (var i=0; i < tempClasses2.classes.length; i++){
-
-		type = tempClasses2.classes[i].level1
-		color = tempClasses2.classes[i].color2
-		colors[type] = color
-	}
+	var grouped = _.groupBy(tempClasses2.classes, "level1")
+	//all colors should be the same within a level 1
+	colors = _.map(grouped, function(g, key){
+		return {level1: key, color: g[0].color1}
+	})
 	return colors
 }
 
@@ -376,7 +373,7 @@ function setupInteraction(layer, _levelEngaged, _visibility){
 	var infoBox = layer.leafletMap.viz.addOverlay( {
 	  type: 'infobox',
 	  layer: layer,
-		template: '<div class="cartodb-tooltip-content-wrapper"><p><span id="level1-set"></span></p></div>',
+		template: '<div class="cartodb--content-wrapper"><p><span id="level1-set"></span></p></div>',
 	  // width: 75,
 	  position: 'top|right'
 	});
@@ -569,7 +566,6 @@ function turnOnFeatureType(featureTypeCalled){
 			$("#lineLegendHolder").addClass( "legend-holder-hidden" )
 			$("#pointLegendHolder").addClass( "legend-holder-hidden" )
 			legendType = "polygons";
-			setupPolygonHistogram();
 			break;
 		case "featureLines":
 			console.log("feature lines called")
@@ -835,33 +831,6 @@ function drawThisView(boundsIn, zoomIn, _levelEngaged, _level1Selected){
 				.done(function(data) {
 					$("#polygonLegendHolder").empty();
 					drawPolygonHistogram(data, _levelEngaged, "#polygonLegendHolder");
-					// var cov1Classes = {}
-					// var grouped = _.groupBy(data.rows, function(num){ // http://underscorejs.org/
-					// 	return classConfigs[num.cov1]["level" + _levelEngaged + "var"];
-					// });
-					// jQuery.each(grouped, function(i, val) {
-					// 	var collectiveVal = 0;
-					// 	jQuery.each(val, function(j, val2) {
-					// 		collectiveVal += val2.shape_area;
-					// 	})
-					// 	var hexColor = "#f545e9" // default to hot pink
-					// 	if (classConfigs[val[0].cov1]){
-					// 		hexColor = classConfigs[val[0].cov1]["color" + _levelEngaged]
-					// 	}
-					// 	cov1Classes[i] = {"cov1": val[0].cov1, "groupSize": Math.round(collectiveVal) , "hex": hexColor }
-					// })
-					// var max = _.max(cov1Classes,  function(num){ return num.groupSize; })
-					// var cov1Classes = _.indexBy(cov1Classes, 'groupSize')
-					// var countKey = 0;
-					// var widthInPercent = (100 / Object.keys(cov1Classes).length)
-					// // _.each(cov1Classes, function(value){
-					// 	featurePct = (value.groupSize / max.groupSize) * 100
-					// 	$("#polygonLegendHolder").append('<div class="histogram-div"; style="height:' + String(featurePct) + '%; width:'+ widthInPercent +'%; left:'
-					// 	+ (countKey * widthInPercent) + '%; background-color:' + value.hex + ';" id="div_'+ value.cov1 +'" onClick="dispatchLegendClick(this.id)">'
-					// 	+ '<div style="background-color:' + value.hex + ';" class="level-1-label-text rotate-text shade-level-1-label-text transition-class">' + classConfigs[value.cov1]["level" + _levelEngaged] + '</div></div>')
-					// 	countKey++;
-					// });
-					// createWordCloud("#pointLegendHolder", cov1Classes, _levelEngaged);
 				})
 				.error(function(errors) {
 					console.log("errors:" + errors);
@@ -877,18 +846,6 @@ function drawThisView(boundsIn, zoomIn, _levelEngaged, _level1Selected){
 var superscript = "⁰¹²³⁴⁵⁶⁷⁸⁹"
 var formatPower = function(d) { return (d + "").split("").map(function(c) { return superscript[c]; }).join(""); };
 
-function setupPolygonHistogram(){
-	// var width = $(el).width();
-	// var height = $(el).height();
-	//
-	// //dimension setup
-	// var margins = {top: 20, left: 20, right: 20, bottom: 70}
-	// height = height - margins.top - margins.bottom;
-	// width = width - margins.left - margins.right;
-	//
-	// //axes setup
-	// x =
-}
 
 function drawPolygonHistogram(data, _levelEngaged, el){
 	var summary = summarizeAreas(data);
@@ -950,8 +907,8 @@ function drawPolygonHistogram(data, _levelEngaged, el){
 }
 
 function getColor1FromLevel1(level1){
-	color = level1Colors[level1]
-	return color
+	which = _.where(level1Colors, {level1: level1})[0]
+	return which.color
 }
 
 
