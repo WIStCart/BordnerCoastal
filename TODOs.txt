@@ -32,6 +32,8 @@ BUGS:
 9) In mobile: layer selector displays upon page load. It should be added to the layer list modal. 
 10) In mobile: Radio buttons are hard to press and are kind of ugly. We can consider styling them up (this applies to both mobile and desktop)
 11) In mobile: The top most controls are obfuscated in mobile/landscape view.
+12) When user zooms out, the filter applied on the legend persists.
+13) When a filter has been applied, the popups on other layers should be disabled.
 //////////////////////////////////////////
 DOWN THE ROAD:
 1) Locate me functionality - SCO, Jay.
