@@ -65,7 +65,6 @@ function getPolyStyle(level, level1Selected){
 			style += thisStyle;
 		}
 	}else{
-		console.log(level1Selected)
 		style = "#layer{polygon-fill: #DDDDDD;polygon-opacity: 0;";
 		for(var i = 0; i < classes.length; i++) {
 			if (level1Selected == classes[i].level1var) {
@@ -75,7 +74,6 @@ function getPolyStyle(level, level1Selected){
 		}
 	}
 	style += "}";
-	console.log(style)
 	return style;
 };
 
@@ -90,7 +88,6 @@ function createStyles(){
 	level1Membership = _.groupBy(classes, function(classObj){
 		return makeVariableFromString(classObj.level1);
 	});
-	console.log(level1Membership)
 };
 
 function makeLevel1ColorList(){
@@ -831,8 +828,9 @@ function drawThisView(boundsIn, zoomIn, _levelEngaged, _level1Selected){
 					") AND the_geom && ST_SetSRID(ST_MakeBox2D(ST_Point(" +
 					String(boundsIn._northEast.lng)+","+String(boundsIn._northEast.lat)+"), ST_Point(" +
 					String(boundsIn._southWest.lng)+","+String(boundsIn._southWest.lat)+")), 4326) ORDER BY cov1 DESC"
+
 			}
-			//console.log(cartoQuery)
+			console.log(cartoQuery)
 			sql.execute(cartoQuery)
 				.done(function(data) {
 					$("#polygonLegendHolder").empty();
@@ -854,7 +852,9 @@ function getLevel1MemberSearch(_level1Selected){
 	var classesSelected = "";
 	var countClasses = 0;
 	var operatorInclusion = ""
-	jQuery.each(level1Membership[_level1Selected], function(i, val) {
+	var level1key = _level1Selected.split(" ").join("_")
+	console.log(level1key)
+	jQuery.each(level1Membership[level1key], function(i, val) {
 		if (countClasses == 1){
 			operatorInclusion = " OR "
 		}
