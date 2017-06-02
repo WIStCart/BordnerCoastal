@@ -67,12 +67,14 @@ function getPolyStyle(level, level1Selected){
 	}else{
 		style = "#layer{polygon-fill: #DDDDDD;polygon-opacity: 0;";
 		for(var i = 0; i < classes.length; i++) {
-			if (level1Selected == classes[i].level1var) {
+			level1key = level1Selected.split(" ").join("_")
+			if (level1key == classes[i].level1var) {
 				var thisStyle = "[cov1='"+classes[i].code+"']{polygon-fill: "+classes[i].color2+";polygon-opacity:1;}";
 				style += thisStyle;
 			}
 		}
 	}
+	console.log(style)
 	style += "}";
 	return style;
 };
@@ -853,7 +855,6 @@ function getLevel1MemberSearch(_level1Selected){
 	var countClasses = 0;
 	var operatorInclusion = ""
 	var level1key = _level1Selected.split(" ").join("_")
-	console.log(level1key)
 	jQuery.each(level1Membership[level1key], function(i, val) {
 		if (countClasses == 1){
 			operatorInclusion = " OR "
@@ -904,12 +905,6 @@ function drawPolygonHistogram(data, _levelEngaged, el){
 		.attr("class", " x axis")
 		.attr("transform", "translate(0," + height + ")")
 		.call(xAxis)
-		// .selectAll("text")
-		// .style("text-anchor", "end")
-		// .attr("dx", "-.8em")
-		// .attr("dy", "-.55em")
-		// // .attr("transform", "rotate(-45)" );
-
 
 	svg.append("g")
 		.attr('class', 'y axis')
@@ -926,8 +921,6 @@ function drawPolygonHistogram(data, _levelEngaged, el){
 			level1Selected = d.type.toLowerCase()
 			dispatchLegendClick(level1Selected)
 		})
-
-
 }
 
 function getColor1FromLevel1(level1){
