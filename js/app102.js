@@ -14,6 +14,7 @@ var level1Selected = "agriculture"
 var sublayer1;
 var sublayer2;
 var layerOpacity = {polygons:0.65};
+var legendType = "polygons";
 var counties;
 var townships;
 var lines;
@@ -22,7 +23,10 @@ var infowindowVars = ['cov1','cov2', 'cov3', 'cov4', 'cov5',
 					'pctcov1', 'pctcov2', 'pctcov3', 'pctcov4', 'pctcov5',
 					'mindiam1','mindiam2','mindiam3','mindiam4','mindiam5',
 					 'maxdiam1','maxdiam2','maxdiam3','maxdiam4','maxdiam5' ]
-
+var polygonLegend; //svg polygon legend
+var level1Colors;
+var level2Colors;
+var polygonLegendFactor = 1e6;
 // Overlay definitions:
 var labelsOverlay = L.tileLayer('http://{s}.tile.stamen.com/toner-labels/{z}/{x}/{y}.png', {
 	attribution: 'stamen toner labels'
@@ -55,7 +59,6 @@ function getPolyStyle(level, level1Selected){
 
 	//Beginning part of the cartocss style
 	style = "#layer{polygon-fill: #DDDDDD;polygon-opacity:1;";
-	console.log()
 	if (level =="level1"){
 		for(var i = 0; i < classes.length; i++) {
 			var thisStyle = "[cov1='"+classes[i].code+"']{polygon-fill: "+classes[i].color1+";}";
@@ -64,12 +67,14 @@ function getPolyStyle(level, level1Selected){
 	}else{
 		style = "#layer{polygon-fill: #DDDDDD;polygon-opacity: 0;";
 		for(var i = 0; i < classes.length; i++) {
-			if (level1Selected == classes[i].level1var) {
+			level1key = level1Selected.split(" ").join("_")
+			if (level1key == classes[i].level1var) {
 				var thisStyle = "[cov1='"+classes[i].code+"']{polygon-fill: "+classes[i].color2+";polygon-opacity:1;}";
 				style += thisStyle;
 			}
 		}
 	}
+	// console.log(style)
 	style += "}";
 	return style;
 };
@@ -85,8 +90,26 @@ function createStyles(){
 	level1Membership = _.groupBy(classes, function(classObj){
 		return makeVariableFromString(classObj.level1);
 	});
-	console.log(level1Membership)
 };
+
+function makeLevel1ColorList(){
+	//not efficient :(
+	var grouped = _.groupBy(tempClasses2.classes, "level1")
+	//all colors should be the same within a level 1
+	colors = _.map(grouped, function(g, key){
+		return {level1: key, color: g[0].color1}
+	})
+	return colors
+}
+function makeLevel2ColorList(){
+	//not efficient :(
+	var grouped = _.groupBy(tempClasses2.classes, "level2")
+	//all colors should be the same within a level 1
+	colors = _.map(grouped, function(g, key){
+		return {level2: key, color: g[0].color2}
+	})
+	return colors
+}
 
 // Helper function to turn a title into a valid variable (i.e. "Lowland Coniferous Forest" to "lowland_coniferous_forest")
 function makeVariableFromString(stringIn){
@@ -102,7 +125,8 @@ window.onload = function() {
 		cartodb_logo: false,
 		center: [43.7844,-88.7879],
 		zoom: 7,
-		minZoom:6
+		minZoom:6,
+		maxZoom: 18
 	});
 
 	// Add county layer
@@ -256,7 +280,7 @@ function getNameFromCode(code){
 	}catch(err){
 		//covClass might be undefined
 		//if the code is null
-		return undefined
+		return "Other"
 	}
 }
 
@@ -266,7 +290,7 @@ function getLevel1FromCode(code){
 		covClass = lookupClassFromCode(code);
 		return covClass.level1
 	}catch(err){
-		return undefined
+		return "Other"
 	}
 }
 
@@ -281,59 +305,58 @@ function translateDensity(den){
 	}else if (den === 4){
 		denTranslate = "Scattered"
 	}
-	console.log(den)
 	return denTranslate
 }
 
-function formatCoverageForInfowindow(content){
+function formatCoverageForInfowindow(data){
 	//prepare the data for templating in the infowindow
 	//not totally necessary but makes the template cleaner
 	//essential --  get the name for the coverage type here
 	infowindowContent = {
 		 coverage1: {
-			 code: content.data.cov1,
-			 name: getNameFromCode(content.data.cov1),
-			 density: content.data.den1,
-			 minDiameter: content.data.mindiam1,
-			 maxDiameter: content.data.maxdiam1,
-			 percentCover: content.data.pctcov1,
-			 densityTranslate : translateDensity(content.data.den1)
+			 code: data.cov1,
+			 name: getNameFromCode(data.cov1),
+			 density:data.den1,
+			 minDiameter: data.mindiam1,
+			 maxDiameter: data.maxdiam1,
+			 percentCover: data.pctcov1,
+			 densityTranslate : translateDensity(data.den1)
 		 },
 		 coverage2: {
-			 code: content.data.cov2,
-			 name: getNameFromCode(content.data.cov2),
-			 density: content.data.den2,
-			 minDiameter: content.data.mindiam2,
-			 maxDiameter: content.data.maxdiam2,
-			 percentCover: content.data.pctcov2,
-			 densityTranslate : translateDensity(content.data.den2)
+			 code: data.cov2,
+			 name: getNameFromCode(data.cov2),
+			 density: data.den2,
+			 minDiameter:data.mindiam2,
+			 maxDiameter: data.maxdiam2,
+			 percentCover: data.pctcov2,
+			 densityTranslate : translateDensity(data.den2)
 		 },
 		 coverage3: {
-			 code: content.data.cov3,
-			 name: getNameFromCode(content.data.cov3),
-			 density: content.data.den3,
-			 minDiameter: content.data.mindiam3,
-			 maxDiameter: content.data.maxdiam3,
-			 percentCover: content.data.pctcov3,
-			 densityTranslate: translateDensity(content.data.den3)
+			 code:data.cov3,
+			 name: getNameFromCode(data.cov3),
+			 density: data.den3,
+			 minDiameter: data.mindiam3,
+			 maxDiameter: data.maxdiam3,
+			 percentCover: data.pctcov3,
+			 densityTranslate: translateDensity(data.den3)
 		 },
 		 coverage4: {
-			 code: content.data.cov3,
-			 name: getNameFromCode(content.data.cov4),
-			 density: content.data.den4,
-			 minDiameter: content.data.mindiam4,
-			 maxDiameter: content.data.maxdiam4,
-			 percentCover: content.data.pctcov4,
-			 densityTranslate: translateDensity(content.data.den4)
+			 code: data.cov3,
+			 name: getNameFromCode(data.cov4),
+			 density: data.den4,
+			 minDiameter: data.mindiam4,
+			 maxDiameter: data.maxdiam4,
+			 percentCover: data.pctcov4,
+			 densityTranslate: translateDensity(data.den4)
 		 },
 		 coverage5: {
-			 code: content.data.cov5,
-			 name: getNameFromCode(content.data.cov5),
-			 density: content.data.den5,
-			 minDiameter: content.data.mindiam5,
-			 maxDiameter: content.data.maxdiam5,
-			 percentCover: content.data.pctcov5,
-			 densityTranslate : translateDensity(content.data.den5)
+			 code: data.cov5,
+			 name: getNameFromCode(data.cov5),
+			 density: data.den5,
+			 minDiameter: data.mindiam5,
+			 maxDiameter: data.maxdiam5,
+			 percentCover: data.pctcov5,
+			 densityTranslate : translateDensity(data.den5)
 		 }
 	}
 	return infowindowContent
@@ -352,16 +375,34 @@ function setupInteraction(layer, _levelEngaged, _visibility){
 			//modify the object here before sending to templating engine
 			//lookup the classname
 			content = obj.content
-			windowContent = formatCoverageForInfowindow(content)
+			windowContent = formatCoverageForInfowindow(content.data)
 			return _.template($('#infowindow_template').html())(windowContent);
 		}
 	});
+
+
+
+	layer.bind('featureClick', function(e, latln, pxPos, data, layer){
+		//hide the feature if it's been filtered out
+		if (+levelEngaged == 2){
+			level1key = level1Selected.split(" ").join("_")
+			level1Members = level1Membership[level1Selected]
+			level1MemberCodes = _.map(level1Members, function(d){return d.code})
+			isAMember = _.contains(level1MemberCodes, data.cov1)
+			if (!isAMember){
+				$(".cartodb-infowindow").hide()
+			}else{
+				$(".cartodb-infowindow").show();
+			}
+		}
+	})
+
 
 	/* To display an infobox within a leaflet control */
 	var infoBox = layer.leafletMap.viz.addOverlay( {
 	  type: 'infobox',
 	  layer: layer,
-		template: '<div class="cartodb-tooltip-content-wrapper"><p><span id="level1-set"></span></p></div>',
+		template: '<div class="cartodb--content-wrapper"><p><span id="level1-set"></span></p></div>',
 	  // width: 75,
 	  position: 'top|right'
 	});
@@ -389,7 +430,17 @@ function setupInteraction(layer, _levelEngaged, _visibility){
 		map.touchZoom.enable();
 		map.doubleClickZoom.enable();
 	})
-}
+	//make lists of color for using in the legend later
+	level1Colors = makeLevel1ColorList();
+	level2Colors = makeLevel2ColorList();
+
+	//setup legend navigation
+	$("#legend-back").click(function(d){
+		dispatchLegendClick(undefined)
+	})
+
+
+} //end setup interaction
 
 function setupGeocoderSearch(){
 	//render the template
@@ -509,7 +560,7 @@ function setUpMap(){
 	$('[data-toggle="tooltip"]').tooltip();
 
 	// Make a demonstration legend
-	demoLegend();
+	// demoLegend();
 
 	// call jsMediaQuery to handle tablet/mobile thresholds upon screen resize, then call it once to configure the initial view
 	$(window).resize(jsMediaQuery);
@@ -552,18 +603,21 @@ function turnOnFeatureType(featureTypeCalled){
 			$("#polygonLegendHolder").removeClass( "legend-holder-hidden" )
 			$("#lineLegendHolder").addClass( "legend-holder-hidden" )
 			$("#pointLegendHolder").addClass( "legend-holder-hidden" )
+			legendType = "polygons";
 			break;
 		case "featureLines":
 			console.log("feature lines called")
 			$("#lineLegendHolder").removeClass( "legend-holder-hidden" )
 			$("#polygonLegendHolder").addClass( "legend-holder-hidden" )
 			$("#pointLegendHolder").addClass( "legend-holder-hidden" )
+			legendType = "lines"
 			break;
 		case "featurePoints":
 			console.log("feature points called")
 			$("#pointLegendHolder").removeClass( "legend-holder-hidden" )
 			$("#lineLegendHolder").addClass( "legend-holder-hidden" )
 			$("#polygonLegendHolder").addClass( "legend-holder-hidden" )
+			legendType = "points"
 			break;
 		default:
 			console.log("unidentified feature type called")
@@ -788,87 +842,325 @@ function drawThisView(boundsIn, zoomIn, _levelEngaged, _level1Selected){
 		// level1 = (Deciduous)
 		// level2 = (Scrub Oak)
 		//var _levelEngaged = "1"
-		if (zoomIn >= 13){
+		if ((zoomIn >= 13) && (legendType === "polygons")){
 			if (_levelEngaged == "1"){
-				var cartoQuery = "SELECT * FROM final_coastal_polygons WHERE the_geom && ST_SetSRID(ST_MakeBox2D(ST_Point(" +
+				//if overview (level1) do this
+				var cartoQuery = "SELECT cov1, area FROM final_coastal_polygons WHERE the_geom && ST_SetSRID(ST_MakeBox2D(ST_Point(" +
 					String(boundsIn._northEast.lng)+","+String(boundsIn._northEast.lat)+"), ST_Point(" +
 					String(boundsIn._southWest.lng)+","+String(boundsIn._southWest.lat)+")), 4326) ORDER BY cov1 DESC"
 			}else{
-				var classesSelected = "";
-				var countClasses = 0;
-				var operatorInclusion = ""
-				jQuery.each(level1Membership[_level1Selected], function(i, val) {
-					if (countClasses == 1){
-						operatorInclusion = " OR "
-					}
-					classesSelected = classesSelected + operatorInclusion + "(cov1 = '" + val.code + "')"
-					countClasses++;
-				})
-				var cartoQuery = "SELECT * FROM final_coastal_polygons WHERE (" + classesSelected +
+				//detailed view of sing class
+			classesSelected = getLevel1MemberSearch(_level1Selected)
+				var cartoQuery = "SELECT cov1, area FROM final_coastal_polygons WHERE (" + classesSelected +
 					") AND the_geom && ST_SetSRID(ST_MakeBox2D(ST_Point(" +
 					String(boundsIn._northEast.lng)+","+String(boundsIn._northEast.lat)+"), ST_Point(" +
 					String(boundsIn._southWest.lng)+","+String(boundsIn._southWest.lat)+")), 4326) ORDER BY cov1 DESC"
+
 			}
-			//console.log(cartoQuery)
+			// console.log(cartoQuery)
 			sql.execute(cartoQuery)
 				.done(function(data) {
 					$("#polygonLegendHolder").empty();
-					var cov1Classes = {}
-					var grouped = _.groupBy(data.rows, function(num){ // http://underscorejs.org/
-						return classConfigs[num.cov1]["level" + _levelEngaged + "var"];
-					});
-					jQuery.each(grouped, function(i, val) {
-						var collectiveVal = 0;
-						jQuery.each(val, function(j, val2) {
-							collectiveVal += val2.shape_area;
-						})
-						var hexColor = "#f545e9" // default to hot pink
-						if (classConfigs[val[0].cov1]){
-							hexColor = classConfigs[val[0].cov1]["color" + _levelEngaged]
-						}
-						cov1Classes[i] = {"cov1": val[0].cov1, "groupSize": Math.round(collectiveVal) , "hex": hexColor }
-					})
-					var max = _.max(cov1Classes,  function(num){ return num.groupSize; })
-					var cov1Classes = _.indexBy(cov1Classes, 'groupSize')
-					var countKey = 0;
-					var widthInPercent = (100 / Object.keys(cov1Classes).length)
-					_.each(cov1Classes, function(value){
-						featurePct = (value.groupSize / max.groupSize) * 100
-						$("#polygonLegendHolder").append('<div class="histogram-div"; style="height:' + String(featurePct) + '%; width:'+ widthInPercent +'%; left:'
-						+ (countKey * widthInPercent) + '%; background-color:' + value.hex + ';" id="div_'+ value.cov1 +'" onClick="dispatchLegendClick(this.id)">'
-						+ '<div style="background-color:' + value.hex + ';" class="level-1-label-text rotate-text shade-level-1-label-text transition-class">' + classConfigs[value.cov1]["level" + _levelEngaged] + '</div></div>')
-						countKey++;
-					});
-					createWordCloud("#pointLegendHolder", cov1Classes, _levelEngaged);
+					drawPolygonHistogram(data, _levelEngaged, "#polygonLegendHolder");
 				})
 				.error(function(errors) {
 					console.log("errors:" + errors);
 				})
+		}else{
+			//zoom < 13
+
+			$("#polygonLegendHolder").html("Zoom in for a histogram of land cover frequencies")
 		}
 }
 
-function dispatchLegendClick(classCode){
-	level1Selected = classConfigs[classCode.replace("div_", "")].level1var;
+
+function getLevel1MemberSearch(_level1Selected){
+	//get all of the cov1 codes that fall within the level1 label
+	var classesSelected = "";
+	var countClasses = 0;
+	var operatorInclusion = ""
+	var level1key = _level1Selected.split(" ").join("_")
+	jQuery.each(level1Membership[level1key], function(i, val) {
+		if (countClasses == 1){
+			operatorInclusion = " OR "
+		}
+		classesSelected = classesSelected + operatorInclusion + "(cov1 = '" + val.code + "')"
+		countClasses++;
+	})
+	return classesSelected
+}
+
+function shadeRGBColor(color, percent) {
+	//https://stackoverflow.com/questions/5560248/programmatically-lighten-or-darken-a-hex-color-or-rgb-and-blend-colors
+    var f=color.split(","),t=percent<0?0:255,p=percent<0?percent*-1:percent,R=parseInt(f[0].slice(4)),G=parseInt(f[1]),B=parseInt(f[2]);
+    return "rgb("+(Math.round((t-R)*p)+R)+","+(Math.round((t-G)*p)+G)+","+(Math.round((t-B)*p)+B)+")";
+}
+
+
+function drawPolygonHistogram(data, _levelEngaged, el){
+	var summary = summarize(data, _levelEngaged)
+
+	// console.log(summary)
+	var width = $(el).width();
+	var height = $(el).height() - 15;
+
+	//dimension setup
+	var margins = {top: 20, left: 75, right: 30, bottom: 30}
+	height = height - margins.top - margins.bottom;
+	width = width - margins.left - margins.right;
+
+	//axes setup
+	var xScale = d3.scale.ordinal().rangeRoundBands([0, width], 0.05)
+	var yScale = d3.scale.linear().range([height, 0])
+
+	var xAxis = d3.svg.axis()
+		.scale(xScale)
+		.orient('bottom')
+
+	var yAxis = d3.svg.axis()
+		.scale(yScale)
+		.orient('left')
+
+	var svg = d3.select(el)
+		.append('svg')
+		.attr('width', width + margins.left + margins.right)
+		.attr('height', height + margins.top + margins.bottom)
+		.append('g')
+			.attr('transform', "translate(" + margins.left + "," + margins.top + ")")
+
+	xScale.domain(summary.map(function(d){return d.type }))
+	yScale.domain([0.1, d3.max(summary, function(d){return d.area / polygonLegendFactor})])
+
+
+	svg.append("g")
+		.attr("class", " x axis")
+		.attr("transform", "translate(0," + height + ")")
+		.call(xAxis)
+		.selectAll(".tick text")
+			.call(wrap, xScale.rangeBand())
+
+	svg.append("g")
+		.attr('class', 'y axis')
+		.call(yAxis)
+
+	//add a background rectange to listen for click events
+	svg.selectAll("background")
+		.data(summary)
+		.enter()
+			.append('rect')
+			.attr('class', function(d){ return "background " + d.type.split(" ").join("_")})
+			.style('fill', function(d){return d.color})
+			.style('fill-opacity', 0.15)
+			.attr('x', function(d){ return xScale(d.type)})
+			.attr('width', xScale.rangeBand())
+			.attr('y', 0)
+			.attr('height', height)
+			.on('click', function(d){
+				level1Selected = d.type.toLowerCase()
+				if (_levelEngaged == 1){
+						dispatchLegendClick(level1Selected)
+				}
+			})
+			//change colors on hover
+			.on('mouseover', function(d){
+				if (_levelEngaged == 1){
+					var self = d3.select(this)
+					//set old color so we can recover it
+					var oldColor = self.style('fill')
+					self.attr('data-fill', oldColor)
+					var newColor = shadeRGBColor(oldColor, -0.25)
+					self.style('fill', newColor)
+					d3.selectAll("." + d.type.split(" ").join("_")).style('fill', newColor)
+				}
+				//make taller
+				// self.attr('y', 0)
+				// self.attr('height', height)
+			})
+			.on('mouseout', function(d){
+				if (_levelEngaged == 1){
+					var self = d3.select(this)
+					var oldColor = self.attr('data-fill')
+					self.style('fill', oldColor)
+				 d3.selectAll("." + d.type.split(" ").join("_")).style('fill', oldColor)
+				}
+			})
+
+
+			//these are the data-driven bars proportional to the area in the screen
+	svg.selectAll('bar')
+		.data(summary)
+		.enter().append('rect')
+		.attr('class', function(d){ return "background " + d.type.split(" ").join("_")})
+		.style('fill', function(d){return d.color})
+		.attr('x', function(d){ return xScale(d.type)})
+		.attr('width', xScale.rangeBand())
+		.attr('y', function(d){
+			var scaledY = yScale(d.area / polygonLegendFactor);
+			return scaledY})
+		.attr('height', function(d){
+			var scaledHeight = height - yScale(d.area / polygonLegendFactor)
+			return scaledHeight})
+			.on('click', function(d){
+				level1Selected = d.type.toLowerCase()
+				if (_levelEngaged == 1){
+						dispatchLegendClick(level1Selected)
+				}
+			})
+			//change colors on hover
+			.on('mouseover', function(d){
+				if (_levelEngaged == 1){
+					var self = d3.select(this)
+					//set old color so we can recover it
+					var oldColor = self.style('fill')
+					self.attr('data-fill', oldColor)
+					var newColor = shadeRGBColor(oldColor, -0.25)
+					d3.selectAll("." + d.type.split(" ").join("_")).style('fill', newColor)
+				}
+			})
+			.on('mouseout', function(d){
+				if (_levelEngaged == 1){
+					var self = d3.select(this)
+					var oldColor = self.attr('data-fill')
+				  d3.selectAll("." + d.type.split(" ").join("_")).style('fill', oldColor)
+				}
+			})
+
+
+	svg.append('text')
+		.attr('transform', 'rotate(-90)')
+		.attr('y', 0-margins.left)
+		.attr('x', 0 - (height / 2))
+		.attr('dy', "1em")
+		.attr('text-anchor', 'middle')
+		.attr('fill', 'white')
+		.attr('text-shadow', 'black 0.1em 0.1em 0.2em')
+		.text("Square Kilometers")
+}
+
+function getColor1FromLevel1(level1){
+	var which = _.where(level1Colors, {level1: level1})[0]
+	return which.color
+}
+
+function getLevel2FromCode(code){
+		//get the level one feature type from the cover code
+	try{
+		covClass = lookupClassFromCode(code);
+		return covClass.level2
+	}catch(err){
+		return "Other"
+	}
+}
+
+function getColor2FromLevel2(level2){
+	var which = _.where(level2Colors, {level2: level2})[0]
+	return which.color
+}
+
+
+function summarize(data, level){
+	if (level == 1){
+		var colorFn = getColor1FromLevel1;
+		var prop = "level1"
+		var accessor = getLevel1FromCode
+	}else if (level==2){
+		var colorFn = getColor2FromLevel2;
+		var prop = "level2"
+		var accessor = getLevel2FromCode;
+	}
+	var mapped = _.map(data.rows, function(d){
+		d[prop] = accessor(d.cov1)
+		return d
+	})
+	var grouped = _.groupBy(mapped, prop)
+	var summed = _.map(grouped, function(g, key){
+		var item =  {type: key, color: colorFn(key), area : _(g).reduce(function(m, x){ return m + x.area;}, 0)}
+		if (item.area > 0){
+			return item
+		}
+	})
+	var sorted = _.sortBy(summed, "area")
+	return sorted
+}
+
+
+
+function wrap(text, width) {
+	//https://bl.ocks.org/mbostock/7555321
+  text.each(function() {
+    var text = d3.select(this),
+        words = text.text().split(/\s+/).reverse(),
+        word,
+        line = [],
+        lineNumber = 0,
+        lineHeight = 1.1, // ems
+        y = text.attr("y"),
+        dy = parseFloat(text.attr("dy")),
+        tspan = text.text(null).append("tspan").attr("x", 0).attr("y", y).attr("dy", dy + "em");
+    while (word = words.pop()) {
+      line.push(word);
+      tspan.text(line.join(" "));
+      if (tspan.node().getComputedTextLength() > width) {
+        line.pop();
+        tspan.text(line.join(" "));
+        line = [word];
+        tspan = text.append("tspan").attr("x", 0).attr("y", y).attr("dy", ++lineNumber * lineHeight + dy + "em").text(word);
+      }
+    }
+  });
+}
+
+
+function dispatchLegendClick(level1Selected){
 	if (levelEngaged == "1"){
+		//go from level one to level 2
 		levelEngaged = "2";
+		$("#legend-back").show();
 	}else{
+		//go from level 2 to level 1
 		levelEngaged = "1";
+		$("#legend-back").hide()
 	}
 	switchLevel(levelEngaged, level1Selected);
 	drawThisView(map.getBounds(), map.getZoom(), levelEngaged, level1Selected);
 }
 
+function drawLineLegend(){
+	//TODO
+}
+
+function drawPointLegend(){
+	//TODO
+}
+
+function displayLevel1Label(level1Selected){
+	//display the selected level one so the user knows there was some change
+	$("#level1Label").html(titleCase(level1Selected))
+
+	//figure out positioning
+	var boxHeight = $("#polygonLegendHolder").height();
+	$("#level1Label").css({'bottom': (boxHeight + 13) + "px", 'left': 0+'px'})
+	$("#level1Label").show();
+}
+
+function hideLevel1Label(){
+	$("#level1Label").html("")
+	$("#level1Label").hide()
+}
+
 // called upon click of legend item
 function switchLevel(_levelEngaged, _level1Selected){
 	cartoCSSRules = getPolyStyle("level"+_levelEngaged, _level1Selected);
-	if (_levelEngaged == "2"){
+	if (_levelEngaged == 2){
 		sublayer2.show();
 		sublayer1.hide();
 		sublayer2.setCartoCSS(cartoCSSRules)
 		sublayer2.setInteraction(true)
+		displayLevel1Label(_level1Selected)
 	}else{
 		sublayer1.show();
 		sublayer2.hide();
+		hideLevel1Label();
 	}
 }
 
@@ -1027,4 +1319,13 @@ function createWordCloud(hashedDivID, tempC, _drawLevel){
 		  .text(function(d) { return d.key; });
 	}
 	d3.layout.cloud().stop();
+}
+
+function titleCase(str) {
+  var newstr = str.split(" ");
+  for(i=0;i<newstr.length;i++){
+    newstr[i] = newstr[i].charAt(0).toUpperCase() + newstr[i].substring(1).toLowerCase();
+  }
+   newstr = newstr.join(" ");
+   return newstr;
 }
