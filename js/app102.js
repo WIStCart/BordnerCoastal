@@ -889,7 +889,7 @@ function drawThisView(boundsIn, zoomIn, _levelEngaged, _level1Selected){
 		// level1 = (Deciduous)
 		// level2 = (Scrub Oak)
 		//var _levelEngaged = "1"
-		console.log(zoomIn)
+		//console.log(zoomIn)
 		if ((zoomIn >= 11) && (legendType === "polygons")){
 			//draw the legend
 			if (_levelEngaged == "1"){
@@ -977,7 +977,9 @@ function drawPolygonHistogram(data, _levelEngaged, el){
 		.append('g')
 			.attr('transform', "translate(" + margins.left + "," + margins.top + ")")
 
-	xScale.domain(summary.map(function(d){return d.type }))
+	xScale.domain(summary.map(function(d){
+		// console.log(d)
+		return d.type }))
 	yScale.domain([0.1, d3.max(summary, function(d){return d.area / polygonLegendFactor})])
 
 
@@ -1124,11 +1126,14 @@ function summarize(data, level){
 	var grouped = _.groupBy(mapped, prop)
 	var summed = _.map(grouped, function(g, key){
 		var item =  {type: key, color: colorFn(key), area : _(g).reduce(function(m, x){ return m + x.area;}, 0)}
-		if (item.area > 0){
-			return item
-		}
+		return item
 	})
 	var sorted = _.sortBy(summed, "area")
+	//sometimes, there's an zero item that has a zero area on it -- remove that or it causes d3 errors
+	if (sorted[0].area == 0){
+		sorted.shift();
+	}
+	// console.log(sorted)
 	return sorted
 }
 
