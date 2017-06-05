@@ -991,11 +991,21 @@ function drawPolyFilter(el, _levelEngaged, _level1Selected){
 			.style('fill', function(d){
 				return d.color
 		})
-			.on('click', function(d){
-				if (levelEngaged == 1){
-						dispatchLegendClick(d.name.toLowerCase())
+		.style('opacity', function(d){
+			if (levelEngaged == 2){
+				level1Key = _level1Selected.toLowerCase().split(" ").join("_")
+				dKey = d.name.toLowerCase().split(" ").join("_")
+				if (level1Key == dKey){
+					return 1
 				}
-			})
+				return 0.25
+			}
+		})
+		.on('click', function(d){
+			if (levelEngaged == 1){
+					dispatchLegendClick(d.name.toLowerCase())
+			}
+		})
 }
 
 
