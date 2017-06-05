@@ -429,14 +429,13 @@ function setupInteraction(layer, _levelEngaged, _visibility){
 } //end setup interaction
 
 function onMapClick(){
-	console.log(isInfowindowOpen)
 	//close the info window on basemap click
 	setTimeout(function(){
 		if(!isInfowindowOpen){
 			infowindow.set('visibility', false);
 		}
 			isInfowindowOpen = false;
-	}, 250)
+	}, 250) //timeout is important here in maintaining correct popup state
 }
 
 

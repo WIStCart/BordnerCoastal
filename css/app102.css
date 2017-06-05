@@ -402,7 +402,7 @@ div.cartodb-tooltip-content-wrapper p{
 	margin-bottom: 2px;
 	opacity: 0.9;
 	text-align: left;
-	font-style: oblique;
+	/*font-style: oblique;*/
 	background-color: #FFF;
 	color: #2c5875;
 	border-radius: 10px;
