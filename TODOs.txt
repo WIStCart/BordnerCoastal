@@ -13,7 +13,7 @@ TODO:
 		*Only display fields that are populated (for example density is only relevant to tree coverage)
 		*(Done) Remove the % value altogether, it isnt populated robustly enough to show
 		*(Done) Add additional rows to the popup if Cov1,Cov2,Cov3,Cov4 exist (as needed)
-		*Add level1 name to the popup so that it displays consistently with the legend.
+		*(Done?) Add level1 name to the popup so that it displays consistently with the legend.
 12) Add points/Lines (use an all, one, or none strategy). CS, check email for the data from MN, ask him for it if it cannot be found (i dont think it is in box). Note that this data only exists in the coastal counties, not the watershed.
 		* Will likely need to implement scale thresholds for features (cartoCSS will likely be enough to achieve this) so as to slowly reveal features as the user zooms in.
 		* note that there are some line features that fall on top of one another. We will need to choose symbology types that all ow the user to see both at the same time (such as varying line width, etc.).
