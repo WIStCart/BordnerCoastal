@@ -27,6 +27,8 @@ var polygonLegend; //svg polygon legend
 var level1Colors;
 var level2Colors;
 var polygonLegendFactor = 1e6;
+var isInfowindowOpen = false;
+var infowindow;
 // Overlay definitions:
 var labelsOverlay = L.tileLayer('http://{s}.tile.stamen.com/toner-labels/{z}/{x}/{y}.png', {
 	attribution: 'stamen toner labels'
@@ -374,7 +376,7 @@ function formatCoverageForInfowindow(data){
 function setupInteraction(layer, _levelEngaged, _visibility){
 	//////////////////////////////////////////////////////
 	/* To construct a rudimentary popup on click (check .html for #infowindow_template) */
-	cdb.vis.Vis.addInfowindow(map, layer, infowindowVars,{
+	infowindow = cdb.vis.Vis.addInfowindow(map, layer, infowindowVars,{
 		'sanitizeTemplate':false
 	}).model.set({
 		'template' :  function(obj){
@@ -387,22 +389,7 @@ function setupInteraction(layer, _levelEngaged, _visibility){
 		}
 	});
 
-
-
-	layer.bind('featureClick', function(e, latln, pxPos, data, layer){
-		//hide the feature if it's been filtered out
-		if (+levelEngaged == 2){
-			level1key = level1Selected.split(" ").join("_")
-			level1Members = level1Membership[level1Selected]
-			level1MemberCodes = _.map(level1Members, function(d){return d.code})
-			isAMember = _.contains(level1MemberCodes, data.cov1)
-			if (!isAMember){
-				$(".cartodb-infowindow").hide()
-			}else{
-				$(".cartodb-infowindow").show();
-			}
-		}
-	})
+	layer.bind('featureClick', onMapFeatureClick)
 
 
 	/* To display an infobox within a leaflet control */
@@ -427,16 +414,8 @@ function setupInteraction(layer, _levelEngaged, _visibility){
 	setupGeocoderSearch()
 
 	//disable mouse events when the table of contents is in use
-	$("#layerList").on('mouseover', function(){
-		map.dragging.disable();
-		map.touchZoom.disable();
-		map.doubleClickZoom.disable();
-	})
-	$("#layerList").on('mouseout', function(){
-		map.dragging.enable();
-		map.touchZoom.enable();
-		map.doubleClickZoom.enable();
-	})
+	$("#layerList").on('mouseover', disableMapInteractionEvents)
+	$("#layerList").on('mouseout', enableMapInteractionEvents)
 	//make lists of color for using in the legend later
 	level1Colors = makeLevel1ColorList();
 	level2Colors = makeLevel2ColorList();
@@ -446,8 +425,53 @@ function setupInteraction(layer, _levelEngaged, _visibility){
 		dispatchLegendClick(undefined)
 	})
 
-
+	$("#map").click(onMapClick)
 } //end setup interaction
+
+function onMapClick(){
+	console.log(isInfowindowOpen)
+	//close the info window on basemap click
+	setTimeout(function(){
+		if(!isInfowindowOpen){
+			infowindow.set('visibility', false);
+		}
+			isInfowindowOpen = false;
+	}, 250)
+}
+
+
+function onMapFeatureClick(e, latln, pxPos, data, layer){
+	//mark the infowindow as open
+	isInfowindowOpen = true;
+	//hide the infowindow if it's been filtered out by legend interaction
+	if (+levelEngaged == 2){
+		level1key = level1Selected.split(" ").join("_")
+		level1Members = level1Membership[level1Selected]
+		level1MemberCodes = _.map(level1Members, function(d){return d.code})
+		isAMember = _.contains(level1MemberCodes, data.cov1)
+		if (!isAMember){
+			// infowindow.set('visibility', false)
+			$(".cartodb-infowindow").hide()
+			isInfowindowOpen = false;
+		}else{
+			$(".cartodb-infowindow").show()
+			isInfowindowOpen = true;
+			// infowindow.set('visibility', true)
+		}
+	}
+}
+
+function disableMapInteractionEvents(){
+	map.dragging.disable();
+	map.touchZoom.disable();
+	map.doubleClickZoom.disable();
+}
+
+function enableMapInteractionEvents(){
+	map.dragging.enable();
+	map.touchZoom.enable();
+	map.doubleClickZoom.enable();
+}
 
 function setupGeocoderSearch(){
 	//render the template
