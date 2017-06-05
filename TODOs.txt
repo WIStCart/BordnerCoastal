@@ -34,6 +34,7 @@ BUGS:
 11) In mobile: The top most controls are obfuscated in mobile/landscape view.
 12)  When user zooms out, the filter applied on the legend persists.
 13) ~~ When a filter has been applied, the popups on other layers should be disabled.~~ (Fixed / SF)
+14) What is the label for density = 0?
 //////////////////////////////////////////
 DOWN THE ROAD:
 1) Locate me functionality - SCO, Jay.
