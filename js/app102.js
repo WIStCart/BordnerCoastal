@@ -28,6 +28,7 @@ var level1Colors;
 var level2Colors;
 var polygonLegendFactor = 1e6;
 var isInfowindowOpen = false;
+var isTOCOpen = false;
 var infowindow;
 // Overlay definitions:
 var labelsOverlay = L.tileLayer('http://{s}.tile.stamen.com/toner-labels/{z}/{x}/{y}.png', {
@@ -519,8 +520,9 @@ function setUpMap(){
 
 	$("#layerListHolder")
 		.html(
-			'<div class="layer-list-view transition-class row" id="layerList">' +
-		'<h5>Table of Contents</h5>' +
+			'<div class="layer-list-view transition-class row clearfix" id="layerList">' +
+			'<button class="btn btn-primary btn-sm btn-close layer-list-close-btn pull-right"><span class="glyphicon glyphicon-remove"></span></button>' +
+		'<h4 class="layer-list-header">Table of Contents</h4>' +
 		'<div class="col-xs-12">' +
 		'<label class="legend-label">Feature Type</label>' +
 			'<div class="feature-type-radio-group">' +
@@ -603,6 +605,9 @@ function setUpMap(){
 
 	$("#layerList").addClass("closed")
 
+	//close the layer list when the close button is clicked
+	$(".layer-list-close-btn").click(closeLayerList)
+
 
 	// Done, tell the console!
 	console.log("setUpMap() complete. desktopMode = " + desktopMode)
@@ -676,6 +681,7 @@ function turnOnOverlay(overlayCalled){
 function toggleTOC(evt){
 	// evt.preventDefault();
 	if ($( "#toc" ).hasClass( "toc-view-open" )){
+		isTOCOpen = false;
 		$( ".level-1-label-text").removeClass( "shade-level-1-label-text" );
 		$( "#toc" ).removeClass( "toc-view-open" );
 		$( "#toc" ).addClass( "toc-view-closed" );
@@ -689,6 +695,7 @@ function toggleTOC(evt){
 			$("#neatline").show();
 		}
 	}else{ //is open
+		isTOCOpen = true;
 		if (desktopMode){
 			$( ".level-1-label-text").addClass( "shade-level-1-label-text" );
 		}
@@ -758,11 +765,9 @@ function dispatchButtonClick(buttonClicked){
 
 			if ((desktopMode == true)&&(buttonClicked == "layerListButton")){
 				if ($( "#layerList" ).hasClass( "open" )){
-					$("#layerList").addClass('closed').removeClass('open')
-					$("#layerListHolder").hide();
+					closeLayerList();
 				}else{
-					$("#layerList").addClass('open').removeClass('closed')
-					$("#layerListHolder").show();
+					openLayerList();
 				}
 			}else{
 				$( "#legend" ).addClass( "legend-off" );
@@ -782,6 +787,18 @@ function dispatchButtonClick(buttonClicked){
 		default:
 			console.log("unidentified button click")
 	}
+}
+
+function closeLayerList(){
+	isTOCOpen = false;
+	$("#layerList").addClass('closed').removeClass('open')
+	$("#layerListHolder").hide();
+}
+
+function openLayerList(){
+	isTOCOpen = true;
+	$("#layerList").addClass('open').removeClass('closed')
+	$("#layerListHolder").show();
 }
 
 // ...
@@ -872,7 +889,9 @@ function drawThisView(boundsIn, zoomIn, _levelEngaged, _level1Selected){
 		// level1 = (Deciduous)
 		// level2 = (Scrub Oak)
 		//var _levelEngaged = "1"
-		if ((zoomIn >= 13) && (legendType === "polygons")){
+		console.log(zoomIn)
+		if ((zoomIn >= 11) && (legendType === "polygons")){
+			//draw the legend
 			if (_levelEngaged == "1"){
 				//if overview (level1) do this
 				var cartoQuery = "SELECT cov1, area FROM final_coastal_polygons WHERE the_geom && ST_SetSRID(ST_MakeBox2D(ST_Point(" +
