@@ -25,7 +25,7 @@ TODO:
 BUGS:
 3) Double check the 0 values that come up in map click popups (should these be <Nulls>)
 4) It does not appear that level 2 is populating the map click popups 
-5) The ^ toggle is obfuscating someof the legend items when docked
+5) ~~The ^ toggle is obfuscating someof the legend items when docked~~ (Fixed with legend improvements / SF)
 6) ~~The basemap switcher/transparency slider's mouse events also trigger the map to pan/query click.~~ (Fixed / SF)
 7) In mobile: format the map click popup to be more narrow (perhaps less than about 320px so that iPhone 5 and like devices look good). We could also consider having the popup be docked to the top or bottom in mobile mode.
 8) In mobile: remove the hover box altogether.
