@@ -17,6 +17,7 @@ var layerOpacity = {polygons:0.65};
 var legendType = "polygons";
 var counties;
 var townships;
+var density1;
 var lines;
 var infowindowVars = ['cov1','cov2', 'cov3', 'cov4', 'cov5',
 					'den1', 'den2', 'den3', 'den4', 'den5',
@@ -216,6 +217,38 @@ window.onload = function() {
 	}]
 	})
 	.addTo(map);
+
+	// add bordner density1 layer
+	var cartoCSSDensity = "#layer { "+
+		"[den1=1] {"+
+			"polygon-pattern-file: url('https://www.amcharts.com/lib/3/patterns/black/pattern1.png');"+
+			"polygon-pattern-alignment: global;"+
+		"}"+
+		"[den1=2] {"+
+			"polygon-pattern-file: url('https://www.amcharts.com/lib/3/patterns/black/pattern2.png');"+
+			"polygon-pattern-alignment: global;"+
+		"}"+
+		"[den1=3] {"+
+			"polygon-pattern-file: url('https://www.amcharts.com/lib/3/patterns/black/pattern3.png');"+
+			"polygon-pattern-alignment: global;"+
+		"}"+
+		"[den1=4] {"+
+			"polygon-pattern-file: url('https://www.amcharts.com/lib/3/patterns/black/pattern4.png');"+
+			"polygon-pattern-alignment: global;"+
+		"}"+
+	"}"
+	cartodb.createLayer(map, {
+      user_name: 'sco-admin',
+      type: 'cartodb',
+      sublayers: [{type: "cartodb",
+			sql: 'SELECT * FROM final_coastal_den1',
+			cartocss: cartoCSSDensity,
+			layerIndex: 6
+	}]
+	})
+	.done(function(layer){
+		density1 = layer;
+	});
 
 	// add bordner layer
 	createStyles()
@@ -515,7 +548,7 @@ function setUpMap(){
 				'<label><input type="checkbox" name="overlayType" id="townships" checked>PLSS</label>' +
 			'</div>' +
 			'<div class="checkbox">' +
-				'<label><input type="checkbox" name="overlayType" id="class1Overlay" disabled>Class 1 Density</label>' +
+				'<label><input type="checkbox" name="overlayType" id="density1">Class 1 Density</label>' +
 			'</div>' +
 			'<label class="legend-label">Basemap</label>' +
 			'<div class="radio">' +
@@ -636,8 +669,10 @@ function turnOnBasemap(basemapCalled){
 function turnOnOverlay(overlayCalled){
 	console.log(overlayCalled)
 	if (map.hasLayer(window[overlayCalled])){
+		console.log("here")
 		map.removeLayer(window[overlayCalled]);
 	}else{
+		console.log("here1")
 		map.addLayer(window[overlayCalled]);
 	}
 }
