@@ -10,7 +10,7 @@ TODO:
 10) Don't use the same hue within a given class (No additional guidance on this aside from using the color bordner maps for inspiration) 
 		*Recommended to reconsider the colors altogether (with color bordner maps for inspiration)
 11) Within map click popups:
-		*Only display fields that are populated (for example density is only relevant to tree coverage)
+		*(Done?) Only display fields that are populated (for example density is only relevant to tree coverage)
 		*(Done) Remove the % value altogether, it isnt populated robustly enough to show
 		*(Done) Add additional rows to the popup if Cov1,Cov2,Cov3,Cov4 exist (as needed)
 		*(Done?) Add level1 name to the popup so that it displays consistently with the legend.
