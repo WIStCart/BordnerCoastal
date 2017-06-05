@@ -583,12 +583,12 @@ function setUpMap(){
 	$('input[name=overlayType]').click(function(){ turnOnOverlay(this.id) });
 
 	// Hide point, line or poly legend as appropriate
-	$("#polygonLegendHolder").addClass( "legend-holder-hidden" )
-	$("#lineLegendHolder").addClass( "legend-holder-hidden" )
-	$("#pointLegendHolder").addClass( "legend-holder-hidden" )
+	// $("#polygonLegendHolder").addClass( "legend-holder-hidden" )
+	// $("#lineLegendHolder").addClass( "legend-holder-hidden" )
+	// $("#pointLegendHolder").addClass( "legend-holder-hidden" )
 
 	// Explicitly set the feature type(will likely use a stateful URL parameter in the future to drive this)
-	$( "#featurePolygons" ).trigger( "click" );
+	$( "#featurePolygons" ).trigger( "click" )
 		// --> $("#featurePolygons").prop("checked", true);
 		// --> $("#featurePoints").prop("checked", true);
 		// --> $("#featureLines").prop("checked", true);
@@ -622,8 +622,6 @@ function setUpMap(){
 	//close the layer list when the close button is clicked
 	$(".layer-list-close-btn").click(closeLayerList)
 
-	drawPolyFilter("#polygonLegendHolder", 1, undefined)
-
 	// Done, tell the console!
 	console.log("setUpMap() complete. desktopMode = " + desktopMode)
 }
@@ -649,24 +647,13 @@ var jsMediaQuery = function() {
 function turnOnFeatureType(featureTypeCalled){
 	switch(featureTypeCalled) {
 		case "featurePolygons":
-			console.log("feature polygons called")
-			$("#polygonLegendHolder").removeClass( "legend-holder-hidden" )
-			$("#lineLegendHolder").addClass( "legend-holder-hidden" )
-			$("#pointLegendHolder").addClass( "legend-holder-hidden" )
 			legendType = "polygons";
 			break;
 		case "featureLines":
-			console.log("feature lines called")
-			$("#lineLegendHolder").removeClass( "legend-holder-hidden" )
-			$("#polygonLegendHolder").addClass( "legend-holder-hidden" )
-			$("#pointLegendHolder").addClass( "legend-holder-hidden" )
 			legendType = "lines"
 			break;
 		case "featurePoints":
 			console.log("feature points called")
-			$("#pointLegendHolder").removeClass( "legend-holder-hidden" )
-			$("#lineLegendHolder").addClass( "legend-holder-hidden" )
-			$("#polygonLegendHolder").addClass( "legend-holder-hidden" )
 			legendType = "points"
 			break;
 		default:
@@ -675,7 +662,6 @@ function turnOnFeatureType(featureTypeCalled){
 	if (legendType == "polygons"){
 		drawThisView(map.getBounds(), map.getZoom(), levelEngaged, level1Selected)
 	}else if (legendType == "lines"){
-		console.log("Drawing line legend")
 		drawLineLegend();
 	}else if (legendType == "points"){
 		drawPointLegend();
@@ -923,15 +909,15 @@ function drawThisView(boundsIn, zoomIn, _levelEngaged, _level1Selected){
 			// console.log(cartoQuery)
 			sql.execute(cartoQuery)
 				.done(function(data) {
-					$("#polygonLegendHolder").empty();
-					drawPolygonHistogram(data, _levelEngaged, "#polygonLegendHolder");
+					$("#legendHolder").empty();
+					drawPolygonHistogram(data, _levelEngaged, "#legendHolder");
 				})
 				.error(function(errors) {
 					console.log("errors:" + errors);
 				})
 		}else{
 			//zoom < 13
-			drawPolyFilter("#polygonLegendHolder", _levelEngaged, _level1Selected)
+			drawPolyFilter("#legendHolder", _levelEngaged, _level1Selected)
 		}
 }
 
@@ -953,7 +939,7 @@ function generateSpecificLayerQuery(boundsIn, _level1Selected){
 }
 
 function drawPolyFilter(el, _levelEngaged, _level1Selected){
-	console.log(_level1Selected)
+	$(el).empty();
 	var level1Props = getLevel1Props();
 		// console.log(summary)
 		var width = $(el).width();
@@ -1041,7 +1027,7 @@ function drawPolygonHistogram(data, _levelEngaged, el){
 
 	// console.log(summary)
 	var width = $(el).width();
-	var height = $(el).height() - 15;
+	var height = $(el).height() - 50;
 
 	//dimension setup
 	var margins = {top: 20, left: 75, right: 30, bottom: 30}
@@ -1261,10 +1247,12 @@ function dispatchLegendClick(level1Selected){
 		//go from level one to level 2
 		levelEngaged = 2;
 		$("#legend-back").show();
+		$(".legend-header").hide();
 	}else{
 		//go from level 2 to level 1
 		levelEngaged = 1;
-		$("#legend-back").hide()
+		$("#legend-back").hide();
+		$(".legend-header").show();
 	}
 	// level1Selected = level1Selected;
 	switchLevel(levelEngaged, level1Selected);
@@ -1272,29 +1260,27 @@ function dispatchLegendClick(level1Selected){
 }
 
 function drawLineLegend(){
-	$("#lineLegendHolder").empty();
-		$("#lineLegendHolder").append("<h4 class='legend-header'>Line Symbols</h4>")
+	$("#legendHolder").empty();
 	for (var i=0; i < lineLegend.length; i++){
 		var symbol = lineLegend[i];
 		var legendEntry = makePointOrLineLegendItem(symbol);
 		console.log(legendEntry)
-		$("#lineLegendHolder").append(legendEntry)
+		$("#legendHolder").append(legendEntry)
 	}
 }
 
 function drawPointLegend(){
-	$("#pointLegendHolder").empty();
-	$("#pointLegendHolder").append("<h4 class='legend-header'>Point Symbols</h4>")
+	$("#legendHolder").empty();
 	for (var i=0; i < pointLegend.length; i++){
 		var symbol = pointLegend[i];
 		var legendEntry = makePointOrLineLegendItem(symbol);
-		$("#pointLegendHolder").append(legendEntry)
+		$("#legendHolder").append(legendEntry)
 	}
 }
 
 
 function makePointOrLineLegendItem(item){
-	var legendItem = "<div class='col-xs-12 col-sm-6 col-md-4 col-lg-2 legend-item'>"
+	var legendItem = "<div class='col-xs-12 col-sm-6 col-md-3 col-lg-2 legend-item'>"
 	legendItem += "<div class='media'>"
 	legendItem += "<div class='media-left'><img class='media-object' src='" + item.icon + "'/></div>"
 	legendItem += "<div class='media-body'>" + item.name + "</div>"
@@ -1308,7 +1294,7 @@ function displayLevel1Label(level1Selected){
 	$("#level1Label").html(titleCase(level1Selected))
 
 	//figure out positioning
-	var boxHeight = $("#polygonLegendHolder").height();
+	var boxHeight = $("#legendHolder").height();
 	$("#level1Label").css({'bottom': (boxHeight + 13) + "px", 'left': 0+'px'})
 	$("#level1Label").show();
 }
