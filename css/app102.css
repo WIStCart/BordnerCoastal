@@ -526,6 +526,8 @@ td{
 .legend-header{
 	color: white;
 	text-shadow: black 0.1em 0.1em 0.2em;
+	padding:0px!important;
+	margin: 0px!important
 }
 
 .legend-item{
