@@ -296,7 +296,9 @@ function getLevel1FromCode(code){
 
 function translateDensity(den){
 	var denTranslate
-	if(den === 1){
+	if (den == 0){
+		denTranslate = "Zero?"
+	}else if(den === 1){
 		denTranslate = "Good"
 	}else if (den === 2){
 		denTranslate = "Medium"
@@ -375,6 +377,7 @@ function setupInteraction(layer, _levelEngaged, _visibility){
 			//modify the object here before sending to templating engine
 			//lookup the classname
 			content = obj.content
+			console.log(content.data)
 			windowContent = formatCoverageForInfowindow(content.data)
 			return _.template($('#infowindow_template').html())(windowContent);
 		}
