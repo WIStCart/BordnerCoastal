@@ -25,11 +25,10 @@
 				<div class="col-sm-4 toc-button toc-button-open transition-class" id="tocButton">
 					<span id="tocIcon" class="icon-class glyphicon glyphicon-chevron-down transition-class"></span>
 				</div>
-				<div class="col-sm-12 legend-view transition-class" id="legend">
-          <div id='legend-back'><span class='glyphicon glyphicon-chevron-left'></span>Back to overview</div>
-					<div class="poly-legend-holder" id="polygonLegendHolder" >POLYGONS</div>
-					<div class="point-legend-holder" id="pointLegendHolder" >POINTS</div>
-					<div class="line-legend-holder" id="lineLegendHolder" >LINES</div>
+				<div class="col-sm-12 legend-view transition-class clearfix" id="legend">
+          <div id='legend-back'><span class='glyphicon glyphicon-chevron-left pull-left'></span>Back to overview</div>
+          <h5 class='pull-left legend-header'>Legend</h5>
+          <div id="legendHolder" class='col-xs-12'></div>
 				</div>
 			</div>
 		</div>
@@ -117,9 +116,11 @@
 	<script src="js/underscore-min.js"></script>
 	<script src="js/bootstrap-slider.min.js"></script>
 	<script src="js/bootstrap.min.js"></script> <!-- Currently using Bootstrap 3.3.7 -->
-	<script src="js/app102.js"></script>
 	<script src="js/cloud.js"></script>
 	<script src="data/temp_classes.js"></script>
+  <script src="data/line-legend.js"></script>
+  <script src="data/point-legend.js"></script>
+  <script src="js/app102.js"></script>
 	<!-- js /\ -->
   </body>
 </html>
