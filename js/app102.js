@@ -361,6 +361,11 @@ function formatCoverageForInfowindow(data){
 			 densityTranslate : translateDensity(data.den5)
 		 }
 	}
+	if (levelEngaged == 1){
+		infowindowContent.levelname = getLevel1FromCode(data.cov1)
+	}else if (levelEngaged == 2){
+		infowindowContent.levelname = getLevel2FromCode(data.cov1)
+	}
 	return infowindowContent
 }
 
@@ -377,7 +382,6 @@ function setupInteraction(layer, _levelEngaged, _visibility){
 			//modify the object here before sending to templating engine
 			//lookup the classname
 			content = obj.content
-			console.log(content.data)
 			windowContent = formatCoverageForInfowindow(content.data)
 			return _.template($('#infowindow_template').html())(windowContent);
 		}
