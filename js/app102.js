@@ -224,7 +224,7 @@ window.onload = function() {
 	// add bordner density1 layer
 	var cartoCSSDensity = "#layer { "+
 		"[den1=1] {"+
-			"polygon-pattern-file: url('https://www.amcharts.com/lib/3/patterns/black/pattern1.png');"+
+			"polygon-pattern-file: url('https://www.amcharts.com/lib/3/patterns/black/pattern2.png');"+
 			"polygon-pattern-alignment: global;"+
 		"}"+
 		"[den1=2] {"+
@@ -704,10 +704,8 @@ function turnOnBasemap(basemapCalled){
 function turnOnOverlay(overlayCalled){
 	console.log(overlayCalled)
 	if (map.hasLayer(window[overlayCalled])){
-		console.log("here")
 		map.removeLayer(window[overlayCalled]);
 	}else{
-		console.log("here1")
 		map.addLayer(window[overlayCalled]);
 	}
 }

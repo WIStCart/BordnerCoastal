@@ -1,6 +1,6 @@
 //////////////////////////////////////////
 TODO:
-2) Include "density1" as another layer that is mutually exclusive of the "cov1" layer. I'm not sure that this is expected/is low priority at this point. (play around with idea of using hash patterns to style these)
+2) Legend for density1 layer, cartocss relative path?
 3) (SF) Implement an accordion effect for legend transition from level1 to level2 and vice versa. Do not ever remove the level1 bars, instead, squish them down to make room for the level2 classes of the selected level1.
 		*HV: Notes that the bars should never take up the entire legend area. We should try to make them a consistent size regardless of the # of classes being displayed.  
 		*We should make sure to keep the bar from taking up entire legend div when there is only one class present. 																								  
