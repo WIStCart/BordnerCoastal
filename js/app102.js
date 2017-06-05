@@ -28,6 +28,9 @@ var polygonLegend; //svg polygon legend
 var level1Colors;
 var level2Colors;
 var polygonLegendFactor = 1e6;
+var isInfowindowOpen = false;
+var isTOCOpen = false;
+var infowindow;
 // Overlay definitions:
 var labelsOverlay = L.tileLayer('http://{s}.tile.stamen.com/toner-labels/{z}/{x}/{y}.png', {
 	attribution: 'stamen toner labels'
@@ -329,7 +332,9 @@ function getLevel1FromCode(code){
 
 function translateDensity(den){
 	var denTranslate
-	if(den === 1){
+	if (den == 0){
+		denTranslate = "Zero?"
+	}else if(den === 1){
 		denTranslate = "Good"
 	}else if (den === 2){
 		denTranslate = "Medium"
@@ -392,6 +397,11 @@ function formatCoverageForInfowindow(data){
 			 densityTranslate : translateDensity(data.den5)
 		 }
 	}
+	if (levelEngaged == 1){
+		infowindowContent.levelname = getLevel1FromCode(data.cov1)
+	}else if (levelEngaged == 2){
+		infowindowContent.levelname = getLevel2FromCode(data.cov1)
+	}
 	return infowindowContent
 }
 
@@ -400,7 +410,7 @@ function formatCoverageForInfowindow(data){
 function setupInteraction(layer, _levelEngaged, _visibility){
 	//////////////////////////////////////////////////////
 	/* To construct a rudimentary popup on click (check .html for #infowindow_template) */
-	cdb.vis.Vis.addInfowindow(map, layer, infowindowVars,{
+	infowindow = cdb.vis.Vis.addInfowindow(map, layer, infowindowVars,{
 		'sanitizeTemplate':false
 	}).model.set({
 		'template' :  function(obj){
@@ -413,22 +423,7 @@ function setupInteraction(layer, _levelEngaged, _visibility){
 		}
 	});
 
-
-
-	layer.bind('featureClick', function(e, latln, pxPos, data, layer){
-		//hide the feature if it's been filtered out
-		if (+levelEngaged == 2){
-			level1key = level1Selected.split(" ").join("_")
-			level1Members = level1Membership[level1Selected]
-			level1MemberCodes = _.map(level1Members, function(d){return d.code})
-			isAMember = _.contains(level1MemberCodes, data.cov1)
-			if (!isAMember){
-				$(".cartodb-infowindow").hide()
-			}else{
-				$(".cartodb-infowindow").show();
-			}
-		}
-	})
+	layer.bind('featureClick', onMapFeatureClick)
 
 
 	/* To display an infobox within a leaflet control */
@@ -453,16 +448,8 @@ function setupInteraction(layer, _levelEngaged, _visibility){
 	setupGeocoderSearch()
 
 	//disable mouse events when the table of contents is in use
-	$("#layerList").on('mouseover', function(){
-		map.dragging.disable();
-		map.touchZoom.disable();
-		map.doubleClickZoom.disable();
-	})
-	$("#layerList").on('mouseout', function(){
-		map.dragging.enable();
-		map.touchZoom.enable();
-		map.doubleClickZoom.enable();
-	})
+	$("#layerList").on('mouseover', disableMapInteractionEvents)
+	$("#layerList").on('mouseout', enableMapInteractionEvents)
 	//make lists of color for using in the legend later
 	level1Colors = makeLevel1ColorList();
 	level2Colors = makeLevel2ColorList();
@@ -472,8 +459,52 @@ function setupInteraction(layer, _levelEngaged, _visibility){
 		dispatchLegendClick(undefined)
 	})
 
-
+	$("#map").click(onMapClick)
 } //end setup interaction
+
+function onMapClick(){
+	//close the info window on basemap click
+	setTimeout(function(){
+		if(!isInfowindowOpen){
+			infowindow.set('visibility', false);
+		}
+			isInfowindowOpen = false;
+	}, 250) //timeout is important here in maintaining correct popup state
+}
+
+
+function onMapFeatureClick(e, latln, pxPos, data, layer){
+	//mark the infowindow as open
+	isInfowindowOpen = true;
+	//hide the infowindow if it's been filtered out by legend interaction
+	if (+levelEngaged == 2){
+		level1key = level1Selected.split(" ").join("_")
+		level1Members = level1Membership[level1Selected]
+		level1MemberCodes = _.map(level1Members, function(d){return d.code})
+		isAMember = _.contains(level1MemberCodes, data.cov1)
+		if (!isAMember){
+			// infowindow.set('visibility', false)
+			$(".cartodb-infowindow").hide()
+			isInfowindowOpen = false;
+		}else{
+			$(".cartodb-infowindow").show()
+			isInfowindowOpen = true;
+			// infowindow.set('visibility', true)
+		}
+	}
+}
+
+function disableMapInteractionEvents(){
+	map.dragging.disable();
+	map.touchZoom.disable();
+	map.doubleClickZoom.disable();
+}
+
+function enableMapInteractionEvents(){
+	map.dragging.enable();
+	map.touchZoom.enable();
+	map.doubleClickZoom.enable();
+}
 
 function setupGeocoderSearch(){
 	//render the template
@@ -522,8 +553,9 @@ function setUpMap(){
 
 	$("#layerListHolder")
 		.html(
-			'<div class="layer-list-view transition-class row" id="layerList">' +
-		'<h5>Table of Contents</h5>' +
+			'<div class="layer-list-view transition-class row clearfix" id="layerList">' +
+			'<button class="btn btn-primary btn-sm btn-close layer-list-close-btn pull-right"><span class="glyphicon glyphicon-remove"></span></button>' +
+		'<h4 class="layer-list-header">Table of Contents</h4>' +
 		'<div class="col-xs-12">' +
 		'<label class="legend-label">Feature Type</label>' +
 			'<div class="feature-type-radio-group">' +
@@ -606,6 +638,9 @@ function setUpMap(){
 
 	$("#layerList").addClass("closed")
 
+	//close the layer list when the close button is clicked
+	$(".layer-list-close-btn").click(closeLayerList)
+
 
 	// Done, tell the console!
 	console.log("setUpMap() complete. desktopMode = " + desktopMode)
@@ -681,6 +716,7 @@ function turnOnOverlay(overlayCalled){
 function toggleTOC(evt){
 	// evt.preventDefault();
 	if ($( "#toc" ).hasClass( "toc-view-open" )){
+		isTOCOpen = false;
 		$( ".level-1-label-text").removeClass( "shade-level-1-label-text" );
 		$( "#toc" ).removeClass( "toc-view-open" );
 		$( "#toc" ).addClass( "toc-view-closed" );
@@ -694,6 +730,7 @@ function toggleTOC(evt){
 			$("#neatline").show();
 		}
 	}else{ //is open
+		isTOCOpen = true;
 		if (desktopMode){
 			$( ".level-1-label-text").addClass( "shade-level-1-label-text" );
 		}
@@ -763,11 +800,9 @@ function dispatchButtonClick(buttonClicked){
 
 			if ((desktopMode == true)&&(buttonClicked == "layerListButton")){
 				if ($( "#layerList" ).hasClass( "open" )){
-					$("#layerList").addClass('closed').removeClass('open')
-					$("#layerListHolder").hide();
+					closeLayerList();
 				}else{
-					$("#layerList").addClass('open').removeClass('closed')
-					$("#layerListHolder").show();
+					openLayerList();
 				}
 			}else{
 				$( "#legend" ).addClass( "legend-off" );
@@ -787,6 +822,18 @@ function dispatchButtonClick(buttonClicked){
 		default:
 			console.log("unidentified button click")
 	}
+}
+
+function closeLayerList(){
+	isTOCOpen = false;
+	$("#layerList").addClass('closed').removeClass('open')
+	$("#layerListHolder").hide();
+}
+
+function openLayerList(){
+	isTOCOpen = true;
+	$("#layerList").addClass('open').removeClass('closed')
+	$("#layerListHolder").show();
 }
 
 // ...
@@ -877,7 +924,9 @@ function drawThisView(boundsIn, zoomIn, _levelEngaged, _level1Selected){
 		// level1 = (Deciduous)
 		// level2 = (Scrub Oak)
 		//var _levelEngaged = "1"
-		if ((zoomIn >= 13) && (legendType === "polygons")){
+		//console.log(zoomIn)
+		if ((zoomIn >= 11) && (legendType === "polygons")){
+			//draw the legend
 			if (_levelEngaged == "1"){
 				//if overview (level1) do this
 				var cartoQuery = "SELECT cov1, area FROM final_coastal_polygons WHERE the_geom && ST_SetSRID(ST_MakeBox2D(ST_Point(" +
@@ -963,7 +1012,9 @@ function drawPolygonHistogram(data, _levelEngaged, el){
 		.append('g')
 			.attr('transform', "translate(" + margins.left + "," + margins.top + ")")
 
-	xScale.domain(summary.map(function(d){return d.type }))
+	xScale.domain(summary.map(function(d){
+		// console.log(d)
+		return d.type }))
 	yScale.domain([0.1, d3.max(summary, function(d){return d.area / polygonLegendFactor})])
 
 
@@ -1110,11 +1161,14 @@ function summarize(data, level){
 	var grouped = _.groupBy(mapped, prop)
 	var summed = _.map(grouped, function(g, key){
 		var item =  {type: key, color: colorFn(key), area : _(g).reduce(function(m, x){ return m + x.area;}, 0)}
-		if (item.area > 0){
-			return item
-		}
+		return item
 	})
 	var sorted = _.sortBy(summed, "area")
+	//sometimes, there's an zero item that has a zero area on it -- remove that or it causes d3 errors
+	if (sorted[0].area == 0){
+		sorted.shift();
+	}
+	// console.log(sorted)
 	return sorted
 }
 

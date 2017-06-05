@@ -402,7 +402,7 @@ div.cartodb-tooltip-content-wrapper p{
 	margin-bottom: 2px;
 	opacity: 0.9;
 	text-align: left;
-	font-style: oblique;
+	/*font-style: oblique;*/
 	background-color: #FFF;
 	color: #2c5875;
 	border-radius: 10px;
@@ -518,4 +518,14 @@ td{
 
 #legend-back:hover{
 	color: cyan;
+}
+
+.infowindow-header{
+	margin-top: 5px;
+}
+
+
+.layer-list-header{
+	color: white;
+	text-shadow: black 0.1em 0.1em 0.2em;
 }
