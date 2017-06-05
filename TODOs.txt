@@ -10,10 +10,10 @@ TODO:
 10) Don't use the same hue within a given class (No additional guidance on this aside from using the color bordner maps for inspiration) 
 		*Recommended to reconsider the colors altogether (with color bordner maps for inspiration)
 11) Within map click popups:
-		*Only display fields that are populated (for example density is only relevant to tree coverage)
-		*Remove the % value altogether, it isnt populated robustly enough to show
-		*Add additional rows to the popup if Cov1,Cov2,Cov3,Cov4 exist (as needed)
-		*Add level1 name to the popup so that it displays consistently with the legend.
+		*(Done?) Only display fields that are populated (for example density is only relevant to tree coverage)
+		*(Done) Remove the % value altogether, it isnt populated robustly enough to show
+		*(Done) Add additional rows to the popup if Cov1,Cov2,Cov3,Cov4 exist (as needed)
+		*(Done?) Add level1 name to the popup so that it displays consistently with the legend.
 12) Add points/Lines (use an all, one, or none strategy). CS, check email for the data from MN, ask him for it if it cannot be found (i dont think it is in box). Note that this data only exists in the coastal counties, not the watershed.
 		* Will likely need to implement scale thresholds for features (cartoCSS will likely be enough to achieve this) so as to slowly reveal features as the user zooms in.
 		* note that there are some line features that fall on top of one another. We will need to choose symbology types that all ow the user to see both at the same time (such as varying line width, etc.).
@@ -25,7 +25,7 @@ TODO:
 BUGS:
 3) Double check the 0 values that come up in map click popups (should these be <Nulls>)
 4) It does not appear that level 2 is populating the map click popups 
-5) The ^ toggle is obfuscating someof the legend items when docked
+5) ~~The ^ toggle is obfuscating someof the legend items when docked~~ (Fixed with legend improvements / SF)
 6) ~~The basemap switcher/transparency slider's mouse events also trigger the map to pan/query click.~~ (Fixed / SF)
 7) In mobile: format the map click popup to be more narrow (perhaps less than about 320px so that iPhone 5 and like devices look good). We could also consider having the popup be docked to the top or bottom in mobile mode.
 8) In mobile: remove the hover box altogether.
@@ -34,6 +34,7 @@ BUGS:
 11) In mobile: The top most controls are obfuscated in mobile/landscape view.
 12)  When user zooms out, the filter applied on the legend persists.
 13) ~~ When a filter has been applied, the popups on other layers should be disabled.~~ (Fixed / SF)
+14) What is the label for density = 0?
 //////////////////////////////////////////
 DOWN THE ROAD:
 1) Locate me functionality - SCO, Jay.
