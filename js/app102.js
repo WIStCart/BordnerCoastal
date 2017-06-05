@@ -10,7 +10,7 @@ var bordner;
 var classConfigs = {};
 var level1Membership = {};
 var levelEngaged = "1";
-var level1Selected = "agriculture"
+var level1Selected = "agriculture";
 var sublayer1;
 var sublayer2;
 var layerOpacity = {polygons:0.65};
@@ -30,6 +30,7 @@ var polygonLegendFactor = 1e6;
 var isInfowindowOpen = false;
 var isTOCOpen = false;
 var infowindow;
+var semanticZoomLevel = 13;
 // Overlay definitions:
 var labelsOverlay = L.tileLayer('http://{s}.tile.stamen.com/toner-labels/{z}/{x}/{y}.png', {
 	attribution: 'stamen toner labels'
@@ -70,7 +71,7 @@ function getPolyStyle(level, level1Selected){
 	}else{
 		style = "#layer{polygon-fill: #DDDDDD;polygon-opacity: 0;";
 		for(var i = 0; i < classes.length; i++) {
-			level1key = level1Selected.split(" ").join("_")
+			level1key = level1Selected.toLowerCase().split(" ").join("_")
 			if (level1key == classes[i].level1var) {
 				var thisStyle = "[cov1='"+classes[i].code+"']{polygon-fill: "+classes[i].color2+";polygon-opacity:1;}";
 				style += thisStyle;
@@ -440,12 +441,23 @@ function onMapClick(){
 }
 
 
+function getLevel1Props(){
+	var level1names = _.pluck(tempClasses2.classes, "level1")
+	var level1colors = _.pluck(tempClasses2.classes, "color1")
+	var props = _.zip(level1names, level1colors).map(function(pair){
+		return _.object(["name", "color"], pair)
+	})
+	var props = _.sortBy(_.unique(props, function(d){return d.name}), "name");
+	return props
+}
+
 function onMapFeatureClick(e, latln, pxPos, data, layer){
 	//mark the infowindow as open
 	isInfowindowOpen = true;
 	//hide the infowindow if it's been filtered out by legend interaction
 	if (+levelEngaged == 2){
-		level1key = level1Selected.split(" ").join("_")
+		console.log(level1Selected)
+		level1key = level1Selected.toLowerCase().split(" ").join("_")
 		level1Members = level1Membership[level1Selected]
 		level1MemberCodes = _.map(level1Members, function(d){return d.code})
 		isAMember = _.contains(level1MemberCodes, data.cov1)
@@ -600,7 +612,9 @@ function setUpMap(){
 
 	// For dynamic legend queries (in progress)
 	map.on('moveend', function() {
-		drawThisView(map.getBounds(), map.getZoom(), levelEngaged, level1Selected);
+		if (legendType == "polygons"){
+					drawThisView(map.getBounds(), map.getZoom(), levelEngaged, level1Selected);
+		}
 	});
 
 	$("#layerList").addClass("closed")
@@ -608,6 +622,7 @@ function setUpMap(){
 	//close the layer list when the close button is clicked
 	$(".layer-list-close-btn").click(closeLayerList)
 
+	drawPolyFilter("#polygonLegendHolder", 1, undefined)
 
 	// Done, tell the console!
 	console.log("setUpMap() complete. desktopMode = " + desktopMode)
@@ -656,6 +671,14 @@ function turnOnFeatureType(featureTypeCalled){
 			break;
 		default:
 			console.log("unidentified feature type called")
+	} //end switch
+	if (legendType == "polygons"){
+		drawThisView(map.getBounds(), map.getZoom(), levelEngaged, level1Selected)
+	}else if (legendType == "lines"){
+		console.log("Drawing line legend")
+		drawLineLegend();
+	}else if (legendType == "points"){
+		drawPointLegend();
 	}
 }
 
@@ -751,9 +774,7 @@ function dispatchButtonClick(buttonClicked){
 			}
 			modalAttachTOC();
 		}
-	}
-
-
+	} //end if
 	// Specific button events...
 	switch(buttonClicked) {
 		case "legendButton":
@@ -890,21 +911,14 @@ function drawThisView(boundsIn, zoomIn, _levelEngaged, _level1Selected){
 		// level2 = (Scrub Oak)
 		//var _levelEngaged = "1"
 		//console.log(zoomIn)
-		if ((zoomIn >= 11) && (legendType === "polygons")){
+		if ((zoomIn >= semanticZoomLevel) && (legendType === "polygons")){
 			//draw the legend
 			if (_levelEngaged == "1"){
 				//if overview (level1) do this
-				var cartoQuery = "SELECT cov1, area FROM final_coastal_polygons WHERE the_geom && ST_SetSRID(ST_MakeBox2D(ST_Point(" +
-					String(boundsIn._northEast.lng)+","+String(boundsIn._northEast.lat)+"), ST_Point(" +
-					String(boundsIn._southWest.lng)+","+String(boundsIn._southWest.lat)+")), 4326) ORDER BY cov1 DESC"
+				cartoQuery = generateAllLayersQuery(boundsIn)
 			}else{
 				//detailed view of sing class
-			classesSelected = getLevel1MemberSearch(_level1Selected)
-				var cartoQuery = "SELECT cov1, area FROM final_coastal_polygons WHERE (" + classesSelected +
-					") AND the_geom && ST_SetSRID(ST_MakeBox2D(ST_Point(" +
-					String(boundsIn._northEast.lng)+","+String(boundsIn._northEast.lat)+"), ST_Point(" +
-					String(boundsIn._southWest.lng)+","+String(boundsIn._southWest.lat)+")), 4326) ORDER BY cov1 DESC"
-
+				cartoQuery = generateSpecificLayerQuery(boundsIn, _level1Selected)
 			}
 			// console.log(cartoQuery)
 			sql.execute(cartoQuery)
@@ -917,9 +931,85 @@ function drawThisView(boundsIn, zoomIn, _levelEngaged, _level1Selected){
 				})
 		}else{
 			//zoom < 13
-
-			$("#polygonLegendHolder").html("Zoom in for a histogram of land cover frequencies")
+			drawPolyFilter("#polygonLegendHolder", _levelEngaged, _level1Selected)
 		}
+}
+
+function generateAllLayersQuery(boundsIn){
+	var cartoQuery = "SELECT cov1, area FROM final_coastal_polygons WHERE the_geom && ST_SetSRID(ST_MakeBox2D(ST_Point(" +
+		String(boundsIn._northEast.lng)+","+String(boundsIn._northEast.lat)+"), ST_Point(" +
+		String(boundsIn._southWest.lng)+","+String(boundsIn._southWest.lat)+")), 4326) ORDER BY cov1 DESC"
+		return cartoQuery
+}
+
+function generateSpecificLayerQuery(boundsIn, _level1Selected){
+	console.log(_level1Selected)
+	var classesSelected = getLevel1MemberSearch(_level1Selected)
+	var cartoQuery = "SELECT cov1, area FROM final_coastal_polygons WHERE (" + classesSelected +
+		") AND the_geom && ST_SetSRID(ST_MakeBox2D(ST_Point(" +
+		String(boundsIn._northEast.lng)+","+String(boundsIn._northEast.lat)+"), ST_Point(" +
+		String(boundsIn._southWest.lng)+","+String(boundsIn._southWest.lat)+")), 4326) ORDER BY cov1 DESC"
+		return cartoQuery
+}
+
+function drawPolyFilter(el, _levelEngaged, _level1Selected){
+	console.log(_level1Selected)
+	var level1Props = getLevel1Props();
+		// console.log(summary)
+		var width = $(el).width();
+		var height = $(el).height() - 15;
+
+		//dimension setup
+		var margins = {top: 20, left: 30, right: 30, bottom: 100}
+		height = height - margins.top - margins.bottom;
+		width = width - margins.left - margins.right;
+
+		//axes setup
+		var xScale = d3.scale.ordinal().rangeRoundBands([0, width], 0.05)
+		var yScale = d3.scale.linear().range([height, 0])
+
+		var xAxis = d3.svg.axis()
+			.scale(xScale)
+			.orient('bottom')
+
+		var svg = d3.select(el)
+			.append('svg')
+			.attr('width', width + margins.left + margins.right)
+			.attr('height', height + margins.top + margins.bottom)
+			.append('g')
+				.attr('transform', "translate(" + margins.left + "," + margins.top + ")")
+
+		xScale.domain(_.pluck(level1Props, "name"))
+
+
+		svg.append("g")
+			.attr("class", " x axis selector-axis")
+			.attr("transform", "translate(0," + height + ")")
+			.call(xAxis)
+			.selectAll(".tick text")
+				.call(wrap, xScale.rangeBand())
+
+				//these are the data-driven bars proportional to the area in the screen
+		svg.selectAll('filter-swatch')
+			.data(level1Props)
+			.enter().append('rect')
+			.style('fill', function(d){return d.color})
+			.attr('x', function(d){ return xScale(d.name)})
+			.attr('data-name', function(d){return d.name})
+			.attr('class', function(d){ return d.name.split(" ").join("_") + " filter-swatch"})
+			.attr('width', xScale.rangeBand())
+			.attr('data-origColor', function(d){return d.color})
+			.attr('data-selectedL1', _level1Selected)
+			.attr('y', 0)
+			.attr('height', 50)
+			.style('fill', function(d){
+				return d.color
+		})
+			.on('click', function(d){
+				if (levelEngaged == 1){
+						dispatchLegendClick(d.name.toLowerCase())
+				}
+			})
 }
 
 
@@ -928,7 +1018,7 @@ function getLevel1MemberSearch(_level1Selected){
 	var classesSelected = "";
 	var countClasses = 0;
 	var operatorInclusion = ""
-	var level1key = _level1Selected.split(" ").join("_")
+	var level1key = _level1Selected.toLowerCase().split(" ").join("_")
 	jQuery.each(level1Membership[level1key], function(i, val) {
 		if (countClasses == 1){
 			operatorInclusion = " OR "
@@ -1086,7 +1176,7 @@ function drawPolygonHistogram(data, _levelEngaged, el){
 		.attr('fill', 'white')
 		.attr('text-shadow', 'black 0.1em 0.1em 0.2em')
 		.text("Square Kilometers")
-}
+} //end of the draw polygon legend function
 
 function getColor1FromLevel1(level1){
 	var which = _.where(level1Colors, {level1: level1})[0]
@@ -1166,26 +1256,52 @@ function wrap(text, width) {
 
 
 function dispatchLegendClick(level1Selected){
-	if (levelEngaged == "1"){
+	console.log(level1Selected)
+	if (+levelEngaged == 1){
 		//go from level one to level 2
-		levelEngaged = "2";
+		levelEngaged = 2;
 		$("#legend-back").show();
 	}else{
 		//go from level 2 to level 1
-		levelEngaged = "1";
+		levelEngaged = 1;
 		$("#legend-back").hide()
 	}
+	// level1Selected = level1Selected;
 	switchLevel(levelEngaged, level1Selected);
 	drawThisView(map.getBounds(), map.getZoom(), levelEngaged, level1Selected);
 }
 
 function drawLineLegend(){
-	//TODO
+	$("#lineLegendHolder").empty();
+		$("#lineLegendHolder").append("<h4 class='legend-header'>Line Symbols</h4>")
+	for (var i=0; i < lineLegend.length; i++){
+		var symbol = lineLegend[i];
+		var legendEntry = makePointOrLineLegendItem(symbol);
+		console.log(legendEntry)
+		$("#lineLegendHolder").append(legendEntry)
+	}
 }
 
 function drawPointLegend(){
-	//TODO
+	$("#pointLegendHolder").empty();
+	$("#pointLegendHolder").append("<h4 class='legend-header'>Point Symbols</h4>")
+	for (var i=0; i < pointLegend.length; i++){
+		var symbol = pointLegend[i];
+		var legendEntry = makePointOrLineLegendItem(symbol);
+		$("#pointLegendHolder").append(legendEntry)
+	}
 }
+
+
+function makePointOrLineLegendItem(item){
+	var legendItem = "<div class='col-xs-12 col-sm-6 col-md-4 col-lg-2 legend-item'>"
+	legendItem += "<div class='media'>"
+	legendItem += "<div class='media-left'><img class='media-object' src='" + item.icon + "'/></div>"
+	legendItem += "<div class='media-body'>" + item.name + "</div>"
+	legendItem += "</div>"
+	return legendItem
+}
+
 
 function displayLevel1Label(level1Selected){
 	//display the selected level one so the user knows there was some change
@@ -1204,6 +1320,8 @@ function hideLevel1Label(){
 
 // called upon click of legend item
 function switchLevel(_levelEngaged, _level1Selected){
+	console.log(_level1Selected)
+	level1Selected = _level1Selected
 	cartoCSSRules = getPolyStyle("level"+_levelEngaged, _level1Selected);
 	if (_levelEngaged == 2){
 		sublayer2.show();

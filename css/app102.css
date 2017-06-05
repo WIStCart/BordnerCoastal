@@ -524,8 +524,49 @@ td{
 	margin-top: 5px;
 }
 
+.selector-axis path{
+	display: none;
+}
+
 
 .layer-list-header{
 	color: white;
 	text-shadow: black 0.1em 0.1em 0.2em;
+}
+
+.legend-header{
+	color: white;
+	text-shadow: black 0.1em 0.1em 0.2em;
+}
+
+.legend-item{
+	height: 100px;
+	min-height: 100px;
+}
+
+.media{
+	height: 100%;
+	/*min-height: 100px;*/
+}
+
+.media-body{
+	color: white;
+	fill: white;
+	text-shadow: black 0.1em 0.1em 0.2em;
+	padding-top: 5%;
+}
+
+.media-left img{
+	height:64px;
+	width: 64px;
+}
+
+#lineLegendHolder{
+	/*padding-top: 15px!important;*/
+	overflow-y: auto;
+}
+
+#pointLegendHolder{
+	/*padding-top: 15px!important;*/
+	overflow-y: auto;
 }
