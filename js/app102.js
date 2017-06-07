@@ -35,6 +35,7 @@ var semanticZoomLevel = 13;
 var lineTypeSelected;
 var points;
 var pointTypeSelected = "none";
+var histogramScale = "linear";
 
 // Overlay definitions:
 var labelsOverlay = L.tileLayer('http://{s}.tile.stamen.com/toner-labels/{z}/{x}/{y}.png', {
@@ -1075,7 +1076,27 @@ function drawThisView(boundsIn, zoomIn, _levelEngaged, _level1Selected){
 			sql.execute(cartoQuery)
 				.done(function(data) {
 					$("#legendHolder").empty();
-					drawPolygonHistogram(data, _levelEngaged, "#legendHolder");
+					$("#legendHolder").append("<div class='btn-group pull-right' role='group'><a id='logHist'>Log</a> | <a id='linearHist'>Linear</a></div>")
+					$("#logHist").click(function(){
+						console.log("Going to log")
+						histogramScale = "log";
+						$(this).addClass('active');
+						$("#linearHist").removeClass('active');
+						drawThisView(boundsIn, zoomIn, _levelEngaged, _level1Selected, histogramScale);
+					})
+					$("#linearHist").click(function(){
+						console.log("Going to linear")
+						histogramScale = "linear";
+						drawThisView(boundsIn, zoomIn, _levelEngaged, _level1Selected);
+						$(this).addClass('active');
+						$("#logHist").removeClass('active');
+					})
+					if (histogramScale == "log"){
+						$("#logHist").addClass('active')
+					}else{
+						$("#linearHist").addClass('active')
+					}
+					drawPolygonHistogram(data, _levelEngaged, "#legendHolder", histogramScale);
 				})
 				.error(function(errors) {
 					console.log("errors:" + errors);
@@ -1117,7 +1138,10 @@ function drawPolyFilter(el, _levelEngaged, _level1Selected){
 
 		//axes setup
 		var xScale = d3.scale.ordinal().rangeRoundBands([0, width], 0.05)
-		var yScale = d3.scale.linear().range([height, 0])
+
+			var yScale = d3.scale.linear().range([height, 0])
+
+
 
 		var xAxis = d3.svg.axis()
 			.scale(xScale)
@@ -1219,7 +1243,8 @@ function shadeRGBColor(color, percent) {
 }
 
 
-function drawPolygonHistogram(data, _levelEngaged, el){
+function drawPolygonHistogram(data, _levelEngaged, el, histogramScale){
+	console.log("Drawing with a ", histogramScale)
 	var summary = summarize(data, _levelEngaged)
 
 	// console.log(summary)
@@ -1233,7 +1258,11 @@ function drawPolygonHistogram(data, _levelEngaged, el){
 
 	//axes setup
 	var xScale = d3.scale.ordinal().rangeRoundBands([0, width], 0.05)
-	var yScale = d3.scale.linear().range([height, 0])
+	if (histogramScale == "linear"){
+		var yScale = d3.scale.linear().range([height, 0])
+	}else if (histogramScale == "log"){
+		var yScale = d3.scale.log().range([height, 0])
+	}
 
 	var xAxis = d3.svg.axis()
 		.scale(xScale)
@@ -1242,6 +1271,7 @@ function drawPolygonHistogram(data, _levelEngaged, el){
 	var yAxis = d3.svg.axis()
 		.scale(yScale)
 		.orient('left')
+		.ticks(5)
 
 	var svg = d3.select(el)
 		.append('svg')
