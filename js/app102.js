@@ -198,16 +198,16 @@ window.onload = function() {
 	// add bordner lines layer
 	var cartoCSSLines = "#layer { " +
 		  "line-color: #000000;"+
-		  "line-width: 1.5;"+
+		  "line-width: 0.5;"+
 		  "line-opacity: 1;"+
 		"[line_type='ARR']{"+
 		  "line-color: #e410dd;"+
-		  "line-width: 3;"+
+		  "line-width: 0.5;"+
 		  "line-opacity: 1;"+
 		"}"+
 		"[line_type='TL']{"+
 		  "line-color: #10e417;"+
-		  "line-width: 3;"+
+		  "line-width: 0.5;"+
 		  "line-opacity: 1;"+
 		"}"+
 	"}"
