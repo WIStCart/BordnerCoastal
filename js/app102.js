@@ -109,7 +109,7 @@ function getLineCSS(lineTypeSelected){
 		for (var i=0; i < lineLegend.length; i++){
 			var thisLineType = lineLegend[i].type
 			if (lineTypeSelected.toLowerCase() === thisLineType.toLowerCase()){
-				var thisStyle = "[line_type='" + thisLineType + "']{line-opacity: 1; line-color: " + lineLegend[i].color + "}"
+				var thisStyle = "[line_type='" + thisLineType + "']{line-opacity: 1; line-color: " + lineLegend[i].color + ";}; "
 				style += thisStyle
 			}//end if
 		} //end loop
@@ -122,15 +122,19 @@ function getPointCSS(pointTypeSelected){
 	var style;
 	if (pointTypeSelected == "all"){
 		//if user wants all lines
-		return "#layer{point-opacity: 1}"
+		style = "#layer{marker-opacity: 1;"
+		for (var i=0; i < pointLegend.length; i++){
+					style +=  "[point_type='" + pointLegend[i].type + "']{marker-opacity: 1; marker-fill: " + pointLegend[i].color + "; marker-file: url(" + pointLegend[i].icon + ");}"
+		}
+		style += "}"
 	}else if (pointTypeSelected == "none"){
-		style = "#layer{point-opacity:0;}"
+		style = "#layer{marker-opacity:0;}"
 	}else{
-		style = "#layer{point-opacity: 0; "
+		style = "#layer{marker-opacity: 0; "
 		for (var i=0; i < pointLegend.length; i++){
 			var thisPointType = pointLegend[i].type
 			if (pointTypeSelected.toLowerCase() === thisPointType.toLowerCase()){
-				var thisStyle = "[point_type='" + thisPointType + "']{point-opacity: 1}"
+				var thisStyle = "[point_type='" + thisPointType + "']{marker-opacity: 1; marker-fill: " + pointLegend[i].color + "; marker-file: url(" + pointLegend[i].icon + ");}"
 				style += thisStyle
 			}//end if
 		} //end loop
@@ -584,6 +588,14 @@ function onMapFeatureClick(e, latln, pxPos, data, layer){
 			isInfowindowOpen = true;
 			// infowindow.set('visibility', true)
 		}
+	}
+	if(legendType == "points"){
+		$(".cartodb-infowindow").hide()
+		isInfowindowOpen = false;
+	}
+	if(legendType == "lines"){
+		$(".cartodb-infowindow").hide()
+		isInfowindowOpen = false;
 	}
 }
 
@@ -1468,7 +1480,7 @@ function listenToLineLegend(){
 		showAllLines();
 		// $("#level1Label").text("All Lines")
 		$("#level1Label").hide();
-
+		$(".legend-media").css({'opacity': 1})
 	})
 	$("#showNone").click(function(){
 		$("#showAll").removeClass('active');
@@ -1477,10 +1489,12 @@ function listenToLineLegend(){
 		showNoLines();
 		// $("#level1Label").text("No Lines")
 		$("#level1Label").hide();
+		$(".legend-media").css({'opacity': 0.25})
 	})
 	$(".legend-item").click(function(){
 		var clickedType = $(this).data('type')
 		var clickedName = $(this).data('name')
+		$(".legend-media").css({"opacity": 0.25})
 		$(".legend-media").removeClass('active');
 		$("#showAll").removeClass('active');
 		$("#showNone").removeClass("active");
@@ -1489,15 +1503,16 @@ function listenToLineLegend(){
 		$("#level1Label").show();
 		var child = $($(this).children()[0])
 		child.addClass('active')
+		child.css({"opacity": 1})
 	})
 
 	$(".legend-media").on('mouseover', function(e){
-			var bkgrd = 'rgba(0, 0, 0, 0.25)'
+			var bkgrd = 'rgba(	179,68,50,.5)'
 			$(this).css({'background': bkgrd})
 	})
 
 	$(".legend-media").on('mouseout', function(e){
-			var bkgrd = 'rgba(0, 0, 0, 0)'
+			var bkgrd = 'rgba(	179,68,50, 0)'
 			$(this).css({'background': bkgrd})
 	})
 }
@@ -1535,6 +1550,7 @@ function listenToPointLegend(){
 		$("#showAll").addClass('active');
 		$("#showNone").removeClass('active');
 		$(".legend-media").removeClass('active');
+		$(".legend-media").css({'opacity': 1})
 		showAllPoints();
 		$("#level1Label").hide();
 		// $("#level1Label").text("All Points")
@@ -1545,6 +1561,7 @@ function listenToPointLegend(){
 		$(".legend-media").removeClass('active');
 		showNoPoints();
 		$("#level1Label").hide();
+		$(".legend-media").css({'opacity': 0.25})
 		// $("#level1Label").text("No Points")
 	})
 	$(".legend-item").click(function(){
@@ -1553,15 +1570,17 @@ function listenToPointLegend(){
 		$(".legend-media").removeClass('active');
 		$("#showAll").removeClass('active');
 		$("#showNone").removeClass("active");
+		$(".legend-media").css({"opacity": 0.25})
 		showOnePoint(clickedType)
 		$("#level1Label").text(clickedName)
 		$("#level1Label").show();
 		var child = $($(this).children()[0])
 		child.addClass('active')
+		child.css({"opacity": 1})
 	})
 
 	$(".legend-media").on('mouseover', function(e){
-			var bkgrd = 'rgba(0, 0, 0, 0.25)'
+			var bkgrd = 'rgba(0, 0, 0, 0.5)'
 			$(this).css({'background': bkgrd})
 	})
 

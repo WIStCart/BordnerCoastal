@@ -572,7 +572,7 @@ button.active{
 }
 
 .active{
-	background-color: cyan!important;
+	background-color: rgba(	179,68,50,.25)!important;
 }
 
 
