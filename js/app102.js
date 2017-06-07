@@ -34,7 +34,8 @@ var infowindow;
 var semanticZoomLevel = 13;
 var lineTypeSelected;
 var points;
-var pointTypeSelected = "none";
+var pointTypeSelected;
+var histogramScale = "linear";
 
 // Overlay definitions:
 var labelsOverlay = L.tileLayer('http://{s}.tile.stamen.com/toner-labels/{z}/{x}/{y}.png', {
@@ -92,13 +93,22 @@ function getPolyStyle(level, level1Selected){
 };
 
 //get the css for a specific line type
-function getLineCSS(lineTypeSelected){
+function getLineCSS(lineTypeSelected, zoomIn){
+	if (typeof(zoomIn) == "undefined"){
+		zoomIn = -1;
+	}
 	var style;
 	if (lineTypeSelected == "all"){
 		//if user wants all lines
-		style = "#layer{line-opacity: 1;"
+		style = "#layer{"
 		for (var i=0; i < lineLegend.length; i++){
-			var thisStyle ="[line_type='" + lineLegend[i].type + "']{line-color: " + lineLegend[i].color + ";}"
+			var thisMinZoom = lineLegend[i].minZoom
+			var thisMaxZoom = lineLegend[i].maxZoom
+			if ((zoomIn <= thisMaxZoom) && (zoomIn >= thisMinZoom)){
+			 thisStyle ="[line_type='" + lineLegend[i].type + "']{line-color: " + lineLegend[i].color + "; line-opacity: 1;}"
+			}else{
+				 thisStyle = "[line_type='" + lineLegend[i].type + "']{line-opacity: 0;}"
+			}
 			style += thisStyle
 		}//end loop
 		style += "}"
@@ -118,13 +128,23 @@ function getLineCSS(lineTypeSelected){
 	return style
 }
 
-function getPointCSS(pointTypeSelected){
+function getPointCSS(pointTypeSelected, zoomIn){
+	if (typeof(zoomIn) == "undefined"){
+		zoomIn = -1;
+	}
 	var style;
 	if (pointTypeSelected == "all"){
 		//if user wants all lines
-		style = "#layer{marker-opacity: 1;"
+		style = "#layer{"
 		for (var i=0; i < pointLegend.length; i++){
-					style +=  "[point_type='" + pointLegend[i].type + "']{marker-opacity: 1; marker-fill: " + pointLegend[i].color + "; marker-file: url(" + pointLegend[i].icon + ");}"
+			var thisMinZoom = pointLegend[i].minZoom;
+			var thisMaxZoom = pointLegend[i].maxZoom;
+			console.log(zoomIn)
+			if ((zoomIn >= thisMinZoom) && (zoomIn <= thisMaxZoom)){
+						style +=  "[point_type='" + pointLegend[i].type + "']{marker-opacity: 1; marker-fill: " + pointLegend[i].color + "; marker-file: url(" + pointLegend[i].icon + "); marker-opacity: 1;}"
+			}else{
+						style +=  "[point_type='" + pointLegend[i].type + "']{marker-opacity: 0;}"
+			}
 		}
 		style += "}"
 	}else if (pointTypeSelected == "none"){
@@ -742,7 +762,14 @@ function setUpMap(){
 	// For dynamic legend queries (in progress)
 	map.on('moveend', function() {
 		if (legendType == "polygons"){
+			console.log("polygons.")
 					drawThisView(map.getBounds(), map.getZoom(), levelEngaged, level1Selected);
+		}else if (legendType == "lines"){
+			console.log("lines")
+			refreshLines();
+		}else if (legendType == "points"){
+			console.log("points")
+			refreshPoints();
 		}
 	});
 
@@ -753,6 +780,19 @@ function setUpMap(){
 
 	// Done, tell the console!
 	console.log("setUpMap() complete. desktopMode = " + desktopMode)
+}
+
+function refreshLines(){
+	if (typeof(lineTypeSelected) == "undefined"){
+		showAllLines();
+	}
+}
+
+function refreshPoints(){
+	if (typeof(pointTypeSelected) == "undefined"){
+		console.log("Refreshing all points")
+		showAllPoints();
+	}
 }
 
 // Media query for when the app traverses the tablet/desktop threshold
@@ -1075,7 +1115,27 @@ function drawThisView(boundsIn, zoomIn, _levelEngaged, _level1Selected){
 			sql.execute(cartoQuery)
 				.done(function(data) {
 					$("#legendHolder").empty();
-					drawPolygonHistogram(data, _levelEngaged, "#legendHolder");
+					$("#legendHolder").append("<div class='btn-group pull-right' role='group'><a id='logHist'>Log</a> | <a id='linearHist'>Linear</a></div>")
+					$("#logHist").click(function(){
+						console.log("Going to log")
+						histogramScale = "log";
+						$(this).addClass('active');
+						$("#linearHist").removeClass('active');
+						drawThisView(boundsIn, zoomIn, _levelEngaged, _level1Selected, histogramScale);
+					})
+					$("#linearHist").click(function(){
+						console.log("Going to linear")
+						histogramScale = "linear";
+						drawThisView(boundsIn, zoomIn, _levelEngaged, _level1Selected);
+						$(this).addClass('active');
+						$("#logHist").removeClass('active');
+					})
+					if (histogramScale == "log"){
+						$("#logHist").addClass('active')
+					}else{
+						$("#linearHist").addClass('active')
+					}
+					drawPolygonHistogram(data, _levelEngaged, "#legendHolder", histogramScale);
 				})
 				.error(function(errors) {
 					console.log("errors:" + errors);
@@ -1117,7 +1177,10 @@ function drawPolyFilter(el, _levelEngaged, _level1Selected){
 
 		//axes setup
 		var xScale = d3.scale.ordinal().rangeRoundBands([0, width], 0.05)
-		var yScale = d3.scale.linear().range([height, 0])
+
+			var yScale = d3.scale.linear().range([height, 0])
+
+
 
 		var xAxis = d3.svg.axis()
 			.scale(xScale)
@@ -1219,7 +1282,8 @@ function shadeRGBColor(color, percent) {
 }
 
 
-function drawPolygonHistogram(data, _levelEngaged, el){
+function drawPolygonHistogram(data, _levelEngaged, el, histogramScale){
+	console.log("Drawing with a ", histogramScale)
 	var summary = summarize(data, _levelEngaged)
 
 	// console.log(summary)
@@ -1233,7 +1297,11 @@ function drawPolygonHistogram(data, _levelEngaged, el){
 
 	//axes setup
 	var xScale = d3.scale.ordinal().rangeRoundBands([0, width], 0.05)
-	var yScale = d3.scale.linear().range([height, 0])
+	if (histogramScale == "linear"){
+		var yScale = d3.scale.linear().range([height, 0])
+	}else if (histogramScale == "log"){
+		var yScale = d3.scale.log().range([height, 0])
+	}
 
 	var xAxis = d3.svg.axis()
 		.scale(xScale)
@@ -1242,6 +1310,7 @@ function drawPolygonHistogram(data, _levelEngaged, el){
 	var yAxis = d3.svg.axis()
 		.scale(yScale)
 		.orient('left')
+		.ticks(5)
 
 	var svg = d3.select(el)
 		.append('svg')
@@ -1456,15 +1525,9 @@ function dispatchLegendClick(level1Selected){
 	drawThisView(map.getBounds(), map.getZoom(), levelEngaged, level1Selected);
 }
 
-function makeAllNoneButtonSet(){
-	var html = "<div class='row button-group all-none-grp' role='group'><button id='showAll' class='btn btn-sm active'>All</button>|<button id='showNone' class='btn btn-sm'>None</button></div>"
-	return html
-}
 
 function drawLineLegend(){
 	$("#legendHolder").empty();
-	$("#legendHolder").append(makeAllNoneButtonSet())
-	$("#legendHolder")
 	for (var i=0; i < lineLegend.length; i++){
 		var symbol = lineLegend[i];
 		var legendEntry = makePointOrLineLegendItem(symbol);
@@ -1475,27 +1538,10 @@ function drawLineLegend(){
 }
 
 function listenToLineLegend(){
-	$("#showAll").click(function(){
-		$("#showAll").addClass("active");
-		$("#showNone").removeClass('active');
-		$(".legend-media").removeClass('active');
-		showAllLines();
-		// $("#level1Label").text("All Lines")
-		$("#level1Label").hide();
-		$(".legend-media").css({'opacity': 1})
-	})
-	$("#showNone").click(function(){
-		$("#showAll").removeClass('active');
-		$("#showNone").addClass('active');
-		$(".legend-media").removeClass("active");
-		showNoLines();
-		// $("#level1Label").text("No Lines")
-		$("#level1Label").hide();
-		$(".legend-media").css({'opacity': 0.25})
-	})
 	$(".legend-item").click(function(){
 		var clickedType = $(this).data('type')
 		var clickedName = $(this).data('name')
+		lineTypeSelected = clickedType
 		$(".legend-media").css({"opacity": 0.25})
 		$(".legend-media").removeClass('active');
 		$("#showAll").removeClass('active');
@@ -1506,6 +1552,18 @@ function listenToLineLegend(){
 		var child = $($(this).children()[0])
 		child.addClass('active')
 		child.css({"opacity": 1})
+		$(".legend-header").hide();
+		$("#legend-back").show();
+		$("#legend-back").unbind('click')
+		$("#legend-back").bind('click', function(){
+			showAllLines();
+			$(".legend-media").css({'opacity': 1})
+			$(".legend-media").removeClass('active');
+			$("#level1Label").hide();
+			$(".legend-header").show()
+			$("#legend-back").hide();
+			lineTypeSelected = undefined
+		})
 	})
 
 	$(".legend-media").on('mouseover', function(e){
@@ -1525,7 +1583,7 @@ function showNoLines(){
 }
 
 function showAllLines(){
-	var lineStyle = getLineCSS("all");
+	var lineStyle = getLineCSS("all", map.getZoom());
 	lines.setCartoCSS(lineStyle)
 }
 
@@ -1536,8 +1594,6 @@ function showOneLine(lineType){
 
 function drawPointLegend(){
 	$("#legendHolder").empty();
-	var allOrNone = makeAllNoneButtonSet();
-	$("#legendHolder").append(allOrNone);
 	for (var i=0; i < pointLegend.length; i++){
 		var symbol = pointLegend[i];
 		var legendEntry = makePointOrLineLegendItem(symbol);
@@ -1548,27 +1604,10 @@ function drawPointLegend(){
 
 
 function listenToPointLegend(){
-	$("#showAll").click(function(){
-		$("#showAll").addClass('active');
-		$("#showNone").removeClass('active');
-		$(".legend-media").removeClass('active');
-		$(".legend-media").css({'opacity': 1})
-		showAllPoints();
-		$("#level1Label").hide();
-		// $("#level1Label").text("All Points")
-	})
-	$("#showNone").click(function(){
-		$("#showAll").removeClass('active');
-		$("#showNone").addClass('active');
-		$(".legend-media").removeClass('active');
-		showNoPoints();
-		$("#level1Label").hide();
-		$(".legend-media").css({'opacity': 0.25})
-		// $("#level1Label").text("No Points")
-	})
 	$(".legend-item").click(function(){
 		var clickedType = $(this).data('type')
 		var clickedName = $(this).data('name')
+		pointTypeSelected = clickedType;
 		$(".legend-media").removeClass('active');
 		$("#showAll").removeClass('active');
 		$("#showNone").removeClass("active");
@@ -1579,6 +1618,18 @@ function listenToPointLegend(){
 		var child = $($(this).children()[0])
 		child.addClass('active')
 		child.css({"opacity": 1})
+		$(".legend-header").hide();
+		$("#legend-back").show();
+		$("#legend-back").unbind('click')
+		$("#legend-back").bind('click', function(){
+			showAllPoints();
+			$(".legend-media").css({'opacity': 1})
+			$(".legend-media").removeClass('active');
+			$("#level1Label").hide();
+			$(".legend-header").show();
+			$("#legend-back").hide();
+			pointTypeSelected = undefined
+		})
 	})
 
 	$(".legend-media").on('mouseover', function(e){
@@ -1597,7 +1648,7 @@ function showNoPoints(){
 	points.setCartoCSS(pointStyle)
 }
 function showAllPoints(){
-	var pointStyle = getPointCSS("all");
+	var pointStyle = getPointCSS("all", map.getZoom());
 	points.setCartoCSS(pointStyle)
 }
 
