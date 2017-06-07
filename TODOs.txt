@@ -1,47 +1,35 @@
 //////////////////////////////////////////
-TODO:
-2) Legend for density1 layer, cartocss relative path?
-3) (SF) Implement an accordion effect for legend transition from level1 to level2 and vice versa. Do not ever remove the level1 bars, instead, squish them down to make room for the level2 classes of the selected level1.
-		*HV: Notes that the bars should never take up the entire legend area. We should try to make them a consistent size regardless of the # of classes being displayed.  
-		*We should make sure to keep the bar from taking up entire legend div when there is only one class present. 																								  
-4) What to do when user is viewing below level 13. Target populating a non-dynamic legend with a level1/2 scheme pulling from all classes collective coverage area.
-5) Alter township layer to also include sections 
+TODO:																						  
+1) Alter township layer to also include sections 
 		*Label this layer similar to the labels used for http://maps.sco.wisc.edu/ControlFinder/ Such as: "T39N R6E"
-10) Don't use the same hue within a given class (No additional guidance on this aside from using the color bordner maps for inspiration) 
+2) Don't use the same hue within a given class (No additional guidance on this aside from using the color bordner maps for inspiration) 
 		*Recommended to reconsider the colors altogether (with color bordner maps for inspiration)
-11) Within map click popups:
-		*(Done) Only display fields that are populated (for example density is only relevant to tree coverage)
-		*(Done) Remove the % value altogether, it isnt populated robustly enough to show
-		*(Done) Add additional rows to the popup if Cov1,Cov2,Cov3,Cov4 exist (as needed)
-		*(Done) Add level1 name to the popup so that it displays consistently with the legend.
-12) Add points/Lines (use an all, one, or none strategy). CS, check email for the data from MN, ask him for it if it cannot be found (i dont think it is in box). Note that this data only exists in the coastal counties, not the watershed.
-		* Will likely need to implement scale thresholds for features (cartoCSS will likely be enough to achieve this) so as to slowly reveal features as the user zooms in.
+3) Add points/Lines (use an all, one, or none strategy).
+		* Will likely need to implement scale thresholds for features so as to slowly reveal features as the user zooms in.
 		* note that there are some line features that fall on top of one another. We will need to choose symbology types that all ow the user to see both at the same time (such as varying line width, etc.).
-		* Use the bordner legend to make icons as .svg. We may be asked to give these color (as opposed to leaving them black) 
-13)	Make the mouseover box in upper right dockable
-15) Work with HV on formula for creating the bar height on a curve.
-16) Add a loader for cases when the user needs to wait.													   
+4) Make the mouseover box in upper right dockable
+5) Work with HV on formula for creating the bar height on a log curve.
+6) Add a loader for cases when the user needs to wait.	(this may no longer be necesscary?/ CS)
+									   
 //////////////////////////////////////////
 BUGS:
-3) Double check the 0 values that come up in map click popups (should these be <Nulls>)
-4) It does not appear that level 2 is populating the map click popups 
-5) ~~The ^ toggle is obfuscating someof the legend items when docked~~ (Fixed with legend improvements / SF)
-6) ~~The basemap switcher/transparency slider's mouse events also trigger the map to pan/query click.~~ (Fixed / SF)
-7) In mobile: format the map click popup to be more narrow (perhaps less than about 320px so that iPhone 5 and like devices look good). We could also consider having the popup be docked to the top or bottom in mobile mode.
-8) In mobile: remove the hover box altogether.
-9) In mobile: layer selector displays upon page load. It should be added to the layer list modal. 
-10) In mobile: Radio buttons are hard to press and are kind of ugly. We can consider styling them up (this applies to both mobile and desktop)
-11) In mobile: The top most controls are obfuscated in mobile/landscape view.
-12)  When user zooms out, the filter applied on the legend persists.
-13) ~~ When a filter has been applied, the popups on other layers should be disabled.~~ (Fixed / SF)
-14) What is the label for density = 0?
+1) It does not appear that level 2 is consistently populating the map click popups 
+2) In mobile: format the map click popup to be more narrow (perhaps less than about 320px so that iPhone 5 and like devices look good). We could also consider having the popup be docked to the top or bottom in mobile mode.
+3) In mobile: remove the hover box altogether.
+4) In mobile: layer selector displays upon page load. It should be added to the layer list modal. 
+5) In mobile: Radio buttons are hard to press and are kind of ugly. We can consider styling them up (this applies to both mobile and desktop)
+6) In mobile: The top most controls are obfuscated in mobile/landscape view.
+7) When user zooms out, the filter applied on the legend persists. (I think we want this functionality, no?/ CS)
+8) ~~ When a filter has been applied, the popups on other layers should be disabled.~~ (Fixed / SF)
+
 //////////////////////////////////////////
 DOWN THE ROAD:
-1) Locate me functionality - SCO, Jay.
+1) Locate me functionality - SCO, Jay. (HTTPS is now supported, Jay got us an SSL certificate for Mapple)
 2) Stateful URL 
 3) WHAI imagery
 4) Info/about pages, etc.
 5) Dictionary/key page for defining the classes better (seems lower priority right now)
+
 //////////////////////////////////////////
 COMPLETE:
 CS: *DONE* Bug with layer click.
@@ -75,3 +63,17 @@ SF: *DONE*: 		*Translate the density values into the following:
 			3 = "Poor Stand Density"
 			4 = "Scattered Density"
 SF: *DONE*: The basemap switcher/transparency slider's mouse events also trigger the map to pan/query click.
+SF: (Done) What is the label for density = 0?
+*Done* Within map click popups:
+		*(Done) Only display fields that are populated (for example density is only relevant to tree coverage)
+		*(Done) Remove the % value altogether, it isnt populated robustly enough to show
+		*(Done) Add additional rows to the popup if Cov1,Cov2,Cov3,Cov4 exist (as needed)
+		*(Done) Add level1 name to the popup so that it displays consistently with the legend.
+*Done* What to do when user is viewing below level 13. Target populating a non-dynamic legend with a level1/2 scheme pulling from all classes collective coverage area.
+*Done* Double check the 0 values that come up in map click popups (should these be <Nulls>)
+SF: *DONE* ~~The ^ toggle is obfuscating someof the legend items when docked~~ (Fixed with legend improvements / SF)
+SF: *DONE* ~~The basemap switcher/transparency slider's mouse events also trigger the map to pan/query click.~~ (Fixed / SF)
+C$: Legend for density1 layer, cartocss relative path?
+SF: *DONE* Implement an accordion effect for legend transition from level1 to level2 and vice versa. Do not ever remove the level1 bars, instead, squish them down to make room for the level2 classes of the selected level1.
+		*HV: Notes that the bars should never take up the entire legend area. We should try to make them a consistent size regardless of the # of classes being displayed.  
+		*We should make sure to keep the bar from taking up entire legend div when there is only one class present. 
