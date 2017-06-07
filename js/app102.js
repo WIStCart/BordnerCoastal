@@ -34,7 +34,7 @@ var infowindow;
 var semanticZoomLevel = 13;
 var lineTypeSelected;
 var points;
-var pointTypeSelected = "none";
+var pointTypeSelected;
 var histogramScale = "linear";
 
 // Overlay definitions:
@@ -128,13 +128,23 @@ function getLineCSS(lineTypeSelected, zoomIn){
 	return style
 }
 
-function getPointCSS(pointTypeSelected){
+function getPointCSS(pointTypeSelected, zoomIn){
+	if (typeof(zoomIn) == "undefined"){
+		zoomIn = -1;
+	}
 	var style;
 	if (pointTypeSelected == "all"){
 		//if user wants all lines
-		style = "#layer{marker-opacity: 1;"
+		style = "#layer{"
 		for (var i=0; i < pointLegend.length; i++){
-					style +=  "[point_type='" + pointLegend[i].type + "']{marker-opacity: 1; marker-fill: " + pointLegend[i].color + "; marker-file: url(" + pointLegend[i].icon + ");}"
+			var thisMinZoom = pointLegend[i].minZoom;
+			var thisMaxZoom = pointLegend[i].maxZoom;
+			console.log(zoomIn)
+			if ((zoomIn >= thisMinZoom) && (zoomIn <= thisMaxZoom)){
+						style +=  "[point_type='" + pointLegend[i].type + "']{marker-opacity: 1; marker-fill: " + pointLegend[i].color + "; marker-file: url(" + pointLegend[i].icon + "); marker-opacity: 1;}"
+			}else{
+						style +=  "[point_type='" + pointLegend[i].type + "']{marker-opacity: 0;}"
+			}
 		}
 		style += "}"
 	}else if (pointTypeSelected == "none"){
@@ -752,10 +762,14 @@ function setUpMap(){
 	// For dynamic legend queries (in progress)
 	map.on('moveend', function() {
 		if (legendType == "polygons"){
+			console.log("polygons.")
 					drawThisView(map.getBounds(), map.getZoom(), levelEngaged, level1Selected);
-		}if (legendType == "lines"){
-
+		}else if (legendType == "lines"){
+			console.log("lines")
 			refreshLines();
+		}else if (legendType == "points"){
+			console.log("points")
+			refreshPoints();
 		}
 	});
 
@@ -771,8 +785,13 @@ function setUpMap(){
 function refreshLines(){
 	if (typeof(lineTypeSelected) == "undefined"){
 		showAllLines();
-	}else{
-		showOneLine(lineTypeSelected)
+	}
+}
+
+function refreshPoints(){
+	if (typeof(pointTypeSelected) == "undefined"){
+		console.log("Refreshing all points")
+		showAllPoints();
 	}
 }
 
@@ -1588,6 +1607,7 @@ function listenToPointLegend(){
 	$(".legend-item").click(function(){
 		var clickedType = $(this).data('type')
 		var clickedName = $(this).data('name')
+		pointTypeSelected = clickedType;
 		$(".legend-media").removeClass('active');
 		$("#showAll").removeClass('active');
 		$("#showNone").removeClass("active");
@@ -1607,7 +1627,8 @@ function listenToPointLegend(){
 			$(".legend-media").removeClass('active');
 			$("#level1Label").hide();
 			$(".legend-header").show();
-						$("#legend-back").hide();
+			$("#legend-back").hide();
+			pointTypeSelected = undefined
 		})
 	})
 
@@ -1627,7 +1648,7 @@ function showNoPoints(){
 	points.setCartoCSS(pointStyle)
 }
 function showAllPoints(){
-	var pointStyle = getPointCSS("all");
+	var pointStyle = getPointCSS("all", map.getZoom());
 	points.setCartoCSS(pointStyle)
 }
 
