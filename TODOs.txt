@@ -7,7 +7,6 @@ TODO:
 3) Scale thresholds for point and line features
 4) Deal with stacked point and line features
 4) Make the mouseover box in upper right dockable
-5) Work with HV on formula for creating the bar height on a log curve.
 6) Add a loader for cases when the user needs to wait.	(this may no longer be necesscary?/ CS) (It might be good for slow connections? / SF)
 									   
 //////////////////////////////////////////
@@ -77,3 +76,4 @@ SF: *DONE* Implement an accordion effect for legend transition from level1 to le
 		*We should make sure to keep the bar from taking up entire legend div when there is only one class present. 
 (Scott) Add points/Lines (use an all, one, or none strategy).
 ~~ When a filter has been applied, the popups on other layers should be disabled.~~ (Fixed / SF)
+5) Work with HV on formula for creating the bar height on a log curve.(DONE/SF)
