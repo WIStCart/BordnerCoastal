@@ -553,3 +553,32 @@ td{
 	height:64px;
 	width: 64px;
 }
+
+
+.btn-sm{
+	padding-left: 10px;
+}
+
+button.active{
+	background: cyan;
+}
+
+.all-none-grp{
+	padding-bottom: 10px;
+}
+
+.legend-media{
+	border-radius: 10px;
+}
+
+.active{
+	background-color: cyan!important;
+}
+
+
+#showAll:hover{
+	background: rgba(0, 0, 0, 0.25)
+}
+#showNone:hover{
+	background: rgba(0, 0, 0, 0.25)
+}

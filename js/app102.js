@@ -32,6 +32,7 @@ var isInfowindowOpen = false;
 var isTOCOpen = false;
 var infowindow;
 var semanticZoomLevel = 13;
+var lineTypeSelected;
 // Overlay definitions:
 var labelsOverlay = L.tileLayer('http://{s}.tile.stamen.com/toner-labels/{z}/{x}/{y}.png', {
 	attribution: 'stamen toner labels'
@@ -83,6 +84,33 @@ function getPolyStyle(level, level1Selected){
 	style += "}";
 	return style;
 };
+
+//get the css for a specific line type
+function getLineCSS(lineTypeSelected){
+	var style;
+	if (lineTypeSelected == "all"){
+		//if user wants all lines
+		style = "#layer{line-opacity: 1;"
+		for (var i=0; i < lineLegend.length; i++){
+			var thisStyle ="[line_type='" + lineLegend[i].type + "']{line-color: " + lineLegend[i].color + ";}"
+			style += thisStyle
+		}//end loop
+		style += "}"
+	}else if (lineTypeSelected == "none"){
+		style = "#layer{line-opacity:0;}"
+	}else{
+		style = "#layer{line-opacity: 0; "
+		for (var i=0; i < lineLegend.length; i++){
+			var thisLineType = lineLegend[i].type
+			if (lineTypeSelected.toLowerCase() === thisLineType.toLowerCase()){
+				var thisStyle = "[line_type='" + thisLineType + "']{line-opacity: 1; line-color: " + lineLegend[i].color + "}"
+				style += thisStyle
+			}//end if
+		} //end loop
+		style += "}"
+	} //end main if
+	return style
+}
 
 // Create a hex dictionary for with cov1 as key (for easy access)
 function createStyles(){
@@ -195,22 +223,25 @@ window.onload = function() {
 		townships = layer;
 	})
 
-	// add bordner lines layer
-	var cartoCSSLines = "#layer { " +
-		  "line-color: #000000;"+
-		  "line-width: 0.5;"+
-		  "line-opacity: 1;"+
-		"[line_type='ARR']{"+
-		  "line-color: #e410dd;"+
-		  "line-width: 0.5;"+
-		  "line-opacity: 1;"+
-		"}"+
-		"[line_type='TL']{"+
-		  "line-color: #10e417;"+
-		  "line-width: 0.5;"+
-		  "line-opacity: 1;"+
-		"}"+
-	"}"
+	// // add bordner lines layer
+	// var cartoCSSLines = "#layer { " +
+	// 	  "line-color: #000000;"+
+	// 	  "line-width: 0.5;"+
+	// 	  "line-opacity: 1;"+
+	// 	"[line_type='ARR']{"+
+	// 	  "line-color: #e410dd;"+
+	// 	  "line-width: 0.5;"+
+	// 	  "line-opacity: 1;"+
+	// 	"}"+
+	// 	"[line_type='TL']{"+
+	// 	  "line-color: #10e417;"+
+	// 	  "line-width: 0.5;"+
+	// 	  "line-opacity: 1;"+
+	// 	"}"+
+	// "}"
+
+var cartoCSSLines = getLineCSS('all')
+
 	lines = cartodb.createLayer(map, {
       user_name: 'sco-admin',
       type: 'cartodb',
@@ -219,8 +250,12 @@ window.onload = function() {
 			cartocss: cartoCSSLines,
 			layerIndex: 5
 	}]
-	}, { https: true })
-	.addTo(map);
+}, { https: true })
+		.addTo(map)
+		.done(function(layer){
+			lines = layer
+			lines.setInteraction(true)
+	})
 
 	// add bordner density1 layer
 	var cartoCSSDensity = "#layer { "+
@@ -620,7 +655,8 @@ function setUpMap(){
 	// $("#pointLegendHolder").addClass( "legend-holder-hidden" )
 
 	// Explicitly set the feature type(will likely use a stateful URL parameter in the future to drive this)
-	$( "#featurePolygons" ).trigger( "click" )
+	// $( "#featurePolygons" ).trigger( "click" )
+	$("#featureLines").trigger("click")
 		// --> $("#featurePolygons").prop("checked", true);
 		// --> $("#featurePoints").prop("checked", true);
 		// --> $("#featureLines").prop("checked", true);
@@ -1016,8 +1052,7 @@ function drawPolyFilter(el, _levelEngaged, _level1Selected){
 			.attr('data-name', function(d){return d.name})
 			.attr('class', function(d){ return d.name.split(" ").join("_") + " filter-swatch"})
 			.attr('width', xScale.rangeBand())
-			.attr('data-origColor', function(d){return d.color})
-			.attr('data-selectedL1', _level1Selected)
+			.attr('data-fill', function(d){return d.color})
 			.attr('y', 0)
 			.attr('height', 50)
 			.style('fill', function(d){
@@ -1036,6 +1071,29 @@ function drawPolyFilter(el, _levelEngaged, _level1Selected){
 		.on('click', function(d){
 			if (levelEngaged == 1){
 					dispatchLegendClick(d.name.toLowerCase())
+			}
+		})
+		//change colors on hover
+		.on('mouseover', function(d){
+			if (_levelEngaged == 1){
+				var self = d3.select(this)
+				//set old color so we can recover it
+				var oldColor = self.style('fill')
+				self.attr('data-fill', oldColor)
+				var newColor = shadeRGBColor(oldColor, -0.25)
+				self.style('fill', newColor)
+				d3.selectAll("." + d.name.split(" ").join("_")).style('fill', newColor)
+			}
+			//make taller
+			// self.attr('y', 0)
+			// self.attr('height', height)
+		})
+		.on('mouseout', function(d){
+			if (_levelEngaged == 1){
+				var self = d3.select(this)
+				var oldColor = self.attr('data-fill')
+				self.style('fill', oldColor)
+			 d3.selectAll("." + d.name.split(" ").join("_")).style('fill', oldColor)
 			}
 		})
 }
@@ -1301,14 +1359,83 @@ function dispatchLegendClick(level1Selected){
 	drawThisView(map.getBounds(), map.getZoom(), levelEngaged, level1Selected);
 }
 
+function makeAllNoneButtonSet(){
+	var html = "<div class='row button-group all-none-grp' role='group'><button id='showAll' class='btn btn-sm active'>All</button>|<button id='showNone' class='btn btn-sm'>None</button></div>"
+	return html
+}
+
 function drawLineLegend(){
 	$("#legendHolder").empty();
+	$("#legendHolder").append(makeAllNoneButtonSet())
+	$("#legendHolder")
 	for (var i=0; i < lineLegend.length; i++){
 		var symbol = lineLegend[i];
 		var legendEntry = makePointOrLineLegendItem(symbol);
 		console.log(legendEntry)
 		$("#legendHolder").append(legendEntry)
 	}
+	listenToLineLegend();
+}
+
+function listenToLineLegend(){
+	$("#showAll").click(function(){
+		$("#showAll").addClass("active");
+		$("#showNone").removeClass('active');
+		$(".legend-media").removeClass('active');
+		showAllLines();
+		$("#level1Label").text("All Lines")
+		$("#level1Label").show();
+	})
+	$("#showNone").click(function(){
+		$("#showAll").removeClass('active');
+		$("#showNone").addClass('active');
+		$(".legend-media").removeClass("active");
+		showNoLines();
+		$("#level1Label").text("No Lines")
+		$("#level1Label").show();
+	})
+	$(".legend-item").click(function(){
+		var clickedType = $(this).data('type')
+		var clickedName = $(this).data('name')
+		$(".legend-media").removeClass('active');
+		$("#showAll").removeClass('active');
+		$("#showNone").removeClass("active");
+		showOneLine(clickedType)
+		$("#level1Label").text(clickedName)
+		$("#level1Label").show();
+		var child = $($(this).children()[0])
+		child.addClass('active')
+	})
+
+	$(".legend-media").on('mouseover', function(e){
+			var bkgrd = 'rgba(0, 0, 0, 0.25)'
+			$(this).css({'background': bkgrd})
+	})
+
+	$(".legend-media").on('mouseout', function(e){
+			var bkgrd = 'rgba(0, 0, 0, 0)'
+			$(this).css({'background': bkgrd})
+	})
+}
+
+function showNoLines(){
+	console.log("Showing no lines!")
+	var lineStyle = getLineCSS("none");
+	lines.setCartoCSS(lineStyle)
+}
+
+function showAllLines(){
+	console.log("Showing all lines!")
+	var lineStyle = getLineCSS("all");
+	lines.setCartoCSS(lineStyle)
+}
+
+function showOneLine(lineType){
+	console.log("Showing only lines of type ", lineType)
+	var lineStyle = getLineCSS(lineType);
+	lines.setCartoCSS(lineStyle);
+	console.log(lineStyle)
+
 }
 
 function drawPointLegend(){
@@ -1322,8 +1449,8 @@ function drawPointLegend(){
 
 
 function makePointOrLineLegendItem(item){
-	var legendItem = "<div class='col-xs-12 col-sm-6 col-md-3 col-lg-2 legend-item'>"
-	legendItem += "<div class='media'>"
+	var legendItem = "<div class='col-xs-12 col-sm-6 col-md-3 col-lg-2 legend-item'  data-type='" + item.type + "' data-name='" + item.name + "'>"
+	legendItem += "<div class='media legend-media'>"
 	legendItem += "<div class='media-left'><img class='media-object' src='" + item.icon + "'/></div>"
 	legendItem += "<div class='media-body'>" + item.name + "</div>"
 	legendItem += "</div>"
