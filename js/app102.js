@@ -33,6 +33,9 @@ var isTOCOpen = false;
 var infowindow;
 var semanticZoomLevel = 13;
 var lineTypeSelected;
+var points;
+var pointTypeSelected = "none";
+
 // Overlay definitions:
 var labelsOverlay = L.tileLayer('http://{s}.tile.stamen.com/toner-labels/{z}/{x}/{y}.png', {
 	attribution: 'stamen toner labels'
@@ -61,6 +64,9 @@ var basemapB =  L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/service
 
 // Create CartoCSS
 function getPolyStyle(level, level1Selected){
+	if (level == "none"){
+		return "#layer{polygon-opacity: 0;}"
+	}
 	classes = tempClasses2.classes;
 
 	//Beginning part of the cartocss style
@@ -104,6 +110,27 @@ function getLineCSS(lineTypeSelected){
 			var thisLineType = lineLegend[i].type
 			if (lineTypeSelected.toLowerCase() === thisLineType.toLowerCase()){
 				var thisStyle = "[line_type='" + thisLineType + "']{line-opacity: 1; line-color: " + lineLegend[i].color + "}"
+				style += thisStyle
+			}//end if
+		} //end loop
+		style += "}"
+	} //end main if
+	return style
+}
+
+function getPointCSS(pointTypeSelected){
+	var style;
+	if (pointTypeSelected == "all"){
+		//if user wants all lines
+		return "#layer{point-opacity: 1}"
+	}else if (pointTypeSelected == "none"){
+		style = "#layer{point-opacity:0;}"
+	}else{
+		style = "#layer{point-opacity: 0; "
+		for (var i=0; i < pointLegend.length; i++){
+			var thisPointType = pointLegend[i].type
+			if (pointTypeSelected.toLowerCase() === thisPointType.toLowerCase()){
+				var thisStyle = "[point_type='" + thisPointType + "']{point-opacity: 1}"
 				style += thisStyle
 			}//end if
 		} //end loop
@@ -240,7 +267,7 @@ window.onload = function() {
 	// 	"}"+
 	// "}"
 
-var cartoCSSLines = getLineCSS('all')
+var cartoCSSLines = getLineCSS('none')
 
 	lines = cartodb.createLayer(map, {
       user_name: 'sco-admin',
@@ -293,7 +320,7 @@ var cartoCSSLines = getLineCSS('all')
 	createStyles()
 	cartoCSSRules = getPolyStyle("level1");
 	// Promise for the first layer
-	bordner = cartodb.createLayer(map, {
+	cartodb.createLayer(map, {
       user_name: 'sco-admin',
       type: 'cartodb',
       sublayers: [{type: "cartodb",
@@ -310,6 +337,7 @@ var cartoCSSLines = getLineCSS('all')
     }, { https: true })
 	.addTo(map) // add cartodb layer and basemap to map object
 	.done(function(layer) {
+		bordner = layer;
 		layerOpacity.polygons = 0.65;
 		layer.setOpacity(layerOpacity.polygons);
 		layer.setInteraction(true);
@@ -321,6 +349,25 @@ var cartoCSSLines = getLineCSS('all')
 			layer.setOpacity(layerOpacity.polygons);
 		});
 	});
+
+	var cartoCSSPoints = getPointCSS('none')
+
+	 cartodb.createLayer(map, {
+	      user_name: 'sco-admin',
+	      type: 'cartodb',
+	      sublayers: [{type: "cartodb",
+				sql: 'SELECT * FROM final_coastal_points',
+				cartocss: cartoCSSPoints,
+				layerIndex: 6
+		}]
+	}, { https: true })
+			.addTo(map)
+			.done(function(layer){
+				points = layer
+				points.setInteraction(true)
+		})
+
+
 	setUpMap();
 };
 
@@ -655,8 +702,8 @@ function setUpMap(){
 	// $("#pointLegendHolder").addClass( "legend-holder-hidden" )
 
 	// Explicitly set the feature type(will likely use a stateful URL parameter in the future to drive this)
-	// $( "#featurePolygons" ).trigger( "click" )
-	$("#featureLines").trigger("click")
+	$( "#featurePolygons" ).trigger( "click" )
+	// $("#featurePoints").trigger("click")
 		// --> $("#featurePolygons").prop("checked", true);
 		// --> $("#featurePoints").prop("checked", true);
 		// --> $("#featureLines").prop("checked", true);
@@ -716,24 +763,60 @@ function turnOnFeatureType(featureTypeCalled){
 	switch(featureTypeCalled) {
 		case "featurePolygons":
 			legendType = "polygons";
+			$(".legend-header").text("Area Features")
 			break;
 		case "featureLines":
 			legendType = "lines"
+			$(".legend-header").text("Line Features")
 			break;
 		case "featurePoints":
 			console.log("feature points called")
 			legendType = "points"
+			$(".legend-header").text("Point Features")
 			break;
 		default:
 			console.log("unidentified feature type called")
 	} //end switch
 	if (legendType == "polygons"){
 		drawThisView(map.getBounds(), map.getZoom(), levelEngaged, level1Selected)
+		if ((typeof(lines) == "undefined") || (typeof(points) == "undefined")){
+			setTimeout(function(featureTypeCalled){turnOnFeatureType(featureTypeCalled)}, 50) //this prevents on init load issues with undefined values
+		}else{
+			showOnlyPolygons();
+		}
 	}else if (legendType == "lines"){
 		drawLineLegend();
+		showOnlyLines();
 	}else if (legendType == "points"){
 		drawPointLegend();
+		showOnlyPoints();
 	}
+}
+
+function showOnlyPolygons(){
+	showNoPoints();
+	showNoLines();
+	showAllPolygons();
+}
+
+function showOnlyLines(){
+	showNoPolygons();
+	showNoPoints();
+	showAllLines();
+}
+
+function showOnlyPoints(){
+	showNoPolygons();
+	showNoLines();
+	showAllPoints();
+}
+
+function showNoPolygons(){
+		bordner.setCartoCSS(getPolyStyle("none"))
+}
+
+function showAllPolygons(){
+	bordner.setCartoCSS(getPolyStyle("level1"))
 }
 
 // To turn on the appropriate basemap, note, the radio button's id must match the basemap's variable name
@@ -1383,16 +1466,17 @@ function listenToLineLegend(){
 		$("#showNone").removeClass('active');
 		$(".legend-media").removeClass('active');
 		showAllLines();
-		$("#level1Label").text("All Lines")
-		$("#level1Label").show();
+		// $("#level1Label").text("All Lines")
+		$("#level1Label").hide();
+
 	})
 	$("#showNone").click(function(){
 		$("#showAll").removeClass('active');
 		$("#showNone").addClass('active');
 		$(".legend-media").removeClass("active");
 		showNoLines();
-		$("#level1Label").text("No Lines")
-		$("#level1Label").show();
+		// $("#level1Label").text("No Lines")
+		$("#level1Label").hide();
 	})
 	$(".legend-item").click(function(){
 		var clickedType = $(this).data('type')
@@ -1419,33 +1503,88 @@ function listenToLineLegend(){
 }
 
 function showNoLines(){
-	console.log("Showing no lines!")
 	var lineStyle = getLineCSS("none");
 	lines.setCartoCSS(lineStyle)
 }
 
 function showAllLines(){
-	console.log("Showing all lines!")
 	var lineStyle = getLineCSS("all");
 	lines.setCartoCSS(lineStyle)
 }
 
 function showOneLine(lineType){
-	console.log("Showing only lines of type ", lineType)
 	var lineStyle = getLineCSS(lineType);
 	lines.setCartoCSS(lineStyle);
-	console.log(lineStyle)
-
 }
 
 function drawPointLegend(){
 	$("#legendHolder").empty();
+	var allOrNone = makeAllNoneButtonSet();
+	$("#legendHolder").append(allOrNone);
 	for (var i=0; i < pointLegend.length; i++){
 		var symbol = pointLegend[i];
 		var legendEntry = makePointOrLineLegendItem(symbol);
 		$("#legendHolder").append(legendEntry)
 	}
+	listenToPointLegend();
 }
+
+
+function listenToPointLegend(){
+	$("#showAll").click(function(){
+		$("#showAll").addClass('active');
+		$("#showNone").removeClass('active');
+		$(".legend-media").removeClass('active');
+		showAllPoints();
+		$("#level1Label").hide();
+		// $("#level1Label").text("All Points")
+	})
+	$("#showNone").click(function(){
+		$("#showAll").removeClass('active');
+		$("#showNone").addClass('active');
+		$(".legend-media").removeClass('active');
+		showNoPoints();
+		$("#level1Label").hide();
+		// $("#level1Label").text("No Points")
+	})
+	$(".legend-item").click(function(){
+		var clickedType = $(this).data('type')
+		var clickedName = $(this).data('name')
+		$(".legend-media").removeClass('active');
+		$("#showAll").removeClass('active');
+		$("#showNone").removeClass("active");
+		showOnePoint(clickedType)
+		$("#level1Label").text(clickedName)
+		$("#level1Label").show();
+		var child = $($(this).children()[0])
+		child.addClass('active')
+	})
+
+	$(".legend-media").on('mouseover', function(e){
+			var bkgrd = 'rgba(0, 0, 0, 0.25)'
+			$(this).css({'background': bkgrd})
+	})
+
+	$(".legend-media").on('mouseout', function(e){
+			var bkgrd = 'rgba(0, 0, 0, 0)'
+			$(this).css({'background': bkgrd})
+	})
+}
+
+function showNoPoints(){
+	var pointStyle = getPointCSS("none");
+	points.setCartoCSS(pointStyle)
+}
+function showAllPoints(){
+	var pointStyle = getPointCSS("all");
+	points.setCartoCSS(pointStyle)
+}
+
+function showOnePoint(pointType){
+	var pointStyle = getPointCSS(pointType);
+	points.setCartoCSS(pointStyle)
+}
+
 
 
 function makePointOrLineLegendItem(item){
