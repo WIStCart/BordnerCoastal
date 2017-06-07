@@ -48,7 +48,7 @@ var basemapA = L.tileLayer('http://{s}.basemaps.cartocdn.com/light_nolabels/{z}/
 	attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, &copy; <a href="http://cartodb.com/attributions">CartoDB</a>'
 });
 
-var basemapB =  L.tileLayer('http://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+var basemapB =  L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
 	attribution: 'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community'
 });
 
@@ -158,7 +158,7 @@ window.onload = function() {
 			cartocss: cartoCSSCounty,
 			layerIndex:4
 	}]
-	})
+	}, { https: true })
 	.addTo(map)
 	.done(function(layer){
 		counties = layer;
@@ -189,7 +189,7 @@ window.onload = function() {
 			cartocss: cartoCSSTown,
 			layerIndex:3
 	}]
-	})
+	}, { https: true })
 	.addTo(map)
 	.done(function(layer){
 		townships = layer;
@@ -219,7 +219,7 @@ window.onload = function() {
 			cartocss: cartoCSSLines,
 			layerIndex: 5
 	}]
-	})
+	}, { https: true })
 	.addTo(map);
 
 	// add bordner density1 layer
@@ -249,7 +249,7 @@ window.onload = function() {
 			cartocss: cartoCSSDensity,
 			layerIndex: 6
 	}]
-	})
+	}, { https: true })
 	.done(function(layer){
 		density1 = layer;
 	});
@@ -272,7 +272,7 @@ window.onload = function() {
 			interactivity: ['cov1', 'cov2'],
 			layerIndex:2
 	}]
-    })
+    }, { https: true })
 	.addTo(map) // add cartodb layer and basemap to map object
 	.done(function(layer) {
 		layerOpacity.polygons = 0.65;
