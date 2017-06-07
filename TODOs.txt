@@ -4,7 +4,7 @@ TODO:
 		*Label this layer similar to the labels used for http://maps.sco.wisc.edu/ControlFinder/ Such as: "T39N R6E"
 2) Don't use the same hue within a given class (No additional guidance on this aside from using the color bordner maps for inspiration) 
 		*Recommended to reconsider the colors altogether (with color bordner maps for inspiration)
-3) Scale thresholds for point and line features
+
 4) Deal with stacked point and line features
 4) Make the mouseover box in upper right dockable
 6) Add a loader for cases when the user needs to wait.	(this may no longer be necesscary?/ CS) (It might be good for slow connections? / SF)
@@ -77,3 +77,4 @@ SF: *DONE* Implement an accordion effect for legend transition from level1 to le
 (Scott) Add points/Lines (use an all, one, or none strategy).
 ~~ When a filter has been applied, the popups on other layers should be disabled.~~ (Fixed / SF)
 5) Work with HV on formula for creating the bar height on a log curve.(DONE/SF)
+3) (DONE /SF) Scale thresholds for point and line features
