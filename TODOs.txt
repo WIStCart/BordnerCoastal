@@ -4,9 +4,8 @@ TODO:
 		*Label this layer similar to the labels used for http://maps.sco.wisc.edu/ControlFinder/ Such as: "T39N R6E"
 2) Don't use the same hue within a given class (No additional guidance on this aside from using the color bordner maps for inspiration) 
 		*Recommended to reconsider the colors altogether (with color bordner maps for inspiration)
-3) (Scott) Add points/Lines (use an all, one, or none strategy).
-		* Will likely need to implement scale thresholds for features so as to slowly reveal features as the user zooms in.
-		* note that there are some line features that fall on top of one another. We will need to choose symbology types that all ow the user to see both at the same time (such as varying line width, etc.).
+3) Scale thresholds for point and line features
+4) Deal with stacked point and line features
 4) Make the mouseover box in upper right dockable
 5) Work with HV on formula for creating the bar height on a log curve.
 6) Add a loader for cases when the user needs to wait.	(this may no longer be necesscary?/ CS) (It might be good for slow connections? / SF)
@@ -77,3 +76,4 @@ C$: Legend for density1 layer, cartocss relative path?
 SF: *DONE* Implement an accordion effect for legend transition from level1 to level2 and vice versa. Do not ever remove the level1 bars, instead, squish them down to make room for the level2 classes of the selected level1.
 		*HV: Notes that the bars should never take up the entire legend area. We should try to make them a consistent size regardless of the # of classes being displayed.  
 		*We should make sure to keep the bar from taking up entire legend div when there is only one class present. 
+(Scott) Add points/Lines (use an all, one, or none strategy).
