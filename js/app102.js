@@ -32,6 +32,10 @@ var isInfowindowOpen = false;
 var isTOCOpen = false;
 var infowindow;
 var semanticZoomLevel = 13;
+var lineTypeSelected;
+var points;
+var pointTypeSelected = "none";
+
 // Overlay definitions:
 var labelsOverlay = L.tileLayer('http://{s}.tile.stamen.com/toner-labels/{z}/{x}/{y}.png', {
 	attribution: 'stamen toner labels'
@@ -60,6 +64,9 @@ var basemapB =  L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/service
 
 // Create CartoCSS
 function getPolyStyle(level, level1Selected){
+	if (level == "none"){
+		return "#layer{polygon-opacity: 0;}"
+	}
 	classes = tempClasses2.classes;
 
 	//Beginning part of the cartocss style
@@ -83,6 +90,58 @@ function getPolyStyle(level, level1Selected){
 	style += "}";
 	return style;
 };
+
+//get the css for a specific line type
+function getLineCSS(lineTypeSelected){
+	var style;
+	if (lineTypeSelected == "all"){
+		//if user wants all lines
+		style = "#layer{line-opacity: 1;"
+		for (var i=0; i < lineLegend.length; i++){
+			var thisStyle ="[line_type='" + lineLegend[i].type + "']{line-color: " + lineLegend[i].color + ";}"
+			style += thisStyle
+		}//end loop
+		style += "}"
+	}else if (lineTypeSelected == "none"){
+		style = "#layer{line-opacity:0;}"
+	}else{
+		style = "#layer{line-opacity: 0; "
+		for (var i=0; i < lineLegend.length; i++){
+			var thisLineType = lineLegend[i].type
+			if (lineTypeSelected.toLowerCase() === thisLineType.toLowerCase()){
+				var thisStyle = "[line_type='" + thisLineType + "']{line-opacity: 1; line-color: " + lineLegend[i].color + ";}; "
+				style += thisStyle
+			}//end if
+		} //end loop
+		style += "}"
+	} //end main if
+	return style
+}
+
+function getPointCSS(pointTypeSelected){
+	var style;
+	if (pointTypeSelected == "all"){
+		//if user wants all lines
+		style = "#layer{marker-opacity: 1;"
+		for (var i=0; i < pointLegend.length; i++){
+					style +=  "[point_type='" + pointLegend[i].type + "']{marker-opacity: 1; marker-fill: " + pointLegend[i].color + "; marker-file: url(" + pointLegend[i].icon + ");}"
+		}
+		style += "}"
+	}else if (pointTypeSelected == "none"){
+		style = "#layer{marker-opacity:0;}"
+	}else{
+		style = "#layer{marker-opacity: 0; "
+		for (var i=0; i < pointLegend.length; i++){
+			var thisPointType = pointLegend[i].type
+			if (pointTypeSelected.toLowerCase() === thisPointType.toLowerCase()){
+				var thisStyle = "[point_type='" + thisPointType + "']{marker-opacity: 1; marker-fill: " + pointLegend[i].color + "; marker-file: url(" + pointLegend[i].icon + ");}"
+				style += thisStyle
+			}//end if
+		} //end loop
+		style += "}"
+	} //end main if
+	return style
+}
 
 // Create a hex dictionary for with cov1 as key (for easy access)
 function createStyles(){
@@ -195,22 +254,25 @@ window.onload = function() {
 		townships = layer;
 	})
 
-	// add bordner lines layer
-	var cartoCSSLines = "#layer { " +
-		  "line-color: #000000;"+
-		  "line-width: 0.5;"+
-		  "line-opacity: 1;"+
-		"[line_type='ARR']{"+
-		  "line-color: #e410dd;"+
-		  "line-width: 0.5;"+
-		  "line-opacity: 1;"+
-		"}"+
-		"[line_type='TL']{"+
-		  "line-color: #10e417;"+
-		  "line-width: 0.5;"+
-		  "line-opacity: 1;"+
-		"}"+
-	"}"
+	// // add bordner lines layer
+	// var cartoCSSLines = "#layer { " +
+	// 	  "line-color: #000000;"+
+	// 	  "line-width: 0.5;"+
+	// 	  "line-opacity: 1;"+
+	// 	"[line_type='ARR']{"+
+	// 	  "line-color: #e410dd;"+
+	// 	  "line-width: 0.5;"+
+	// 	  "line-opacity: 1;"+
+	// 	"}"+
+	// 	"[line_type='TL']{"+
+	// 	  "line-color: #10e417;"+
+	// 	  "line-width: 0.5;"+
+	// 	  "line-opacity: 1;"+
+	// 	"}"+
+	// "}"
+
+var cartoCSSLines = getLineCSS('none')
+
 	lines = cartodb.createLayer(map, {
       user_name: 'sco-admin',
       type: 'cartodb',
@@ -219,8 +281,12 @@ window.onload = function() {
 			cartocss: cartoCSSLines,
 			layerIndex: 5
 	}]
-	}, { https: true })
-	.addTo(map);
+}, { https: true })
+		.addTo(map)
+		.done(function(layer){
+			lines = layer
+			lines.setInteraction(true)
+	})
 
 	// add bordner density1 layer
 	var cartoCSSDensity = "#layer { "+
@@ -258,7 +324,7 @@ window.onload = function() {
 	createStyles()
 	cartoCSSRules = getPolyStyle("level1");
 	// Promise for the first layer
-	bordner = cartodb.createLayer(map, {
+	cartodb.createLayer(map, {
       user_name: 'sco-admin',
       type: 'cartodb',
       sublayers: [{type: "cartodb",
@@ -275,6 +341,7 @@ window.onload = function() {
     }, { https: true })
 	.addTo(map) // add cartodb layer and basemap to map object
 	.done(function(layer) {
+		bordner = layer;
 		layerOpacity.polygons = 0.65;
 		layer.setOpacity(layerOpacity.polygons);
 		layer.setInteraction(true);
@@ -286,6 +353,25 @@ window.onload = function() {
 			layer.setOpacity(layerOpacity.polygons);
 		});
 	});
+
+	var cartoCSSPoints = getPointCSS('none')
+
+	 cartodb.createLayer(map, {
+	      user_name: 'sco-admin',
+	      type: 'cartodb',
+	      sublayers: [{type: "cartodb",
+				sql: 'SELECT * FROM final_coastal_points',
+				cartocss: cartoCSSPoints,
+				layerIndex: 6
+		}]
+	}, { https: true })
+			.addTo(map)
+			.done(function(layer){
+				points = layer
+				points.setInteraction(true)
+		})
+
+
 	setUpMap();
 };
 
@@ -489,9 +575,8 @@ function onMapFeatureClick(e, latln, pxPos, data, layer){
 	isInfowindowOpen = true;
 	//hide the infowindow if it's been filtered out by legend interaction
 	if (+levelEngaged == 2){
-		console.log(level1Selected)
 		level1key = level1Selected.toLowerCase().split(" ").join("_")
-		level1Members = level1Membership[level1Selected]
+		level1Members = level1Membership[level1key]
 		level1MemberCodes = _.map(level1Members, function(d){return d.code})
 		isAMember = _.contains(level1MemberCodes, data.cov1)
 		if (!isAMember){
@@ -503,6 +588,14 @@ function onMapFeatureClick(e, latln, pxPos, data, layer){
 			isInfowindowOpen = true;
 			// infowindow.set('visibility', true)
 		}
+	}
+	if(legendType == "points"){
+		$(".cartodb-infowindow").hide()
+		isInfowindowOpen = false;
+	}
+	if(legendType == "lines"){
+		$(".cartodb-infowindow").hide()
+		isInfowindowOpen = false;
 	}
 }
 
@@ -622,6 +715,7 @@ function setUpMap(){
 
 	// Explicitly set the feature type(will likely use a stateful URL parameter in the future to drive this)
 	$( "#featurePolygons" ).trigger( "click" )
+	// $("#featurePoints").trigger("click")
 		// --> $("#featurePolygons").prop("checked", true);
 		// --> $("#featurePoints").prop("checked", true);
 		// --> $("#featureLines").prop("checked", true);
@@ -681,24 +775,60 @@ function turnOnFeatureType(featureTypeCalled){
 	switch(featureTypeCalled) {
 		case "featurePolygons":
 			legendType = "polygons";
+			$(".legend-header").text("Area Features")
 			break;
 		case "featureLines":
 			legendType = "lines"
+			$(".legend-header").text("Line Features")
 			break;
 		case "featurePoints":
 			console.log("feature points called")
 			legendType = "points"
+			$(".legend-header").text("Point Features")
 			break;
 		default:
 			console.log("unidentified feature type called")
 	} //end switch
 	if (legendType == "polygons"){
 		drawThisView(map.getBounds(), map.getZoom(), levelEngaged, level1Selected)
+		if ((typeof(lines) == "undefined") || (typeof(points) == "undefined")){
+			setTimeout(function(featureTypeCalled){turnOnFeatureType(featureTypeCalled)}, 50) //this prevents on init load issues with undefined values
+		}else{
+			showOnlyPolygons();
+		}
 	}else if (legendType == "lines"){
 		drawLineLegend();
+		showOnlyLines();
 	}else if (legendType == "points"){
 		drawPointLegend();
+		showOnlyPoints();
 	}
+}
+
+function showOnlyPolygons(){
+	showNoPoints();
+	showNoLines();
+	showAllPolygons();
+}
+
+function showOnlyLines(){
+	showNoPolygons();
+	showNoPoints();
+	showAllLines();
+}
+
+function showOnlyPoints(){
+	showNoPolygons();
+	showNoLines();
+	showAllPoints();
+}
+
+function showNoPolygons(){
+		bordner.setCartoCSS(getPolyStyle("none"))
+}
+
+function showAllPolygons(){
+	bordner.setCartoCSS(getPolyStyle("level1"))
 }
 
 // To turn on the appropriate basemap, note, the radio button's id must match the basemap's variable name
@@ -1017,8 +1147,7 @@ function drawPolyFilter(el, _levelEngaged, _level1Selected){
 			.attr('data-name', function(d){return d.name})
 			.attr('class', function(d){ return d.name.split(" ").join("_") + " filter-swatch"})
 			.attr('width', xScale.rangeBand())
-			.attr('data-origColor', function(d){return d.color})
-			.attr('data-selectedL1', _level1Selected)
+			.attr('data-fill', function(d){return d.color})
 			.attr('y', 0)
 			.attr('height', 50)
 			.style('fill', function(d){
@@ -1037,6 +1166,29 @@ function drawPolyFilter(el, _levelEngaged, _level1Selected){
 		.on('click', function(d){
 			if (levelEngaged == 1){
 					dispatchLegendClick(d.name.toLowerCase())
+			}
+		})
+		//change colors on hover
+		.on('mouseover', function(d){
+			if (_levelEngaged == 1){
+				var self = d3.select(this)
+				//set old color so we can recover it
+				var oldColor = self.style('fill')
+				self.attr('data-fill', oldColor)
+				var newColor = shadeRGBColor(oldColor, -0.25)
+				self.style('fill', newColor)
+				d3.selectAll("." + d.name.split(" ").join("_")).style('fill', newColor)
+			}
+			//make taller
+			// self.attr('y', 0)
+			// self.attr('height', height)
+		})
+		.on('mouseout', function(d){
+			if (_levelEngaged == 1){
+				var self = d3.select(this)
+				var oldColor = self.attr('data-fill')
+				self.style('fill', oldColor)
+			 d3.selectAll("." + d.name.split(" ").join("_")).style('fill', oldColor)
 			}
 		})
 }
@@ -1302,29 +1454,161 @@ function dispatchLegendClick(level1Selected){
 	drawThisView(map.getBounds(), map.getZoom(), levelEngaged, level1Selected);
 }
 
+function makeAllNoneButtonSet(){
+	var html = "<div class='row button-group all-none-grp' role='group'><button id='showAll' class='btn btn-sm active'>All</button>|<button id='showNone' class='btn btn-sm'>None</button></div>"
+	return html
+}
+
 function drawLineLegend(){
 	$("#legendHolder").empty();
+	$("#legendHolder").append(makeAllNoneButtonSet())
+	$("#legendHolder")
 	for (var i=0; i < lineLegend.length; i++){
 		var symbol = lineLegend[i];
 		var legendEntry = makePointOrLineLegendItem(symbol);
 		console.log(legendEntry)
 		$("#legendHolder").append(legendEntry)
 	}
+	listenToLineLegend();
+}
+
+function listenToLineLegend(){
+	$("#showAll").click(function(){
+		$("#showAll").addClass("active");
+		$("#showNone").removeClass('active');
+		$(".legend-media").removeClass('active');
+		showAllLines();
+		// $("#level1Label").text("All Lines")
+		$("#level1Label").hide();
+		$(".legend-media").css({'opacity': 1})
+	})
+	$("#showNone").click(function(){
+		$("#showAll").removeClass('active');
+		$("#showNone").addClass('active');
+		$(".legend-media").removeClass("active");
+		showNoLines();
+		// $("#level1Label").text("No Lines")
+		$("#level1Label").hide();
+		$(".legend-media").css({'opacity': 0.25})
+	})
+	$(".legend-item").click(function(){
+		var clickedType = $(this).data('type')
+		var clickedName = $(this).data('name')
+		$(".legend-media").css({"opacity": 0.25})
+		$(".legend-media").removeClass('active');
+		$("#showAll").removeClass('active');
+		$("#showNone").removeClass("active");
+		showOneLine(clickedType)
+		$("#level1Label").text(clickedName)
+		$("#level1Label").show();
+		var child = $($(this).children()[0])
+		child.addClass('active')
+		child.css({"opacity": 1})
+	})
+
+	$(".legend-media").on('mouseover', function(e){
+			var bkgrd = 'rgba(	179,68,50,.5)'
+			$(this).css({'background': bkgrd})
+	})
+
+	$(".legend-media").on('mouseout', function(e){
+			var bkgrd = 'rgba(	179,68,50, 0)'
+			$(this).css({'background': bkgrd})
+	})
+}
+
+function showNoLines(){
+	var lineStyle = getLineCSS("none");
+	lines.setCartoCSS(lineStyle)
+}
+
+function showAllLines(){
+	var lineStyle = getLineCSS("all");
+	lines.setCartoCSS(lineStyle)
+}
+
+function showOneLine(lineType){
+	var lineStyle = getLineCSS(lineType);
+	lines.setCartoCSS(lineStyle);
 }
 
 function drawPointLegend(){
 	$("#legendHolder").empty();
+	var allOrNone = makeAllNoneButtonSet();
+	$("#legendHolder").append(allOrNone);
 	for (var i=0; i < pointLegend.length; i++){
 		var symbol = pointLegend[i];
 		var legendEntry = makePointOrLineLegendItem(symbol);
 		$("#legendHolder").append(legendEntry)
 	}
+	listenToPointLegend();
 }
 
 
+function listenToPointLegend(){
+	$("#showAll").click(function(){
+		$("#showAll").addClass('active');
+		$("#showNone").removeClass('active');
+		$(".legend-media").removeClass('active');
+		$(".legend-media").css({'opacity': 1})
+		showAllPoints();
+		$("#level1Label").hide();
+		// $("#level1Label").text("All Points")
+	})
+	$("#showNone").click(function(){
+		$("#showAll").removeClass('active');
+		$("#showNone").addClass('active');
+		$(".legend-media").removeClass('active');
+		showNoPoints();
+		$("#level1Label").hide();
+		$(".legend-media").css({'opacity': 0.25})
+		// $("#level1Label").text("No Points")
+	})
+	$(".legend-item").click(function(){
+		var clickedType = $(this).data('type')
+		var clickedName = $(this).data('name')
+		$(".legend-media").removeClass('active');
+		$("#showAll").removeClass('active');
+		$("#showNone").removeClass("active");
+		$(".legend-media").css({"opacity": 0.25})
+		showOnePoint(clickedType)
+		$("#level1Label").text(clickedName)
+		$("#level1Label").show();
+		var child = $($(this).children()[0])
+		child.addClass('active')
+		child.css({"opacity": 1})
+	})
+
+	$(".legend-media").on('mouseover', function(e){
+			var bkgrd = 'rgba(0, 0, 0, 0.5)'
+			$(this).css({'background': bkgrd})
+	})
+
+	$(".legend-media").on('mouseout', function(e){
+			var bkgrd = 'rgba(0, 0, 0, 0)'
+			$(this).css({'background': bkgrd})
+	})
+}
+
+function showNoPoints(){
+	var pointStyle = getPointCSS("none");
+	points.setCartoCSS(pointStyle)
+}
+function showAllPoints(){
+	var pointStyle = getPointCSS("all");
+	points.setCartoCSS(pointStyle)
+}
+
+function showOnePoint(pointType){
+	var pointStyle = getPointCSS(pointType);
+	points.setCartoCSS(pointStyle)
+}
+
+
+
 function makePointOrLineLegendItem(item){
-	var legendItem = "<div class='col-xs-12 col-sm-6 col-md-3 col-lg-2 legend-item'>"
-	legendItem += "<div class='media'>"
+	var legendItem = "<div class='col-xs-12 col-sm-6 col-md-3 col-lg-2 legend-item'  data-type='" + item.type + "' data-name='" + item.name + "'>"
+	legendItem += "<div class='media legend-media'>"
 	legendItem += "<div class='media-left'><img class='media-object' src='" + item.icon + "'/></div>"
 	legendItem += "<div class='media-body'>" + item.name + "</div>"
 	legendItem += "</div>"
