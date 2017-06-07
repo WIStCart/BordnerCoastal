@@ -528,8 +528,10 @@ function setupInteraction(layer, _levelEngaged, _visibility){
 	//manually change the popup text on mouseover
 	//only way to actually manipulate the data in the mouse events
 	layer.bind('featureOver', function(e, latln, pxPos, data, layer){
-		level1 = getLevel1FromCode(data.cov1)
-		$("#level1-set").html(level1)
+		if (legendType == "polygons"){
+			level1 = getLevel1FromCode(data.cov1)
+			$("#level1-set").html(level1)
+		}
 	})
 
 	setupGeocoderSearch()
