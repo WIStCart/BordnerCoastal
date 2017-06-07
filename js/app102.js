@@ -93,13 +93,22 @@ function getPolyStyle(level, level1Selected){
 };
 
 //get the css for a specific line type
-function getLineCSS(lineTypeSelected){
+function getLineCSS(lineTypeSelected, zoomIn){
+	if (typeof(zoomIn) == "undefined"){
+		zoomIn = -1;
+	}
 	var style;
 	if (lineTypeSelected == "all"){
 		//if user wants all lines
-		style = "#layer{line-opacity: 1;"
+		style = "#layer{"
 		for (var i=0; i < lineLegend.length; i++){
-			var thisStyle ="[line_type='" + lineLegend[i].type + "']{line-color: " + lineLegend[i].color + ";}"
+			var thisMinZoom = lineLegend[i].minZoom
+			var thisMaxZoom = lineLegend[i].maxZoom
+			if ((zoomIn <= thisMaxZoom) && (zoomIn >= thisMinZoom)){
+			 thisStyle ="[line_type='" + lineLegend[i].type + "']{line-color: " + lineLegend[i].color + "; line-opacity: 1;}"
+			}else{
+				 thisStyle = "[line_type='" + lineLegend[i].type + "']{line-opacity: 0;}"
+			}
 			style += thisStyle
 		}//end loop
 		style += "}"
@@ -744,6 +753,9 @@ function setUpMap(){
 	map.on('moveend', function() {
 		if (legendType == "polygons"){
 					drawThisView(map.getBounds(), map.getZoom(), levelEngaged, level1Selected);
+		}if (legendType == "lines"){
+
+			refreshLines();
 		}
 	});
 
@@ -754,6 +766,14 @@ function setUpMap(){
 
 	// Done, tell the console!
 	console.log("setUpMap() complete. desktopMode = " + desktopMode)
+}
+
+function refreshLines(){
+	if (typeof(lineTypeSelected) == "undefined"){
+		showAllLines();
+	}else{
+		showOneLine(lineTypeSelected)
+	}
 }
 
 // Media query for when the app traverses the tablet/desktop threshold
@@ -1502,6 +1522,7 @@ function listenToLineLegend(){
 	$(".legend-item").click(function(){
 		var clickedType = $(this).data('type')
 		var clickedName = $(this).data('name')
+		lineTypeSelected = clickedType
 		$(".legend-media").css({"opacity": 0.25})
 		$(".legend-media").removeClass('active');
 		$("#showAll").removeClass('active');
@@ -1522,6 +1543,7 @@ function listenToLineLegend(){
 			$("#level1Label").hide();
 			$(".legend-header").show()
 			$("#legend-back").hide();
+			lineTypeSelected = undefined
 		})
 	})
 
@@ -1542,7 +1564,7 @@ function showNoLines(){
 }
 
 function showAllLines(){
-	var lineStyle = getLineCSS("all");
+	var lineStyle = getLineCSS("all", map.getZoom());
 	lines.setCartoCSS(lineStyle)
 }
 
