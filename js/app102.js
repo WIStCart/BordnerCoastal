@@ -1486,15 +1486,9 @@ function dispatchLegendClick(level1Selected){
 	drawThisView(map.getBounds(), map.getZoom(), levelEngaged, level1Selected);
 }
 
-function makeAllNoneButtonSet(){
-	var html = "<div class='row button-group all-none-grp' role='group'><button id='showAll' class='btn btn-sm active'>All</button>|<button id='showNone' class='btn btn-sm'>None</button></div>"
-	return html
-}
 
 function drawLineLegend(){
 	$("#legendHolder").empty();
-	$("#legendHolder").append(makeAllNoneButtonSet())
-	$("#legendHolder")
 	for (var i=0; i < lineLegend.length; i++){
 		var symbol = lineLegend[i];
 		var legendEntry = makePointOrLineLegendItem(symbol);
@@ -1505,24 +1499,6 @@ function drawLineLegend(){
 }
 
 function listenToLineLegend(){
-	$("#showAll").click(function(){
-		$("#showAll").addClass("active");
-		$("#showNone").removeClass('active');
-		$(".legend-media").removeClass('active');
-		showAllLines();
-		// $("#level1Label").text("All Lines")
-		$("#level1Label").hide();
-		$(".legend-media").css({'opacity': 1})
-	})
-	$("#showNone").click(function(){
-		$("#showAll").removeClass('active');
-		$("#showNone").addClass('active');
-		$(".legend-media").removeClass("active");
-		showNoLines();
-		// $("#level1Label").text("No Lines")
-		$("#level1Label").hide();
-		$(".legend-media").css({'opacity': 0.25})
-	})
 	$(".legend-item").click(function(){
 		var clickedType = $(this).data('type')
 		var clickedName = $(this).data('name')
@@ -1536,6 +1512,17 @@ function listenToLineLegend(){
 		var child = $($(this).children()[0])
 		child.addClass('active')
 		child.css({"opacity": 1})
+		$(".legend-header").hide();
+		$("#legend-back").show();
+		$("#legend-back").unbind('click')
+		$("#legend-back").bind('click', function(){
+			showAllLines();
+			$(".legend-media").css({'opacity': 1})
+			$(".legend-media").removeClass('active');
+			$("#level1Label").hide();
+			$(".legend-header").show()
+			$("#legend-back").hide();
+		})
 	})
 
 	$(".legend-media").on('mouseover', function(e){
@@ -1566,8 +1553,6 @@ function showOneLine(lineType){
 
 function drawPointLegend(){
 	$("#legendHolder").empty();
-	var allOrNone = makeAllNoneButtonSet();
-	$("#legendHolder").append(allOrNone);
 	for (var i=0; i < pointLegend.length; i++){
 		var symbol = pointLegend[i];
 		var legendEntry = makePointOrLineLegendItem(symbol);
@@ -1578,24 +1563,6 @@ function drawPointLegend(){
 
 
 function listenToPointLegend(){
-	$("#showAll").click(function(){
-		$("#showAll").addClass('active');
-		$("#showNone").removeClass('active');
-		$(".legend-media").removeClass('active');
-		$(".legend-media").css({'opacity': 1})
-		showAllPoints();
-		$("#level1Label").hide();
-		// $("#level1Label").text("All Points")
-	})
-	$("#showNone").click(function(){
-		$("#showAll").removeClass('active');
-		$("#showNone").addClass('active');
-		$(".legend-media").removeClass('active');
-		showNoPoints();
-		$("#level1Label").hide();
-		$(".legend-media").css({'opacity': 0.25})
-		// $("#level1Label").text("No Points")
-	})
 	$(".legend-item").click(function(){
 		var clickedType = $(this).data('type')
 		var clickedName = $(this).data('name')
@@ -1609,6 +1576,17 @@ function listenToPointLegend(){
 		var child = $($(this).children()[0])
 		child.addClass('active')
 		child.css({"opacity": 1})
+		$(".legend-header").hide();
+		$("#legend-back").show();
+		$("#legend-back").unbind('click')
+		$("#legend-back").bind('click', function(){
+			showAllPoints();
+			$(".legend-media").css({'opacity': 1})
+			$(".legend-media").removeClass('active');
+			$("#level1Label").hide();
+			$(".legend-header").show();
+						$("#legend-back").hide();
+		})
 	})
 
 	$(".legend-media").on('mouseover', function(e){
