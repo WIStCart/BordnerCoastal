@@ -489,9 +489,8 @@ function onMapFeatureClick(e, latln, pxPos, data, layer){
 	isInfowindowOpen = true;
 	//hide the infowindow if it's been filtered out by legend interaction
 	if (+levelEngaged == 2){
-		console.log(level1Selected)
 		level1key = level1Selected.toLowerCase().split(" ").join("_")
-		level1Members = level1Membership[level1Selected]
+		level1Members = level1Membership[level1key]
 		level1MemberCodes = _.map(level1Members, function(d){return d.code})
 		isAMember = _.contains(level1MemberCodes, data.cov1)
 		if (!isAMember){
