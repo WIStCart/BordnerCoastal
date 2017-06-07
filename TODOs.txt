@@ -9,7 +9,7 @@ TODO:
 		* note that there are some line features that fall on top of one another. We will need to choose symbology types that all ow the user to see both at the same time (such as varying line width, etc.).
 4) Make the mouseover box in upper right dockable
 5) Work with HV on formula for creating the bar height on a log curve.
-6) Add a loader for cases when the user needs to wait.	(this may no longer be necesscary?/ CS)
+6) Add a loader for cases when the user needs to wait.	(this may no longer be necesscary?/ CS) (It might be good for slow connections? / SF)
 									   
 //////////////////////////////////////////
 BUGS:
