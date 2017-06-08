@@ -36,6 +36,7 @@ var lineTypeSelected;
 var points;
 var pointTypeSelected;
 var histogramScale = "linear";
+var showInfoboxOnHover = true;
 
 // Overlay definitions:
 var labelsOverlay = L.tileLayer('http://{s}.tile.stamen.com/toner-labels/{z}/{x}/{y}.png', {
@@ -139,7 +140,6 @@ function getPointCSS(pointTypeSelected, zoomIn){
 		for (var i=0; i < pointLegend.length; i++){
 			var thisMinZoom = pointLegend[i].minZoom;
 			var thisMaxZoom = pointLegend[i].maxZoom;
-			console.log(zoomIn)
 			if ((zoomIn >= thisMinZoom) && (zoomIn <= thisMaxZoom)){
 						style +=  "[point_type='" + pointLegend[i].type + "']{marker-opacity: 1; marker-fill: " + pointLegend[i].color + "; marker-file: url(" + pointLegend[i].icon + "); marker-opacity: 1;}"
 			}else{
@@ -575,7 +575,7 @@ function onLineOver(e, latln, pxPos, data, layer){
 	if (legendType == "lines"){
 		var lineName = getPointOrLineNameFromCode(data.line_type, 'lines');
 		//only dispaly the infobox if the feature is within its zoom level
-		if (isFeatureInZoom(data.line_type, 'lines')){
+		if (isFeatureInZoom(data.line_type, 'lines') && (showInfoboxOnHover)){
 			$(".infobox").show()
 			$("#level1-set").html(lineName)
 		}
@@ -592,7 +592,7 @@ function onPointOver(e, latln, pxPos, data, layer){
 	if (legendType == "points"){
 		var pointName = getPointOrLineNameFromCode(data.point_type, 'points');
 		$("#level1-set").html(pointName)
-		if (isFeatureInZoom(data.point_type, 'points')){
+		if (isFeatureInZoom(data.point_type, 'points') && (showInfoboxOnHover)){
 			$(".infobox").show()
 			$("#level1-set").html(pointName)
 		}
@@ -606,7 +606,7 @@ function onPointOut(e, latln, pxPos, data, layer){
 }
 
 function onPolyOver(e, latln, pxPos, data, layer){
-	if (legendType == "polygons"){
+	if ((legendType == "polygons") && showInfoboxOnHover ){
 		$(".infobox").show()
 		level1 = getLevel1FromCode(data.cov1)
 		$("#level1-set").html(level1)
@@ -776,6 +776,8 @@ function setUpMap(){
 			'<div class="checkbox">' +
 				'<label><input type="checkbox" name="overlayType" id="density1">Class 1 Density</label>' +
 			'</div>' +
+			"<div class='checkbox'>"+
+			'<label><input type="checkbox" name="showInfobox" id="showInfobox" checked>Show Info on Hover</label></div>' +
 			'<label class="legend-label">Basemap</label>' +
 			'<div class="radio">' +
 				'<label><input type="radio" name="basemapType" id="basemapA">Streets</label>' +
@@ -796,6 +798,10 @@ function setUpMap(){
 	$('input[name=featureType]').click(function(){ turnOnFeatureType(this.id) });
 	$('input[name=basemapType]').click(function(){ turnOnBasemap(this.id) });
 	$('input[name=overlayType]').click(function(){ turnOnOverlay(this.id) });
+	$("#showInfobox").change(function(){
+		var isChecked = $(this).prop('checked');
+		showInfoboxOnHover = isChecked
+	})
 
 	// Hide point, line or poly legend as appropriate
 	// $("#polygonLegendHolder").addClass( "legend-holder-hidden" )

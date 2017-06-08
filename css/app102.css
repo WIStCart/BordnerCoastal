@@ -613,4 +613,5 @@ button.active{
 	z-index:105;
 	top: 10px;
 	right: 10px;
+	display: none;
 }
