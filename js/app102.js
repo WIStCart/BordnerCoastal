@@ -39,10 +39,16 @@ var histogramScale = "linear";
 var showInfoboxOnHover = true;
 var basemapChoice = "streets";
 
+//overlays on the map
 var labelsAreOn = false;
 var countiesAreOn = false;
 var townshipsAreOn = false;
 var densityIsOn = false;
+
+//geolocation of the user
+var navIsOn = false;
+var theLocation;
+var canDoGeolocation;
 
 // Overlay definitions:
 var labelsOverlay = L.tileLayer('http://{s}.tile.stamen.com/toner-labels/{z}/{x}/{y}.png', {
@@ -427,10 +433,10 @@ var cartoCSSLines = getLineCSS('none')
 
 
 	// //add stateful URL
-	// var hash = new L.Hash(map);
 	parseURL();
 
 	setUpMap();
+
 }; // end of onLoad
 
 
@@ -953,6 +959,9 @@ function setUpMap(){
 			'<div data-toggle="tooltip" title="share" class="leaflet-bar leaflet-control leaflet-control-custom" id="shareButton" onClick="dispatchButtonClick(this.id)">' +
 				'<span id="shareButtonIcon" class="button-icon-class glyphicon glyphicon-share-alt">' +
 			'</div></br>' +
+			'<div data-toggle="tooltip" title="Locate Me" class="leaflet-bar leaflet-control leaflet-control-custom" id="locateMeButton" onClick="dispatchButtonClick(this.id)">' +
+				'<span id="shareButtonIcon" class="button-icon-class glyphicon glyphicon-map-marker">' +
+			'</div></br>' +
 			'<div data-toggle="tooltip" title="layers" class="leaflet-bar leaflet-control leaflet-control-custom" id="layerListButton" onClick="dispatchButtonClick(this.id)">' +
 				'<span id="layerListButtonIcon" class="button-icon-class glyphicon glyphicon-menu-hamburger">' +
 			'</div></br>' +
@@ -1325,7 +1334,7 @@ function transformToTablet(){
 function dispatchButtonClick(buttonClicked){
 	// If modal is not already open, then open it
 	if ($('.modal.in').length <= 0){
-		if ((desktopMode == true)&&(buttonClicked == "layerListButton")){
+		if ((desktopMode == true)&&((buttonClicked == "layerListButton") || (buttonClicked == "locateMeButton"))){
 
 		}else{
 			$( "#tocModal" ).modal();
@@ -1366,8 +1375,10 @@ function dispatchButtonClick(buttonClicked){
 			break;
 		case "geocodeButton":
 			break;
+		case "locateMeButton":
+				geoLocate();
 		default:
-			console.log("unidentified button click")
+			return;
 	}
 }
 
@@ -1404,6 +1415,24 @@ function configInfoShareModal(){
 	}
 }
 
+
+function geoLocate(){
+	navigator.geolocation.getCurrentPosition(displayUserLocation);
+}
+
+function displayUserLocation(pos){
+	if (!navIsOn){
+		var lat = pos.coords.latitude;
+		var lng = pos.coords.longitude
+		// var point = new L.latLng(lat, lng);
+		theLocation = L.circleMarker([lat, lng], {radius: 10}).bindPopup("<h6>You are here</h6>").addTo(map)
+		navIsOn = true;
+	}else{
+		map.removeLayer(theLocation)
+		navIsOn = false;
+	}
+}
+
 // Whenever the modal is closed...
 $('.modal').on('hidden.bs.modal', function () {
 	$("#map").append($(".leaflet-control-container").addClass( "leaflet-control-container-tablet-custom" ));
@@ -1425,6 +1454,8 @@ var tabletCustomControl = L.Control.extend({
 		return container;
 	}
 })
+
+
 
 // Just a temp. function for demonstrating legend construction
 function demoLegend(){
