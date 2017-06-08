@@ -1919,6 +1919,7 @@ function dispatchLegendClick(level1Selected){
 		levelEngaged = 1;
 		$("#legend-back").hide();
 		$(".legend-header").show();
+		replaceQueryValue("polygonFilter", undefined)
 	}
 	// level1Selected = level1Selected;
 	switchLevel(levelEngaged, level1Selected);
@@ -2072,7 +2073,7 @@ function makePointOrLineLegendItem(item){
 
 function displayLevel1Label(level1Selected){
 	//display the selected level one so the user knows there was some change
-	$("#level1Label").html(titleCase(level1Selected))
+	$("#level1Label").html(titleCase(level1Selected.split("_").join(" ")))
 
 	//figure out positioning
 	var boxHeight = $("#legendHolder").height();
