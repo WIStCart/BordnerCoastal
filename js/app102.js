@@ -37,6 +37,11 @@ var points;
 var pointTypeSelected;
 var histogramScale = "linear";
 var showInfoboxOnHover = true;
+var basemapChoice = "streets";
+
+var labelsAreOn = false;
+var countiesAreOn = false;
+var townshipsAreOn = false;
 
 // Overlay definitions:
 var labelsOverlay = L.tileLayer('http://{s}.tile.stamen.com/toner-labels/{z}/{x}/{y}.png', {
@@ -213,6 +218,7 @@ window.onload = function() {
 		maxZoom: 18
 	});
 
+
 	// Add county layer
 	var cartoCSSCounty = "#layer { " +
 	  "polygon-fill: #374C70;" +
@@ -238,9 +244,12 @@ window.onload = function() {
 			layerIndex:4
 	}]
 	}, { https: true })
-	.addTo(map)
+	// .addTo(map)
 	.done(function(layer){
 		counties = layer;
+		if (countiesAreOn){
+			$("#counties").trigger('click') //add to the map
+		}
 	})
 
 	// Add township layer
@@ -269,27 +278,14 @@ window.onload = function() {
 			layerIndex:3
 	}]
 	}, { https: true })
-	.addTo(map)
+	// .addTo(map)
 	.done(function(layer){
 		townships = layer;
+		if (townshipsAreOn){
+			$("#townships").trigger('click') //add to the map
+		}
 	})
 
-	// // add bordner lines layer
-	// var cartoCSSLines = "#layer { " +
-	// 	  "line-color: #000000;"+
-	// 	  "line-width: 0.5;"+
-	// 	  "line-opacity: 1;"+
-	// 	"[line_type='ARR']{"+
-	// 	  "line-color: #e410dd;"+
-	// 	  "line-width: 0.5;"+
-	// 	  "line-opacity: 1;"+
-	// 	"}"+
-	// 	"[line_type='TL']{"+
-	// 	  "line-color: #10e417;"+
-	// 	  "line-width: 0.5;"+
-	// 	  "line-opacity: 1;"+
-	// 	"}"+
-	// "}"
 
 var cartoCSSLines = getLineCSS('none')
 
@@ -341,6 +337,7 @@ var cartoCSSLines = getLineCSS('none')
 	}, { https: true })
 	.done(function(layer){
 		density1 = layer;
+
 	});
 
 	// add bordner layer
@@ -400,8 +397,81 @@ var cartoCSSLines = getLineCSS('none')
 		})
 
 
+	//add stateful URL
+	var hash = new L.Hash(map);
+	parseURL();
+
+
 	setUpMap();
-};
+}; // end of onLoad
+
+
+function parseURL(){
+	//get URL parameters and set them as variables here
+	//choose what feature types are displayed
+	featureTypeParam = getParameterByName("featureType")
+	if (validateFeatureTypeParam(featureTypeParam)){
+		legendType = featureTypeParam
+	}
+
+	//choose the basemap
+	basemapParam = getParameterByName("basemap")
+	if (validateBasemapParam(basemapParam)){
+		basemapChoice = basemapParam
+	}
+
+	//overlays
+	countyParam = getParameterByName("showCounties")
+	if (validateBooleanParam(countyParam)){
+		countiesAreOn = true;
+	}else{
+		countiesAreOn = false;
+	}
+
+	PLSSParam = getParameterByName("showPLSS")
+	if (validateBooleanParam(PLSSParam)){
+		townshipsAreOn = true;
+	}else{
+		townshipsAreOn = false;
+	}
+
+	labelParam = getParameterByName("showLabels")
+	if (validateBooleanParam(labelParam)){
+		labelsAreOn = true;
+	}else{
+		labelsAreOn = false;
+	}
+
+
+} // end parse URL
+
+function validateBasemapParam(param){
+	var basemapChoices = ["streets", "satellite"]
+	if (basemapChoices.indexOf(param) > -1){
+		return true
+	}else{
+		return false
+	}
+}
+
+function validateFeatureTypeParam(param){
+	var featureTypeChoices = ["poylgons", "lines", "points"];
+	if (featureTypeChoices.indexOf(param) > -1){
+		return true;
+	}else{
+		return false;
+	}
+}
+
+function validateBooleanParam(param){
+	var paramChoices = ["true", true]
+	if (paramChoices.indexOf(param) > -1){
+		return true
+	}
+	return false;
+}
+
+
 
 // function for setting up the two sublayers - will turn off the sublayer if it is "hidden"
 function setupSublayer(layer, _levelEngaged, _visibility){
@@ -768,10 +838,10 @@ function setUpMap(){
 				'<label><input type="checkbox" name="overlayType" id="labelsOverlay">Labels</label>' +
 			'</div>' +
 			'<div class="checkbox">' +
-				'<label><input type="checkbox" name="overlayType" id="counties" checked>Counties</label>' +
+				'<label><input type="checkbox" name="overlayType" id="counties" >Counties</label>' +
 			'</div>' +
 			'<div class="checkbox">' +
-				'<label><input type="checkbox" name="overlayType" id="townships" checked>PLSS</label>' +
+				'<label><input type="checkbox" name="overlayType" id="townships" >PLSS</label>' +
 			'</div>' +
 			'<div class="checkbox">' +
 				'<label><input type="checkbox" name="overlayType" id="density1">Class 1 Density</label>' +
@@ -791,7 +861,7 @@ function setUpMap(){
 			"</div>" +
 			'<div class="col-xs-12">' +
 			'<label class="legend-label">Overlay Opacity</label>' +
-				'<input type="text" value="50" id="rangeSlider" data-slider-min="0" data-slider-max="100" data-slider-step="1" data-slider-value="50" data-slider-ticks="[0, 100]" data-slider-ticks-labels="[0, 100]">' +
+				'<input type="text" value="50" id="rangeSlider" data-slider-min="0" data-slider-max="100" data-slider-step="1" data-slider-value="' +  layerOpacity.polygons*100 + '" data-slider-ticks="[0, 100]" data-slider-ticks-labels="[0, 100]">' +
 				'</div>' +
 		'</div>')
 
@@ -809,15 +879,31 @@ function setUpMap(){
 	// $("#pointLegendHolder").addClass( "legend-holder-hidden" )
 
 	// Explicitly set the feature type(will likely use a stateful URL parameter in the future to drive this)
-	$( "#featurePolygons" ).trigger( "click" )
+	if (legendType == "polygons"){
+		$( "#featurePolygons" ).trigger( "click" )
+	}else if (legendType == "points"){
+		$( "#featurePoints" ).trigger( "click" )
+	}else if (legendType == "lines"){
+		$( "#featureLines" ).trigger( "click" )
+	}
+
 	// $("#featurePoints").trigger("click")
 		// --> $("#featurePolygons").prop("checked", true);
 		// --> $("#featurePoints").prop("checked", true);
 		// --> $("#featureLines").prop("checked", true);
 
 	// Explicitly set current basemap and click its radio button
-	currentBasemap = basemapB;
-	$( "#basemapB" ).trigger( "click" );
+	if (basemapChoice == "streets" ){
+		currentBasemap = basemapA;
+		$( "#basemapA" ).trigger( "click" );
+	}else if (basemapChoice == "satellite"){
+		currentBasemap = basemapB;
+		$( "#basemapB" ).trigger( "click" );
+	}else{
+		currentBasemap = basemapB;
+		$( "#basemapB" ).trigger( "click" );
+	}
+
 
 	// Fade-in the toc button and give it a click handler
 	$("#tocButton").addClass( "toc-button-unfade" );
@@ -847,6 +933,10 @@ function setUpMap(){
 	});
 
 	$("#layerList").addClass("closed")
+
+	if (labelsAreOn){
+		$("#labelsOverlay").trigger("click")
+	}
 
 	//close the layer list when the close button is clicked
 	$(".layer-list-close-btn").click(closeLayerList)
@@ -913,10 +1003,18 @@ function turnOnFeatureType(featureTypeCalled){
 		}
 	}else if (legendType == "lines"){
 		drawLineLegend();
-		showOnlyLines();
+		if ((typeof(bordner) == "undefined") || (typeof(points) == "undefined")){
+			setTimeout(function(featureTypeCalled){turnOnFeatureType(featureTypeCalled)}, 50) //this prevents on init load issues with undefined values
+		}else{
+			showOnlyLines();
+		}
 	}else if (legendType == "points"){
 		drawPointLegend();
-		showOnlyPoints();
+		if ((typeof(lines) == "undefined") || (typeof(bordner) == "undefined")){
+			setTimeout(function(featureTypeCalled){turnOnFeatureType(featureTypeCalled)}, 50) //this prevents on init load issues with undefined values
+		}else{
+			showOnlyPoints();
+		}
 	}
 }
 
@@ -956,7 +1054,6 @@ function turnOnBasemap(basemapCalled){
 
 // To turn on the appropriate basemap, note, the radio button's id must match the basemap's variable name
 function turnOnOverlay(overlayCalled){
-	console.log(overlayCalled)
 	if (map.hasLayer(window[overlayCalled])){
 		map.removeLayer(window[overlayCalled]);
 	}else{
@@ -1227,7 +1324,6 @@ function generateAllLayersQuery(boundsIn){
 }
 
 function generateSpecificLayerQuery(boundsIn, _level1Selected){
-	console.log(_level1Selected)
 	var classesSelected = getLevel1MemberSearch(_level1Selected)
 	var cartoQuery = "SELECT cov1, area FROM final_coastal_polygons WHERE (" + classesSelected +
 		") AND the_geom && ST_SetSRID(ST_MakeBox2D(ST_Point(" +
@@ -1581,7 +1677,6 @@ function wrap(text, width) {
 
 
 function dispatchLegendClick(level1Selected){
-	console.log(level1Selected)
 	if (+levelEngaged == 1){
 		//go from level one to level 2
 		levelEngaged = 2;
@@ -1604,7 +1699,6 @@ function drawLineLegend(){
 	for (var i=0; i < lineLegend.length; i++){
 		var symbol = lineLegend[i];
 		var legendEntry = makePointOrLineLegendItem(symbol);
-		console.log(legendEntry)
 		$("#legendHolder").append(legendEntry)
 	}
 	listenToLineLegend();
@@ -1759,7 +1853,6 @@ function hideLevel1Label(){
 
 // called upon click of legend item
 function switchLevel(_levelEngaged, _level1Selected){
-	console.log(_level1Selected)
 	level1Selected = _level1Selected
 	cartoCSSRules = getPolyStyle("level"+_levelEngaged, _level1Selected);
 	if (_levelEngaged == 2){
@@ -1939,4 +2032,14 @@ function titleCase(str) {
   }
    newstr = newstr.join(" ");
    return newstr;
+}
+
+function getParameterByName(name, url) {
+    if (!url) url = window.location.href;
+    name = name.replace(/[\[\]]/g, "\\$&");
+    var regex = new RegExp("[?&]" + name + "(=([^&#]*)|&|#|$)"),
+        results = regex.exec(url);
+    if (!results) return null;
+    if (!results[2]) return '';
+    return decodeURIComponent(results[2].replace(/\+/g, " "));
 }
