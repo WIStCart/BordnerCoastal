@@ -376,7 +376,6 @@ var cartoCSSLines = getLineCSS('none')
 	.addTo(map) // add cartodb layer and basemap to map object
 	.done(function(layer) {
 		bordner = layer;
-		layerOpacity.polygons = 0.65;
 		layer.setOpacity(layerOpacity);
 		layer.setInteraction(true);
 		setupSublayer(layer, 1, "visible");
@@ -415,8 +414,6 @@ var cartoCSSLines = getLineCSS('none')
 				points.bind('featureOver', onPointOver)
 				points.bind('featureOut', onPointOut)
 				points.setOpacity(layerOpacity)
-				replaceQueryValue("layerOpacity", this.value*100)
-
 				if ((legendType == "points") && (typeof(pointTypeSelected) !="undefined")){
 					setTimeout(function(){triggerPointOrLineLegendClick(pointTypeSelected)}, 100)
 				}
