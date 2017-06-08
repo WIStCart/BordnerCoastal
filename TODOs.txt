@@ -15,7 +15,7 @@ BUGS:
 4) In mobile: layer selector displays upon page load. It should be added to the layer list modal. 
 5) In mobile: Radio buttons are hard to press and are kind of ugly. We can consider styling them up (this applies to both mobile and desktop)
 6) In mobile: The top most controls are obfuscated in mobile/landscape view.
-7) When user zooms out, the filter applied on the legend persists. (I think we want this functionality, no?/ CS)(Fixed with legend update.)
+
 
 //////////////////////////////////////////
 DOWN THE ROAD:
@@ -80,3 +80,5 @@ SF: *DONE* Implement an accordion effect for legend transition from level1 to le
 4) (DONE)  Make the mouseover box in upper right dockable
 
 (DONE)Stateful URL 
+
+7) When user zooms out, the filter applied on the legend persists. (I think we want this functionality, no?/ CS)(Fixed with legend update.)
