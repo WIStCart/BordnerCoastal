@@ -20,7 +20,6 @@ BUGS:
 //////////////////////////////////////////
 DOWN THE ROAD:
 1) Locate me functionality - SCO, Jay. (HTTPS is now supported, Jay got us an SSL certificate for Mapple)
-2) Stateful URL 
 3) WHAI imagery
 4) Info/about pages, etc.
 5) Dictionary/key page for defining the classes better (seems lower priority right now)
@@ -79,3 +78,5 @@ SF: *DONE* Implement an accordion effect for legend transition from level1 to le
 6) Add a loader for cases when the user needs to wait.	(Did this for initial load / SF)
 1) (DONE) It does not appear that level 2 is consistently populating the map click popups 
 4) (DONE)  Make the mouseover box in upper right dockable
+
+(DONE)Stateful URL 
