@@ -32,7 +32,7 @@ var pointLegend = [{"type":" ","name":"Unknown","icon":"http://maps.sco.wisc.edu
 {"type":"RS","name":"?","icon":"http://maps.sco.wisc.edu/BordnerCoastal/BordnerIcon/unknown-15.svg","maxZoom":21,"minZoom":13,"color":"#000000"},
 {"type":"RU","name":"?","icon":"http://maps.sco.wisc.edu/BordnerCoastal/BordnerIcon/unknown-15.svg","maxZoom":21,"minZoom":13,"color":"#000000"},
 {"type":"S","name":"Store","icon":"http://maps.sco.wisc.edu/BordnerCoastal/BordnerIcon/building-15.svg","maxZoom":21,"minZoom":13,"color":"#000000"},
-{"type":"SH","name":"Summer Home","icon":"http://maps.sco.wisc.edu/BordnerCoastal/BordnerIcon/cummer-house-15.svg","maxZoom":21,"minZoom":13,"color":"#000000"},
+{"type":"SH","name":"Summer Home","icon":"http://maps.sco.wisc.edu/BordnerCoastal/BordnerIcon/summer-house-15.svg","maxZoom":21,"minZoom":13,"color":"#000000"},
 {"type":"Ski Jump","name":"Ski Jump","icon":"http://maps.sco.wisc.edu/BordnerCoastal/BordnerIcon/skiing-15.svg","maxZoom":21,"minZoom":13,"color":"#000000"},
 {"type":"SL","name":"?","icon":"http://maps.sco.wisc.edu/BordnerCoastal/BordnerIcon/unknown-15.svg","maxZoom":21,"minZoom":13,"color":"#000000"},
 {"type":"SP","name":"Spring","icon":"http://maps.sco.wisc.edu/BordnerCoastal/BordnerIcon/unknown-15.svg","maxZoom":21,"minZoom":13,"color":"#000000"},
