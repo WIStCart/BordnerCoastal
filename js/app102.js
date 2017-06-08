@@ -10,10 +10,10 @@ var bordner;
 var classConfigs = {};
 var level1Membership = {};
 var levelEngaged = "1";
-var level1Selected = "agriculture";
+var level1Selected = undefined;
 var sublayer1;
 var sublayer2;
-var layerOpacity = {polygons:0.65};
+var layerOpacity = 0.65;
 var legendType = "polygons";
 var counties;
 var townships;
@@ -37,6 +37,12 @@ var points;
 var pointTypeSelected;
 var histogramScale = "linear";
 var showInfoboxOnHover = true;
+var basemapChoice = "streets";
+
+var labelsAreOn = false;
+var countiesAreOn = false;
+var townshipsAreOn = false;
+var densityIsOn = false;
 
 // Overlay definitions:
 var labelsOverlay = L.tileLayer('http://{s}.tile.stamen.com/toner-labels/{z}/{x}/{y}.png', {
@@ -50,11 +56,11 @@ var terrainOverlay = L.tileLayer('http://{s}.tiles.wmflabs.org/hillshading/{z}/{
 });
 
 // Basemap definitions:
-var basemapA = L.tileLayer('http://{s}.basemaps.cartocdn.com/light_nolabels/{z}/{x}/{y}.png', {
+var streetsBasemap = L.tileLayer('http://{s}.basemaps.cartocdn.com/light_nolabels/{z}/{x}/{y}.png', {
 	attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, &copy; <a href="http://cartodb.com/attributions">CartoDB</a>'
 });
 
-var basemapB =  L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+var satelliteBasemap =  L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
 	attribution: 'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community'
 });
 
@@ -213,6 +219,7 @@ window.onload = function() {
 		maxZoom: 18
 	});
 
+
 	// Add county layer
 	var cartoCSSCounty = "#layer { " +
 	  "polygon-fill: #374C70;" +
@@ -238,9 +245,12 @@ window.onload = function() {
 			layerIndex:4
 	}]
 	}, { https: true })
-	.addTo(map)
+	// .addTo(map)
 	.done(function(layer){
 		counties = layer;
+		if (countiesAreOn){
+			$("#counties").trigger('click') //add to the map
+		}
 	})
 
 	// Add township layer
@@ -269,27 +279,14 @@ window.onload = function() {
 			layerIndex:3
 	}]
 	}, { https: true })
-	.addTo(map)
+	// .addTo(map)
 	.done(function(layer){
 		townships = layer;
+		if (townshipsAreOn){
+			$("#townships").trigger('click') //add to the map
+		}
 	})
 
-	// // add bordner lines layer
-	// var cartoCSSLines = "#layer { " +
-	// 	  "line-color: #000000;"+
-	// 	  "line-width: 0.5;"+
-	// 	  "line-opacity: 1;"+
-	// 	"[line_type='ARR']{"+
-	// 	  "line-color: #e410dd;"+
-	// 	  "line-width: 0.5;"+
-	// 	  "line-opacity: 1;"+
-	// 	"}"+
-	// 	"[line_type='TL']{"+
-	// 	  "line-color: #10e417;"+
-	// 	  "line-width: 0.5;"+
-	// 	  "line-opacity: 1;"+
-	// 	"}"+
-	// "}"
 
 var cartoCSSLines = getLineCSS('none')
 
@@ -307,8 +304,21 @@ var cartoCSSLines = getLineCSS('none')
 		.done(function(layer){
 			lines = layer
 			lines.setInteraction(true)
+
 			lines.bind('featureOver', onLineOver)
 			lines.bind('featureOut', onLineOut)
+
+			lines.setOpacity(layerOpacity)
+
+			if ((legendType == "lines") && (typeof(lineTypeSelected) !="undefined")){
+				setTimeout(function(){triggerPointOrLineLegendClick(lineTypeSelected)}, 100)
+			}
+			$('#rangeSlider').slider().on('change', function (ev) {
+					ev.preventDefault();
+					layerOpacity.points = this.value / 100;
+					lines.setOpacity(layerOpacity);
+					replaceQueryValue("layerOpacity", this.value)
+			});
 	})
 
 	// add bordner density1 layer
@@ -341,6 +351,7 @@ var cartoCSSLines = getLineCSS('none')
 	}, { https: true })
 	.done(function(layer){
 		density1 = layer;
+
 	});
 
 	// add bordner layer
@@ -365,18 +376,23 @@ var cartoCSSLines = getLineCSS('none')
 	.addTo(map) // add cartodb layer and basemap to map object
 	.done(function(layer) {
 		bordner = layer;
-		layerOpacity.polygons = 0.65;
-		layer.setOpacity(layerOpacity.polygons);
+		layer.setOpacity(layerOpacity);
 		layer.setInteraction(true);
 		setupSublayer(layer, 1, "visible");
 		setupSublayer(layer, 2, "hidden");
 		$('#rangeSlider').slider().on('change', function (ev) {
 			ev.preventDefault();
 			layerOpacity.polygons = this.value / 100;
-			layer.setOpacity(layerOpacity.polygons);
+			layer.setOpacity(layerOpacity);
+			replaceQueryValue("layerOpacity", this.value)
 		});
 		layer.bind('featureOver', onPolyOver)
 		layer.bind('featureOut', onPolyOut)
+
+		//dispatch the filter, if required in the url parameter
+		if ((typeof(level1Selected) != "undefined") && (legendType == "polygons")){
+			dispatchLegendClick(level1Selected)
+		}
 	});
 
 	var cartoCSSPoints = getPointCSS('none')
@@ -397,11 +413,188 @@ var cartoCSSLines = getLineCSS('none')
 				points.setInteraction(true)
 				points.bind('featureOver', onPointOver)
 				points.bind('featureOut', onPointOut)
+				points.setOpacity(layerOpacity)
+				if ((legendType == "points") && (typeof(pointTypeSelected) !="undefined")){
+					setTimeout(function(){triggerPointOrLineLegendClick(pointTypeSelected)}, 100)
+				}
+				$('#rangeSlider').slider().on('change', function (ev) {
+						ev.preventDefault();
+						layerOpacity = this.value / 100;
+						lines.setOpacity(layerOpacity);
+						replaceQueryValue("layerOpacity", this.value)
+				});
 		})
 
 
+	// //add stateful URL
+	// var hash = new L.Hash(map);
+	parseURL();
+
 	setUpMap();
-};
+}; // end of onLoad
+
+
+function parseURL(){
+	//get URL parameters and set them as variables here
+	//choose what feature types are displayed
+	featureTypeParam = $.query.get('featureType')
+	if (validateFeatureTypeParam(featureTypeParam)){
+		legendType = featureTypeParam
+	}
+
+	//choose the basemap
+	basemapParam = $.query.get('basemap');
+	if (validateBasemapParam(basemapParam)){
+		basemapChoice = basemapParam
+	}
+
+	//overlays
+	//show counties?
+	countyParam = $.query.get('showCounties')
+	if (validateBooleanParam(countyParam)){
+		countiesAreOn = countyParam;
+	}
+	//show PLSS overlays?
+	PLSSParam = $.query.get('showPLSS')
+	if (validateBooleanParam(PLSSParam)){
+		townshipsAreOn = PLSSParam == "true";
+	}
+
+	//show labels?
+	labelParam = $.query.get('showLabels')
+	if (validateBooleanParam(labelParam)){
+		labelsAreOn = labelParam == "true";
+	}
+
+//show density overlay
+	densityParam = $.query.get('showDensity')
+	if (validateBooleanParam(densityParam)){
+		densityIsOn = densityParam == "true"
+	}
+
+	//histogram scale parameter
+	histScaleParam = $.query.get("histogramScale")
+	if(validateHistgoramScaleParam(histScaleParam)){
+		histogramScale = histScaleParam
+	}
+
+	//show the info box
+	showInfoBoxParam = $.query.get("showInfo")
+	if(validateBooleanParam(showInfoBoxParam)){
+		showInfoboxOnHover = showInfoBoxParam == "true";
+	}
+
+	var zoom = $.query.get('zoom')
+	if ((!isNaN(+zoom)) && (+zoom > 0)){
+			map.setZoom(zoom)
+	}
+	var lat = $.query.get('latitude')
+	var lng =  $.query.get('longitude')
+
+	if ((lat != '') && (lng != '') && (!isNaN(+lat)) && (!isNaN(+lng))){
+		var center = new L.latLng(lat, lng)
+		console.log(center)
+		map.getCenter(center)
+	}
+
+	//set feature type queries
+
+	//select polygons
+	var polygonParam = $.query.get("polygonFilter")
+	if (validatePolygonFilterParam(polygonParam)){
+		level1Selected = polygonParam;
+	}
+
+	//select lines
+	var lineFilterParam = $.query.get("lineFilter")
+	if (validateLineFilterParam(lineFilterParam)){
+		lineTypeSelected = lineFilterParam
+	}
+
+	//select points
+	var pointFilterParam = $.query.get("pointFilter");
+	if (validatePointFilterParam(pointFilterParam)){
+		pointTypeSelected = pointFilterParam
+	}
+
+	//layer opacity
+	var layerOpacityParam = $.query.get("layerOpacity");
+	if (validateLayerOpacityParameter(layerOpacityParam)){
+		layerOpacity = layerOpacityParam / 100
+	}
+
+} // end parse URL
+
+function validateBasemapParam(param){
+	var basemapChoices = ["streets", "satellite"]
+	if (basemapChoices.indexOf(param) > -1){
+		return true
+	}else{
+		return false
+	}
+}
+
+function validateFeatureTypeParam(param){
+	var featureTypeChoices = ["poylgons", "lines", "points"];
+	if (featureTypeChoices.indexOf(param) > -1){
+		return true;
+	}else{
+		return false;
+	}
+}
+
+function validateBooleanParam(param){
+	var paramIsTrue = param == "true"
+	var paramIsFalse = param == "false"
+	if (paramIsTrue || paramIsFalse){
+		return true
+	}
+	return false;
+}
+
+function validateHistgoramScaleParam(param){
+	var paramChoices = ["log", "linear"]
+	if (paramChoices.indexOf(param) > -1){
+		return true
+	}
+	return false;
+}
+
+function validatePolygonFilterParam(param){
+	var paramChoices = _.keys(level1Membership)
+	if (paramChoices.indexOf(param) > -1){
+		return true
+	}
+	return false
+}
+
+function validateLineFilterParam(param){
+	var paramChoices = _.pluck(lineLegend, "type")
+	if (paramChoices.indexOf(param) > -1){
+		return true
+	}
+	return false;
+}
+
+function validatePointFilterParam(param){
+	var paramChoices = _.pluck(pointLegend, "type");
+	if (paramChoices.indexOf(param) > -1){
+		return true;
+	}
+	return false;
+}
+
+function validateLayerOpacityParameter(param){
+	param = +param
+	if ((!isNaN(param)) && (param >= 0) && (param <=100) && (param != '')){
+		return true
+	}
+}
+
+
+function triggerPointOrLineLegendClick(code){
+	$('[data-type="' + code + '"]').trigger('click')
+}
 
 // function for setting up the two sublayers - will turn off the sublayer if it is "hidden"
 function setupSublayer(layer, _levelEngaged, _visibility){
@@ -576,8 +769,15 @@ function onLineOver(e, latln, pxPos, data, layer){
 		var lineName = getPointOrLineNameFromCode(data.line_type, 'lines');
 		//only dispaly the infobox if the feature is within its zoom level
 		if (isFeatureInZoom(data.line_type, 'lines') && (showInfoboxOnHover)){
+			if (typeof(lineTypeSelected) == "undefined"){
 			$(".infobox").show()
 			$("#level1-set").html(lineName)
+			}else{
+				if (data.line_type == lineTypeSelected){
+					$(".infobox").show()
+					$("#level1-set").html(lineName)
+				}
+			}
 		}
 	}
 }
@@ -590,12 +790,14 @@ function onLineOut(e, latln, pxPos, data, layer){
 
 function onPointOver(e, latln, pxPos, data, layer){
 	if (legendType == "points"){
-		var pointName = getPointOrLineNameFromCode(data.point_type, 'points');
-		$("#level1-set").html(pointName)
-		if (isFeatureInZoom(data.point_type, 'points') && (showInfoboxOnHover)){
-			$(".infobox").show()
-			$("#level1-set").html(pointName)
-		}
+			var pointName = getPointOrLineNameFromCode(data.point_type, 'points');
+			if (isFeatureInZoom(data.point_type, 'points') && (showInfoboxOnHover)){
+				if ((typeof(pointTypeSelected) != "undefined") && (data.point_type != pointTypeSelected)){
+					return;
+				}
+				$(".infobox").show()
+				$("#level1-set").html(pointName)
+			}
 	}
 }
 
@@ -607,9 +809,18 @@ function onPointOut(e, latln, pxPos, data, layer){
 
 function onPolyOver(e, latln, pxPos, data, layer){
 	if ((legendType == "polygons") && showInfoboxOnHover ){
-		$(".infobox").show()
-		level1 = getLevel1FromCode(data.cov1)
-		$("#level1-set").html(level1)
+		if (typeof(level1Selected) == 'undefined'){
+			$(".infobox").show()
+			level1 = getLevel1FromCode(data.cov1)
+			$("#level1-set").html(level1)
+		}else{
+			var lev1 = getLevel1FromCode(data.cov1)
+			if (lev1.toLowerCase() == level1Selected.toLowerCase()){
+				$(".infobox").show()
+				level1 = getLevel1FromCode(data.cov1)
+				$("#level1-set").html(level1)
+			}
+		}
 	}
 }
 
@@ -626,14 +837,19 @@ function isFeatureInZoom(code, featureType){
 }
 
 function getPointOrLineNameFromCode(code, featureType){
+
 	if(featureType == "lines"){
 		var featureSet = lineLegend;
 	}else if (featureType == "points"){
 		var featureSet = pointLegend;
 	}
-	var theMatch = _.find(featureSet, function(d){return d.type == code});
-	var theName = theMatch.name;
+	var theMatch = _.where(featureSet, {type: code});
+	if (typeof(theMatch[0]) == "undefined"){
+		return "Not in legend"
+	}
+	var theName = theMatch[0].name;
 	return theName
+
 }
 
 function getZoomLevelsFromCode(code, featureType){
@@ -643,6 +859,9 @@ function getZoomLevelsFromCode(code, featureType){
 		var featureSet = pointLegend;
 	}
 	var theMatch = _.find(featureSet, function(d){return d.type == code});
+	if (typeof(theMatch) == "undefined"){
+		return "Not in legend"
+	}
 	var minZoom = theMatch.minZoom;
 	var maxZoom = theMatch.maxZoom;
 	return {minZoom: minZoom, maxZoom:maxZoom}
@@ -768,10 +987,10 @@ function setUpMap(){
 				'<label><input type="checkbox" name="overlayType" id="labelsOverlay">Labels</label>' +
 			'</div>' +
 			'<div class="checkbox">' +
-				'<label><input type="checkbox" name="overlayType" id="counties" checked>Counties</label>' +
+				'<label><input type="checkbox" name="overlayType" id="counties" >Counties</label>' +
 			'</div>' +
 			'<div class="checkbox">' +
-				'<label><input type="checkbox" name="overlayType" id="townships" checked>PLSS</label>' +
+				'<label><input type="checkbox" name="overlayType" id="townships" >PLSS</label>' +
 			'</div>' +
 			'<div class="checkbox">' +
 				'<label><input type="checkbox" name="overlayType" id="density1">Class 1 Density</label>' +
@@ -780,10 +999,10 @@ function setUpMap(){
 			'<label><input type="checkbox" name="showInfobox" id="showInfobox" checked>Show Info on Hover</label></div>' +
 			'<label class="legend-label">Basemap</label>' +
 			'<div class="radio">' +
-				'<label><input type="radio" name="basemapType" id="basemapA">Streets</label>' +
+				'<label><input type="radio" name="basemapType" id="streetsBasemap">Streets</label>' +
 			'</div>' +
 			'<div class="radio">' +
-				'<label><input type="radio" name="basemapType" id="basemapB">Satellite</label>' +
+				'<label><input type="radio" name="basemapType" id="satelliteBasemap">Satellite</label>' +
 			'</div>' +
 			'<div class="radio">' +
 				'<label><input type="radio" name="basemapType" id="basemapC" disabled>Historic Imagery</label>' +
@@ -791,7 +1010,7 @@ function setUpMap(){
 			"</div>" +
 			'<div class="col-xs-12">' +
 			'<label class="legend-label">Overlay Opacity</label>' +
-				'<input type="text" value="50" id="rangeSlider" data-slider-min="0" data-slider-max="100" data-slider-step="1" data-slider-value="50" data-slider-ticks="[0, 100]" data-slider-ticks-labels="[0, 100]">' +
+				'<input type="text" value="50" id="rangeSlider" data-slider-min="0" data-slider-max="100" data-slider-step="1" data-slider-value="' +  layerOpacity*100 + '" data-slider-ticks="[0, 100]" data-slider-ticks-labels="[0, 100]">' +
 				'</div>' +
 		'</div>')
 
@@ -801,6 +1020,7 @@ function setUpMap(){
 	$("#showInfobox").change(function(){
 		var isChecked = $(this).prop('checked');
 		showInfoboxOnHover = isChecked
+		replaceQueryValue("showInfo", isChecked)
 	})
 
 	// Hide point, line or poly legend as appropriate
@@ -809,15 +1029,31 @@ function setUpMap(){
 	// $("#pointLegendHolder").addClass( "legend-holder-hidden" )
 
 	// Explicitly set the feature type(will likely use a stateful URL parameter in the future to drive this)
-	$( "#featurePolygons" ).trigger( "click" )
+	if (legendType == "polygons"){
+		$( "#featurePolygons" ).trigger( "click" )
+	}else if (legendType == "points"){
+		$( "#featurePoints" ).trigger( "click" )
+	}else if (legendType == "lines"){
+		$( "#featureLines" ).trigger( "click" )
+	}
+
 	// $("#featurePoints").trigger("click")
 		// --> $("#featurePolygons").prop("checked", true);
 		// --> $("#featurePoints").prop("checked", true);
 		// --> $("#featureLines").prop("checked", true);
 
 	// Explicitly set current basemap and click its radio button
-	currentBasemap = basemapB;
-	$( "#basemapB" ).trigger( "click" );
+	if (basemapChoice == "streets" ){
+		currentBasemap = streetsBasemap;
+		$( "#streetsBasemap" ).trigger( "click" );
+	}else if (basemapChoice == "satellite"){
+		currentBasemap = satelliteBasemap;
+		$( "#satelliteBasemap" ).trigger( "click" );
+	}else{
+		currentBasemap = satelliteBasemap;
+		$( "#satelliteBasemap" ).trigger( "click" );
+	}
+
 
 	// Fade-in the toc button and give it a click handler
 	$("#tocButton").addClass( "toc-button-unfade" );
@@ -844,9 +1080,21 @@ function setUpMap(){
 			console.log("points")
 			refreshPoints();
 		}
+
+		//update query string with zoom/extent
+		replaceQueryValue("zoom", map.getZoom())
+		var center = map.getCenter();
+		var lat = center.lat;
+		var lng = center.lng
+		replaceQueryValue("latitude", lat);
+		replaceQueryValue("longitude", lng);
 	});
 
 	$("#layerList").addClass("closed")
+
+	if (labelsAreOn){
+		$("#labelsOverlay").trigger("click")
+	}
 
 	//close the layer list when the close button is clicked
 	$(".layer-list-close-btn").click(closeLayerList)
@@ -891,15 +1139,18 @@ function turnOnFeatureType(featureTypeCalled){
 		case "featurePolygons":
 			legendType = "polygons";
 			$(".legend-header").text("Area Features")
+			manageURLToPolygons();
 			break;
 		case "featureLines":
 			legendType = "lines"
 			$(".legend-header").text("Line Features")
+			manageURLToLines();
 			break;
 		case "featurePoints":
-			console.log("feature points called")
+			replaceQueryValue("featureType", "points");
 			legendType = "points"
 			$(".legend-header").text("Point Features")
+			manageURLToPoints();
 			break;
 		default:
 			console.log("unidentified feature type called")
@@ -910,14 +1161,45 @@ function turnOnFeatureType(featureTypeCalled){
 			setTimeout(function(featureTypeCalled){turnOnFeatureType(featureTypeCalled)}, 50) //this prevents on init load issues with undefined values
 		}else{
 			showOnlyPolygons();
+			$("#rangeSlider").slider('setValue', layerOpacity*100);
 		}
 	}else if (legendType == "lines"){
 		drawLineLegend();
-		showOnlyLines();
+		if ((typeof(bordner) == "undefined") || (typeof(points) == "undefined")){
+			setTimeout(function(featureTypeCalled){turnOnFeatureType(featureTypeCalled)}, 50) //this prevents on init load issues with undefined values
+		}else{
+			showOnlyLines();
+			$("#rangeSlider").slider('setValue', layerOpacity*100);
+		}
+
 	}else if (legendType == "points"){
 		drawPointLegend();
-		showOnlyPoints();
+		if ((typeof(lines) == "undefined") || (typeof(bordner) == "undefined")){
+			setTimeout(function(featureTypeCalled){turnOnFeatureType(featureTypeCalled)}, 50) //this prevents on init load issues with undefined values
+		}else{
+			showOnlyPoints();
+			$("#rangeSlider").slider('setValue', layerOpacity*100);
+		}
+
 	}
+}
+
+function manageURLToPolygons(){
+	replaceQueryValue("featureType", "polygons");
+	replaceQueryValue("lineFilter", null)
+	replaceQueryValue("pointFilter", null)
+}
+
+function manageURLToPoints(){
+	replaceQueryValue("featureType", "points");
+	replaceQueryValue("polygonFilter", null);
+	replaceQueryValue("lineFilter", null);
+}
+
+function manageURLToLines(){
+	replaceQueryValue("featureType", "lines");
+	replaceQueryValue("polygonFilter", null);
+	replaceQueryValue("pointFilter", null);
 }
 
 function showOnlyPolygons(){
@@ -952,15 +1234,30 @@ function turnOnBasemap(basemapCalled){
 	map.addLayer(window[basemapCalled]);
 	window[basemapCalled].bringToBack();
 	currentBasemap = window[basemapCalled]
+	replaceQueryValue("basemap", basemapCalled.replace("Basemap", ""));
 }
 
 // To turn on the appropriate basemap, note, the radio button's id must match the basemap's variable name
 function turnOnOverlay(overlayCalled){
-	console.log(overlayCalled)
 	if (map.hasLayer(window[overlayCalled])){
 		map.removeLayer(window[overlayCalled]);
+		didAdd = false;
 	}else{
 		map.addLayer(window[overlayCalled]);
+		didAdd = true;
+	}
+	reflectChangeLayerInQueryString(overlayCalled, didAdd)
+}
+
+function reflectChangeLayerInQueryString(overlayCalled, didAdd){
+	if (overlayCalled == "counties"){
+		replaceQueryValue("showCounties", didAdd)
+	}else if (overlayCalled == "townships"){
+		replaceQueryValue("showPLSS", didAdd)
+	}else if (overlayCalled == "labelsOverlay"){
+		replaceQueryValue("showLabels", didAdd)
+	}else if (overlayCalled == "density1"){
+		replaceQueryValue("showDensity", didAdd)
 	}
 }
 
@@ -1190,18 +1487,18 @@ function drawThisView(boundsIn, zoomIn, _levelEngaged, _level1Selected){
 					$("#legendHolder").empty();
 					$("#legendHolder").append("<div class='btn-group pull-right' role='group'><a id='logHist'>Log</a> | <a id='linearHist'>Linear</a></div>")
 					$("#logHist").click(function(){
-						console.log("Going to log")
 						histogramScale = "log";
 						$(this).addClass('active');
 						$("#linearHist").removeClass('active');
 						drawThisView(boundsIn, zoomIn, _levelEngaged, _level1Selected, histogramScale);
+						replaceQueryValue("histogramScale", "log")
 					})
 					$("#linearHist").click(function(){
-						console.log("Going to linear")
 						histogramScale = "linear";
 						drawThisView(boundsIn, zoomIn, _levelEngaged, _level1Selected);
 						$(this).addClass('active');
 						$("#logHist").removeClass('active');
+						replaceQueryValue("histogramScale", "linear")
 					})
 					if (histogramScale == "log"){
 						$("#logHist").addClass('active')
@@ -1227,7 +1524,6 @@ function generateAllLayersQuery(boundsIn){
 }
 
 function generateSpecificLayerQuery(boundsIn, _level1Selected){
-	console.log(_level1Selected)
 	var classesSelected = getLevel1MemberSearch(_level1Selected)
 	var cartoQuery = "SELECT cov1, area FROM final_coastal_polygons WHERE (" + classesSelected +
 		") AND the_geom && ST_SetSRID(ST_MakeBox2D(ST_Point(" +
@@ -1581,12 +1877,12 @@ function wrap(text, width) {
 
 
 function dispatchLegendClick(level1Selected){
-	console.log(level1Selected)
 	if (+levelEngaged == 1){
 		//go from level one to level 2
 		levelEngaged = 2;
 		$("#legend-back").show();
 		$(".legend-header").hide();
+		replaceQueryValue("polygonFilter", level1Selected.split(" ").join("_"))
 	}else{
 		//go from level 2 to level 1
 		levelEngaged = 1;
@@ -1604,7 +1900,6 @@ function drawLineLegend(){
 	for (var i=0; i < lineLegend.length; i++){
 		var symbol = lineLegend[i];
 		var legendEntry = makePointOrLineLegendItem(symbol);
-		console.log(legendEntry)
 		$("#legendHolder").append(legendEntry)
 	}
 	listenToLineLegend();
@@ -1637,6 +1932,7 @@ function listenToLineLegend(){
 			$("#legend-back").hide();
 			lineTypeSelected = undefined
 		})
+		replaceQueryValue("lineFilter", clickedType)
 	})
 
 	$(".legend-media").on('mouseover', function(e){
@@ -1703,6 +1999,7 @@ function listenToPointLegend(){
 			$("#legend-back").hide();
 			pointTypeSelected = undefined
 		})
+		replaceQueryValue("pointFilter", clickedType)
 	})
 
 	$(".legend-media").on('mouseover', function(e){
@@ -1759,7 +2056,6 @@ function hideLevel1Label(){
 
 // called upon click of legend item
 function switchLevel(_levelEngaged, _level1Selected){
-	console.log(_level1Selected)
 	level1Selected = _level1Selected
 	cartoCSSRules = getPolyStyle("level"+_levelEngaged, _level1Selected);
 	if (_levelEngaged == 2){
@@ -1939,4 +2235,50 @@ function titleCase(str) {
   }
    newstr = newstr.join(" ");
    return newstr;
+}
+
+function getParameterByName(name, url) {
+    if (!url) url = window.location.href;
+    name = name.replace(/[\[\]]/g, "\\$&");
+    var regex = new RegExp("[?&]" + name + "(=([^&#]*)|&|#|$)"),
+        results = regex.exec(url);
+    if (!results) return null;
+    if (!results[2]) return '';
+    return decodeURIComponent(results[2].replace(/\+/g, " "));
+}
+
+
+function updateQueryString(key, value, url) {
+    if (!url) url = window.location.href;
+    var re = new RegExp("([?&])" + key + "=.*?(&|#|$)(.*)", "gi"),
+        hash;
+
+    if (re.test(url)) {
+        if (typeof value !== 'undefined' && value !== null)
+            return url.replace(re, '$1' + key + "=" + value + '$2$3');
+        else {
+            hash = url.split('#');
+            url = hash[0].replace(re, '$1$3').replace(/(&|\?)$/, '');
+            if (typeof hash[1] !== 'undefined' && hash[1] !== null)
+                url += '#' + hash[1];
+            return url;
+        }
+    }
+    else {
+        if (typeof value !== 'undefined' && value !== null) {
+            var separator = url.indexOf('?') !== -1 ? '&' : '?';
+            hash = url.split('#');
+            url = hash[0] + separator + key + '=' + value;
+            if (typeof hash[1] !== 'undefined' && hash[1] !== null)
+                url += '#' + hash[1];
+            return url;
+        }
+        else
+            return url;
+    }
+}
+
+function replaceQueryValue(key, value){
+	newURL = updateQueryString(key, value);
+	window.history.replaceState({path: newURL}, '', newURL)
 }
