@@ -299,6 +299,7 @@ var cartoCSSLines = getLineCSS('none')
       sublayers: [{type: "cartodb",
 			sql: 'SELECT * FROM final_coastal_lines',
 			cartocss: cartoCSSLines,
+			interactivity: ['line_type'],
 			layerIndex: 5
 	}]
 }, { https: true })
@@ -306,6 +307,8 @@ var cartoCSSLines = getLineCSS('none')
 		.done(function(layer){
 			lines = layer
 			lines.setInteraction(true)
+			lines.bind('featureOver', onLineOver)
+			lines.bind('featureOut', onLineOut)
 	})
 
 	// add bordner density1 layer
@@ -372,6 +375,8 @@ var cartoCSSLines = getLineCSS('none')
 			layerOpacity.polygons = this.value / 100;
 			layer.setOpacity(layerOpacity.polygons);
 		});
+		layer.bind('featureOver', onPolyOver)
+		layer.bind('featureOut', onPolyOut)
 	});
 
 	var cartoCSSPoints = getPointCSS('none')
@@ -382,6 +387,7 @@ var cartoCSSLines = getLineCSS('none')
 	      sublayers: [{type: "cartodb",
 				sql: 'SELECT * FROM final_coastal_points',
 				cartocss: cartoCSSPoints,
+				interactivity: ['point_type'],
 				layerIndex: 6
 		}]
 	}, { https: true })
@@ -389,6 +395,8 @@ var cartoCSSLines = getLineCSS('none')
 			.done(function(layer){
 				points = layer
 				points.setInteraction(true)
+				points.bind('featureOver', onPointOver)
+				points.bind('featureOut', onPointOut)
 		})
 
 
@@ -531,28 +539,7 @@ function setupInteraction(layer, _levelEngaged, _visibility){
 	});
 
 	layer.bind('featureClick', onMapFeatureClick)
-
-
-	/* To display an infobox within a leaflet control */
-	var infoBox = layer.leafletMap.viz.addOverlay( {
-	  type: 'infobox',
-	  layer: layer,
-		template: '<div class="cartodb--content-wrapper"><p><span id="level1-set"></span></p></div>',
-	  // width: 75,
-	  position: 'top|right'
-	});
-
-	//render the box (no template features)
-	$('body').append(infoBox.render().el);
-
-	//manually change the popup text on mouseover
-	//only way to actually manipulate the data in the mouse events
-	layer.bind('featureOver', function(e, latln, pxPos, data, layer){
-		if (legendType == "polygons"){
-			level1 = getLevel1FromCode(data.cov1)
-			$("#level1-set").html(level1)
-		}
-	})
+	//manage the population of the infobox
 
 	setupGeocoderSearch()
 
@@ -579,6 +566,86 @@ function onMapClick(){
 		}
 			isInfowindowOpen = false;
 	}, 250) //timeout is important here in maintaining correct popup state
+}
+
+
+//functions for events on particular feature types
+
+function onLineOver(e, latln, pxPos, data, layer){
+	if (legendType == "lines"){
+		var lineName = getPointOrLineNameFromCode(data.line_type, 'lines');
+		//only dispaly the infobox if the feature is within its zoom level
+		if (isFeatureInZoom(data.line_type, 'lines')){
+			$(".infobox").show()
+			$("#level1-set").html(lineName)
+		}
+	}
+}
+
+function onLineOut(e, latln, pxPos, data, layer){
+	if (legendType == "lines"){
+		$(".infobox").hide()
+	}
+}
+
+function onPointOver(e, latln, pxPos, data, layer){
+	if (legendType == "points"){
+		var pointName = getPointOrLineNameFromCode(data.point_type, 'points');
+		$("#level1-set").html(pointName)
+		if (isFeatureInZoom(data.point_type, 'points')){
+			$(".infobox").show()
+			$("#level1-set").html(pointName)
+		}
+	}
+}
+
+function onPointOut(e, latln, pxPos, data, layer){
+	if(legendType == "points"){
+		$(".infobox").hide();
+	}
+}
+
+function onPolyOver(e, latln, pxPos, data, layer){
+	if (legendType == "polygons"){
+		$(".infobox").show()
+		level1 = getLevel1FromCode(data.cov1)
+		$("#level1-set").html(level1)
+	}
+}
+
+function onPolyOut(e, latln, pxPos, data, layer){
+	if (legendType == "polygons"){
+		$(".infobox").hide()
+	}
+}
+
+function isFeatureInZoom(code, featureType){
+	var zooms = getZoomLevelsFromCode(code, featureType);
+	var currentZoom = map.getZoom();
+	return ((currentZoom >= zooms.minZoom) && (currentZoom <= zooms.maxZoom))
+}
+
+function getPointOrLineNameFromCode(code, featureType){
+	if(featureType == "lines"){
+		var featureSet = lineLegend;
+	}else if (featureType == "points"){
+		var featureSet = pointLegend;
+	}
+	var theMatch = _.find(featureSet, function(d){return d.type == code});
+	var theName = theMatch.name;
+	return theName
+}
+
+function getZoomLevelsFromCode(code, featureType){
+	if(featureType == "lines"){
+		var featureSet = lineLegend;
+	}else if (featureType == "points"){
+		var featureSet = pointLegend;
+	}
+	var theMatch = _.find(featureSet, function(d){return d.type == code});
+	var minZoom = theMatch.minZoom;
+	var maxZoom = theMatch.maxZoom;
+	return {minZoom: minZoom, maxZoom:maxZoom}
 }
 
 
