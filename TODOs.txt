@@ -6,12 +6,10 @@ TODO:
 		*Recommended to reconsider the colors altogether (with color bordner maps for inspiration)
 
 4) Deal with stacked point and line features
-4) (in progress: SF)  Make the mouseover box in upper right dockable
-
 									   
 //////////////////////////////////////////
 BUGS:
-1) (DONE) It does not appear that level 2 is consistently populating the map click popups 
+
 2) In mobile: format the map click popup to be more narrow (perhaps less than about 320px so that iPhone 5 and like devices look good). We could also consider having the popup be docked to the top or bottom in mobile mode.
 3) In mobile: remove the hover box altogether.
 4) In mobile: layer selector displays upon page load. It should be added to the layer list modal. 
@@ -79,3 +77,5 @@ SF: *DONE* Implement an accordion effect for legend transition from level1 to le
 5) Work with HV on formula for creating the bar height on a log curve.(DONE/SF)
 3) (DONE /SF) Scale thresholds for point and line features
 6) Add a loader for cases when the user needs to wait.	(Did this for initial load / SF)
+1) (DONE) It does not appear that level 2 is consistently populating the map click popups 
+4) (DONE)  Make the mouseover box in upper right dockable
