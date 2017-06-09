@@ -26,14 +26,13 @@
 				<div class="col-sm-4 toc-button toc-button-open transition-class" id="tocButton">
 					<span id="tocIcon" class="icon-class glyphicon glyphicon-chevron-down transition-class"></span>
 				</div>
-				<div class="col-sm-12 legend-view transition-class clearfix" id="legend">
+				<div class="col-sm-12 transition-class clearfix" id="legend">
           <div id='legend-back' class='legend-bar'><span class="glyphicon glyphicon-chevron-left pull-left"></span>Back to overview</div>
           <div class='legend-bar' id='legend-header'>Legend</div>
           <div id="legendHolder" class="col-xs-12>"</div>
 				</div>
 			</div>
 		</div>
-		<h1 class="sampleClass"></h1>
 	</div>
 
 	<div id="layerListModal" class="modal fade" role="dialog">
@@ -49,6 +48,20 @@
       </div>
     </div>
 	</div>
+
+  <div id="legendModal" class="modal fade" role="dialog">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <h3 class='page-header'>The Legend</h3>
+        <div class="modal-body" id="legendModalBody">
+          <div id='modal-layerListHolder'></div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Done</button>
+        </div>
+      </div>
+    </div>
+  </div>
 
   <div id='layerList' class='transiton transition-class row clearfix'>
   </div>

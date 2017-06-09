@@ -792,7 +792,7 @@ function onLineOver(e, latln, pxPos, data, layer){
 }
 
 function onLineOut(e, latln, pxPos, data, layer){
-	if (legendType == "lines"){
+	if (legendType == "lines" &&(!showInfoboxOnHover)){
 		$(".infobox").hide()
 	}
 }
@@ -811,7 +811,7 @@ function onPointOver(e, latln, pxPos, data, layer){
 }
 
 function onPointOut(e, latln, pxPos, data, layer){
-	if(legendType == "points"){
+	if(legendType == "points" &&(!showInfoboxOnHover)){
 		$(".infobox").hide();
 	}
 }
@@ -834,7 +834,7 @@ function onPolyOver(e, latln, pxPos, data, layer){
 }
 
 function onPolyOut(e, latln, pxPos, data, layer){
-	if (legendType == "polygons"){
+	if (legendType == "polygons" &&(!showInfoboxOnHover)){
 		$(".infobox").hide()
 	}
 }
@@ -1021,11 +1021,9 @@ function setUpMap(){
 			'<div class="radio">' +
 				'<label><input type="radio" name="basemapType" id="basemapC" disabled>Historic Imagery</label>' +
 			'</div>' +
-					'</div>' +
-			'<div class="col-xs-12">' +
 			'<label class="legend-label">Overlay Opacity</label>' +
-			'<input type="text" value="50" id="rangeSlider" data-slider-min="0" data-slider-max="100" data-slider-step="1" data-slider-value="' +  layerOpacity*100 + '" data-slider-ticks="[0, 100]" data-slider-ticks-labels="[0, 100]" / >' +
-			"</div>")
+			'<input type="text" value="50" id="rangeSlider" data-slider-min="0" data-slider-max="100" data-slider-step="1" data-slider-value="' +  layerOpacity*100 + '" data-slider-ticks="[0, 100]"  / >' +
+		'</div>')
 
 	$('input[name=featureType]').click(function(){ turnOnFeatureType(this.id) });
 	$('input[name=basemapType]').click(function(){ turnOnBasemap(this.id) });
@@ -1038,6 +1036,7 @@ function setUpMap(){
 			$("#infoboxHolder").css({'top': '40px'})
 		}else{
 			$("#infoboxHolder").css({'top': '10px'})
+			$("#infobox").hide();
 		}
 	})
 
@@ -1334,40 +1333,38 @@ function toggleTOC(evt){
 
 // To configure desktop view (not called upon pageload - all HTML defaults to desktop styles)
 function transformToDesktop(){
-	$( "#toc" ).appendTo( $( "#tocParent" ) );
-	$( ".feature-type-radio-group" ).prependTo( $( "#layerList" ) );
-	$( "#legend" ).removeClass( "legend-off" );
-	$( "#layerList" ).removeClass( "layer-list-off" );
-    if ($( "#toc" ).hasClass( "toc-view-open" )){
-		$( ".level-1-label-text").addClass( "shade-level-1-label-text" );
-	}
-	if ($('.modal.in').length > 0){
-		$( "#tocModal" ).modal('hide');
-		$("#map").append($(".leaflet-control-container").addClass( "leaflet-control-container-tablet-custom" ));
-	}
+	// $( "#toc" ).appendTo( $( "#tocParent" ) );
+	// $( ".feature-type-radio-group" ).prependTo( $( "#layerList" ) );
+	// $( "#legend" ).removeClass( "legend-off" );
+	// $( "#layerList" ).removeClass( "layer-list-off" );
+  //   if ($( "#toc" ).hasClass( "toc-view-open" )){
+	// 	$( ".level-1-label-text").addClass( "shade-level-1-label-text" );
+	// }
+	// if ($('.modal.in').length > 0){
+	// 	$( "#tocModal" ).modal('hide');
+	// 	$("#map").append($(".leaflet-control-container").addClass( "leaflet-control-container-tablet-custom" ));
+	// }
+
+	$("#tocModal").modal('hide');
+	$("#infoModal").modal('hide');
 
 	$("#infoboxHolder").show();
 	$("#infoboxHolder").show();
 
 	$("#level1Label").css({'bottom': '200px'})
+
+	$("#toc").show();
 }
 
 // To configure tablet view (is called upon pageload)
 function transformToTablet(){
-	// console.log(typeomap.zoomControl)
-	// map.removeControl(map.zoomControl); //Remove the zoom
-	// $( "#toc" ).appendTo( $( "#tocModalDialogue" ) );
-	// setupMobileTOC()
-	// $( ".feature-type-radio-group" ).appendTo( $( "#legend" ) );
-	// $( ".level-1-label-text").removeClass( "shade-level-1-label-text" );
-	// if ($('.modal.in').length > 0){
-	// 	$( "#tocModal" ).modal('hide');
-	// }
 
 	$("#infoboxHolder").hide();
 	$("#infobox").hide();
 
 	$("#level1Label").css({'bottom': '10px'})
+
+	$("#toc").hide();
 }
 
 // Handles all click events from the 4 main UI buttons
@@ -1394,7 +1391,7 @@ function dispatchButtonClick(buttonClicked){
 		if (buttonClicked == 'locateMeButton'){
 			geoLocate();
 		}else if (buttonClicked == "legendButton"){
-
+			openLegendTablet();
 		}else if (buttonClicked == "layerListButton"){
 			openLayerListTablet();
 		} else if (buttonClicked == "infoButton"){
@@ -1409,59 +1406,6 @@ function dispatchButtonClick(buttonClicked){
 		}
 	}
 
-
-
-	//
-	// // If modal is not already open, then open it
-	// if ($('.modal.in').length <= 0){
-	// 	if ((desktopMode == true)&&((buttonClicked == "layerListButton") || (buttonClicked == "locateMeButton"))){
-	//
-	// 	}else{
-	// 		if (buttonClicked != 'locateMeButton'){
-	// 			// $( "#tocModal" ).modal();
-	// 			// If the table of contents is collapsed and we are in tablet mode, then open it by toggleTOC()
-	// 			// if (($( "#toc" ).hasClass( "toc-view-closed" )) && (desktopMode == false)){
-	// 			// 	toggleTOC();
-	// 			// }
-	// 			// modalAttachTOC();
-	// 		}
-	// 	}
-	// } //end if
-	// // Specific button events...
-	// switch(buttonClicked) {
-	// 	case "legendButton":
-	// 		// console.log("Legend TOC")
-	// 		// $( "#legend" ).removeClass( "legend-off" );
-	// 		// $( "#layerList" ).addClass( "layer-list-off" );
-	// 		break;
-	// 	case "layerListButton":
-	// 		console.log("Layer list button");
-	// 		// if ((desktopMode == true)&&(buttonClicked == "layerListButton")){
-	// 		// 	if ($( "#layerList" ).hasClass( "open" )){
-	// 		// 		closeLayerList();
-	// 		// 	}else{
-	// 		// 		openLayerList();
-	// 		// 	}
-	// 		// }else{
-	// 		// 	// $( "#legend" ).addClass( "legend-off" );
-	// 		// 	// $( "#layerList" ).removeClass( "layer-list-off" );
-	// 		// }
-	// 		break;
-	// 	case "infoButton":
-	// 		console.log("Info")
-	// 		// configInfoShareModal();
-	// 		break;
-	// 	case "shareButton":
-	// 		console.log("Share")
-	// 		// configInfoShareModal();
-	// 		break;
-	// 	case "geocodeButton":
-	// 		break;
-	// 	case "locateMeButton":
-	// 			geoLocate();
-	// 	default:
-	// 		return;
-	// }
 }
 
 function toggleLayerListDesktop(){
@@ -1496,6 +1440,39 @@ function openLayerListTablet(){
 function closeLayerListTablet(){
 	$("#modal-layerListHolder").empty();
 }
+
+function openLegendTablet(){
+	$("#legendModal").modal('show');
+	$("#legend").appendTo("#legendModalBody")
+	$("legendHolder").addClass("legend-holder-modal")
+	drawTabletLegend()
+}
+
+
+
+function drawTabletLegend(){
+	setTimeout(function(){ //wait for modal to be open
+		if (legendType == "polygons"){
+			drawThisView(map.getBounds(), map.getZoom(), levelEngaged, level1Selected);
+		}else if (legendType == "lines"){
+			drawLineLegend()
+		}else if (legendType == "points"){
+			drawPointLegend();
+		}
+	}, 250)
+	setTimeout(adjustTabletLegend, 500);
+}
+
+
+function adjustTabletLegend(){
+	d3.selectAll(".axis").style("fill", "black");
+	d3.selectAll(".axis").style("text-shadow", "none");
+	d3.selectAll(" text").style("fill", "black");
+}
+
+// function closeLegendTablet(){
+// 	$("#legendModalContent").empty();
+// }
 
 // ...
 function modalAttachTOC(){
@@ -1647,6 +1624,7 @@ function drawThisView(boundsIn, zoomIn, _levelEngaged, _level1Selected){
 						$("#linearHist").addClass('active')
 					}
 					drawPolygonHistogram(data, _levelEngaged, "#legendHolder", histogramScale);
+					adjustTabletLegend()
 				})
 				.error(function(errors) {
 					console.log("errors:" + errors);
@@ -1654,6 +1632,7 @@ function drawThisView(boundsIn, zoomIn, _levelEngaged, _level1Selected){
 		}else{
 			//zoom < 13
 			drawPolyFilter("#legendHolder", _levelEngaged, _level1Selected)
+			adjustTabletLegend()
 		}
 }
 
@@ -1674,6 +1653,7 @@ function generateSpecificLayerQuery(boundsIn, _level1Selected){
 }
 
 function drawPolyFilter(el, _levelEngaged, _level1Selected){
+	console.log("Drawing filter")
 	$(el).empty();
 	var level1Props = getLevel1Props();
 		// console.log(summary)
@@ -1681,6 +1661,7 @@ function drawPolyFilter(el, _levelEngaged, _level1Selected){
 		var height = $(el).height() - 15;
 
 		var margins = {top: 20, left: 30, right: 30, bottom: 100}
+		console.log(el)
 
 
 		if (height < 0){
@@ -1699,9 +1680,7 @@ function drawPolyFilter(el, _levelEngaged, _level1Selected){
 		//axes setup
 		var xScale = d3.scale.ordinal().rangeRoundBands([0, width], 0.05)
 
-			var yScale = d3.scale.linear().range([height, 0])
-
-
+		var yScale = d3.scale.linear().range([height, 0])
 
 		var xAxis = d3.svg.axis()
 			.scale(xScale)
