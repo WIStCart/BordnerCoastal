@@ -3,6 +3,25 @@ body{
 	overflow-x: hidden;
 }
 
+#layerList::-webkit-scrollbar-track
+{
+	-webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3);
+	border-radius: 10px;
+	background-color: #F5F5F5;
+}
+
+#layerList::-webkit-scrollbar
+{
+	width: 12px;
+	background-color: #041e2b;
+}
+
+#layerList::-webkit-scrollbar-thumb
+{
+	border-radius: 10px;
+	-webkit-box-shadow: inset 0 0 6px rgba(0,0,0,.3);
+	background-color: #041e2b;
+}
 /* apply this class for animation transitions between classes */
 .transition-class{
     -webkit-transition: all 0.5s ease;
@@ -11,15 +30,28 @@ body{
     transition: all 0.5s ease;
 }
 
-#layerListHolder{
-	height: 500px;
-	width: 300px;
-	display: none;
-}
 
 #layerList{
-	height: 100%;
-	width: 100%;
+	overflow-y: auto;
+	overflow-x: hidden;
+	border-radius: 10px;
+	height: 45%;
+	width: 30%;
+	position: absolute;
+	top: 10px;
+	left: 20px;
+	z-index: 10000;
+	border-radius: 10px;
+	min-height: 150px;
+	min-width: 250px;
+	background-color: #2c5875;
+	display: none;
+	padding: 10px;
+}
+
+
+.slider{
+	top: 5vh!important;
 }
 
 /* for css when *TABLET* mode is engaged */
@@ -88,7 +120,8 @@ body{
 /* for css when *DESKTOP* mode is engaged */
 @media (min-width: 768px){
 	.toc-view{
-		height: 20vh;
+		height: 20%;
+		min-height: 150px;
 		background-color: #619ec7 !important;
 	}
 	.map-view{
@@ -100,19 +133,13 @@ body{
 	.toc-button{
 		visibility: visible;
 	}
-	#layerListHolder{
-	    position: relative;
-		top: -75px;
-		left: 12px;
-	}
+
 
 	.layer-list-holder-closed{
 		width: 0px;
 		height: 0px;
 	}
-	#layerList{
-		width: 120%;
-	}
+
 }
 
 /* glyphicons */
@@ -153,19 +180,31 @@ body{
 	padding-left:5px;
 }
 .map-view-full{
-	height: 100vh!important;
+	height: 100%!important;
+	position: absolute;
+	top: 0px;
+	left: 0px;
 }
 .map-view-toc{
-	height: 80vh;
+	position: absolute;
+	top:0px;
+	left:0px;
+	height: 80%;
 }
 .toc-view{
 	padding:4px;
 }
 .toc-view-open{
-	height: 20vh!important;
+	position: absolute;
+	bottom: 0px;
+	left: 0px;
+	height: 20%!important;
 }
 .toc-view-closed{
-	height: 5vh;
+	height: 1%;
+	position: absolute;
+	bottom:0px;
+	left:0px;
 }
 
 /* toc elements  */
@@ -498,7 +537,7 @@ td{
 	text-shadow: black 0.1em 0.1em 0.2em;
 	z-index: 999;
 	position: absolute;
-	bottom: 200px;
+	bottom: 10%;
 	left: 10px;
 	display: none;
 }
@@ -598,12 +637,15 @@ button.active{
 	color: white;
 	text-shadow: black 0.1em 0.1em 0.2em;
 	font-size: 10px;
+	cursor: pointer;
 }
 
 #linearHist{
 	color: white;
 		text-shadow: black 0.1em 0.1em 0.2em;
 		font-size: 10px;
+		cursor: pointer;
+		padding-right: 25px;
 }
 
 .infobox{
@@ -686,6 +728,7 @@ button.active{
 #showInfoboxLabel{
 	padding-left: 5px!important;
 	height: 25px;
+
 }
 
 #modal-layerListHolder{

@@ -755,6 +755,9 @@ function setupInteraction(layer, _levelEngaged, _visibility){
 	})
 
 	$("#map").click(onMapClick)
+
+
+
 } //end setup interaction
 
 function onMapClick(){
@@ -914,15 +917,15 @@ function onMapFeatureClick(e, latln, pxPos, data, layer){
 }
 
 function disableMapInteractionEvents(){
-	map.dragging.disable();
-	map.touchZoom.disable();
-	map.doubleClickZoom.disable();
+	map._handlers.forEach(function(handler) {
+	    handler.disable();
+	});
 }
 
 function enableMapInteractionEvents(){
-	map.dragging.enable();
-	map.touchZoom.enable();
-	map.doubleClickZoom.enable();
+	map._handlers.forEach(function(handler) {
+	    handler.enable();
+	});
 }
 
 function setupGeocoderSearch(){
@@ -960,9 +963,6 @@ function setUpMap(){
 			'<div data-toggle="tooltip" title="share" class="leaflet-bar leaflet-control leaflet-control-custom" id="shareButton" onClick="dispatchButtonClick(this.id)">' +
 				'<span id="shareButtonIcon" class="button-icon-class glyphicon glyphicon-share-alt">' +
 			'</div></br>' +
-			'<div data-toggle="tooltip" title="Locate Me" class="leaflet-bar leaflet-control leaflet-control-custom" id="locateMeButton" onClick="dispatchButtonClick(this.id)">' +
-				'<span id="shareButtonIcon" class="button-icon-class glyphicon glyphicon-map-marker">' +
-			'</div></br>' +
 			'<div data-toggle="tooltip" title="layers" class="leaflet-bar leaflet-control leaflet-control-custom" id="layerListButton" onClick="dispatchButtonClick(this.id)">' +
 				'<span id="layerListButtonIcon" class="button-icon-class glyphicon glyphicon-menu-hamburger">' +
 			'</div></br>' +
@@ -971,14 +971,19 @@ function setUpMap(){
 			'</div></br>' +
 			'<div data-toggle="tooltip" title="Search" class="leaflet-bar leaflet-control leaflet-control-custom" id="geocodeButton" onClick="dispatchButtonClick(this.id)">' +
 				'<span id="geocodeButtonIcon" class="button-icon-class glyphicon glyphicon-globe"></span>' +
-			'</div></br>' +
-			'<div class="leaflet-bar leaflet-control layer-list-holder-closed transition-class closed" id="layerListHolder"></div></br>'
+			'</div></br>'
 		)
 
-	$("#layerListHolder")
+	map.addControl(new geolocationControl({position: 'bottomright'}));
+	$(".geolocation-control").html(
+		'<div data-toggle="tooltip" title="Locate Me" class="leaflet-bar leaflet-control leaflet-control-custom" id="locateMeButton" onClick="dispatchButtonClick(this.id)">' +
+		'<span id="shareButtonIcon" class="button-icon-class glyphicon glyphicon-map-marker">' +
+		'</div></br>'
+	)
+
+	$("#layerList")
 		.html(
-			'<div class="layer-list-view transition-class row clearfix" id="layerList">' +
-			'<button class="btn btn-primary btn-sm btn-close layer-list-close-btn pull-right"><span class="glyphicon glyphicon-remove"></span></button>' +
+		'<button class="btn btn-primary btn-sm btn-close layer-list-close-btn pull-right"><span class="glyphicon glyphicon-remove"></span></button>' +
 		'<h4 class="layer-list-header">Table of Contents</h4>' +
 		'<div class="col-xs-12" id="layerListBody">' +
 		'<label class="legend-label">Feature Type</label>' +
@@ -1016,12 +1021,11 @@ function setUpMap(){
 			'<div class="radio">' +
 				'<label><input type="radio" name="basemapType" id="basemapC" disabled>Historic Imagery</label>' +
 			'</div>' +
+					'</div>' +
 			'<div class="col-xs-12">' +
 			'<label class="legend-label">Overlay Opacity</label>' +
-				'<input type="text" value="50" id="rangeSlider" data-slider-min="0" data-slider-max="100" data-slider-step="1" data-slider-value="' +  layerOpacity*100 + '" data-slider-ticks="[0, 100]" data-slider-ticks-labels="[0, 100]">' +
-				'</div>' +
-						"</div>" +
-		'</div>')
+			'<input type="text" value="50" id="rangeSlider" data-slider-min="0" data-slider-max="100" data-slider-step="1" data-slider-value="' +  layerOpacity*100 + '" data-slider-ticks="[0, 100]" data-slider-ticks-labels="[0, 100]" / >' +
+			"</div>")
 
 	$('input[name=featureType]').click(function(){ turnOnFeatureType(this.id) });
 	$('input[name=basemapType]').click(function(){ turnOnBasemap(this.id) });
@@ -1111,7 +1115,19 @@ function setUpMap(){
 	}
 
 	// //close the layer list when the close button is clicked
-	// $(".layer-list-close-btn").click(closeLayerList)
+	$(".layer-list-close-btn").click(function(){
+		console.log("been clicked")
+		if (desktopMode){
+			closeLayerListDesktop();
+		}
+	})
+
+
+	map.on('move', function(){
+		if (desktopMode){
+			closeLayerListDesktop();
+		}
+	})
 
 	// Done, tell the console!
 	console.log("setUpMap() complete. desktopMode = " + desktopMode)
@@ -1132,6 +1148,7 @@ function refreshPoints(){
 
 // Media query for when the app traverses the tablet/desktop threshold
 var jsMediaQuery = function() {
+	console.log("Called")
 	if (window.matchMedia('(max-width: 768px)').matches){
 		if (desktopMode){
 			desktopMode = false;
@@ -1292,6 +1309,7 @@ function toggleTOC(evt){
 		if (desktopMode){
 			$("#neatline").show();
 		}
+			setTimeout(function(){ map.invalidateSize()}, 450)
 	}else{ //is open
 		isTOCOpen = true;
 		if (desktopMode){
@@ -1455,15 +1473,15 @@ function toggleLayerListDesktop(){
 }
 
 function closeLayerListDesktop(){
-	// isTOCOpen = false;
-	// $("#layerList").addClass('closed').removeClass('open')
-	// $("#layerListHolder").hide();
+	isTOCOpen = false;
+	$("#layerList").addClass('closed').removeClass('open')
+	$("#layerList").hide();
 }
 
 function openLayerListDesktop(){
-	// isTOCOpen = true;
-	// $("#layerList").addClass('open').removeClass('closed')
-	// $("#layerListHolder").show();
+	isTOCOpen = true;
+	$("#layerList").addClass('open').removeClass('closed')
+	$("#layerList").show();
 }
 
 
@@ -1503,17 +1521,16 @@ function geoLocate(){
 }
 
 function displayUserLocation(pos){
-	if (!navIsOn){
-		var lat = pos.coords.latitude;
-		var lng = pos.coords.longitude
-		// var point = new L.latLng(lat, lng);
-		theLocation = L.circleMarker([lat, lng], {radius: 10}).bindPopup("<h6>You are here</h6>").addTo(map)
-		navIsOn = true;
-		map.setView([lat, lng])
-	}else{
+	if (navIsOn){
 		map.removeLayer(theLocation)
-		navIsOn = false;
 	}
+
+	var lat = pos.coords.latitude;
+	var lng = pos.coords.longitude
+	// var point = new L.latLng(lat, lng);
+	theLocation = L.circleMarker([lat, lng], {radius: 10}).bindPopup("<h6>You are here</h6>").addTo(map)
+	navIsOn = true;
+	map.setView([lat, lng])
 }
 
 // Whenever the modal is closed...
@@ -1534,6 +1551,16 @@ var tabletCustomControl = L.Control.extend({
 	},
 	onAdd: function (map) {
 		var container = L.DomUtil.create('div', 'tablet-custom-control');
+		return container;
+	}
+})
+
+var geolocationControl = L.Control.extend({
+	options: {
+		position: "bottomright"
+	},
+	onAdd: function(map){
+		var container = L.DomUtil.create("div", "geolocation-control")
 		return container;
 	}
 })
@@ -1653,8 +1680,19 @@ function drawPolyFilter(el, _levelEngaged, _level1Selected){
 		var width = $(el).width();
 		var height = $(el).height() - 15;
 
-		//dimension setup
 		var margins = {top: 20, left: 30, right: 30, bottom: 100}
+
+
+		if (height < 0){
+			return;
+		}
+
+		if (height < 100){
+			height = 200;
+			margins.bottom = 50;
+		}
+
+		//dimension setup
 		height = height - margins.top - margins.bottom;
 		width = width - margins.left - margins.right;
 
@@ -1681,7 +1719,7 @@ function drawPolyFilter(el, _levelEngaged, _level1Selected){
 
 		svg.append("g")
 			.attr("class", " x axis selector-axis")
-			.attr("transform", "translate(0," + height + ")")
+			.attr("transform", "translate(0,50)")
 			.call(xAxis)
 			.selectAll(".tick text")
 				.call(wrap, xScale.rangeBand())
@@ -1768,12 +1806,21 @@ function shadeRGBColor(color, percent) {
 function drawPolygonHistogram(data, _levelEngaged, el, histogramScale){
 	var summary = summarize(data, _levelEngaged)
 
+	if (_levelEngaged == 2){
+		summary.reverse();
+	}
+
 	// console.log(summary)
 	var margins = {top: 20, left: 75, right: 30, bottom: 30}
 
 	var height = $(el).height() - 50;
 	if (height < 0){
 		return;
+	}
+
+	if (height < 100){
+		height = 200;
+		margins.bottom = 50;
 	}
 
 	if (_levelEngaged == 2){
@@ -1788,9 +1835,13 @@ function drawPolygonHistogram(data, _levelEngaged, el, histogramScale){
 		var width = $(el).width();
 	}
 
+
+
 	//dimension setup
 	height = height - margins.top - margins.bottom;
 	width = width - margins.left - margins.right;
+
+
 
 	//axes setup
 	var xScale = d3.scale.ordinal().rangeRoundBands([0, width], 0.05)
@@ -1799,9 +1850,6 @@ function drawPolygonHistogram(data, _levelEngaged, el, histogramScale){
 	}else if (histogramScale == "log"){
 		var yScale = d3.scale.log().range([height, 0])
 	}
-
-	console.log(yScale.range())
-	console.log()
 
 	var xAxis = d3.svg.axis()
 		.scale(xScale)
@@ -1840,9 +1888,6 @@ function drawPolygonHistogram(data, _levelEngaged, el, histogramScale){
 		.attr('class', 'y axis')
 		.call(yAxis)
 
-		console.log(height)
-		console.log(margins)
-
 	//add a background rectange to listen for click events
 	svg.selectAll("background")
 		.data(summary)
@@ -1871,10 +1916,8 @@ function drawPolygonHistogram(data, _levelEngaged, el, histogramScale){
 					var newColor = shadeRGBColor(oldColor, -0.25)
 					self.style('fill', newColor)
 					d3.selectAll("." + d.type.split(" ").join("_")).style('fill', newColor)
+					self.attr('cursor', 'pointer')
 				}
-				//make taller
-				// self.attr('y', 0)
-				// self.attr('height', height)
 			})
 			.on('mouseout', function(d){
 				if (_levelEngaged == 1){
@@ -1882,6 +1925,7 @@ function drawPolygonHistogram(data, _levelEngaged, el, histogramScale){
 					var oldColor = self.attr('data-fill')
 					self.style('fill', oldColor)
 				 d3.selectAll("." + d.type.split(" ").join("_")).style('fill', oldColor)
+				 self.attr('cursor', 'default')
 				}
 			})
 
@@ -1915,6 +1959,7 @@ function drawPolygonHistogram(data, _levelEngaged, el, histogramScale){
 					self.attr('data-fill', oldColor)
 					var newColor = shadeRGBColor(oldColor, -0.25)
 					d3.selectAll("." + d.type.split(" ").join("_")).style('fill', newColor)
+					self.attr('cursor', 'pointer')
 				}
 			})
 			.on('mouseout', function(d){
@@ -1922,6 +1967,7 @@ function drawPolygonHistogram(data, _levelEngaged, el, histogramScale){
 					var self = d3.select(this)
 					var oldColor = self.attr('data-fill')
 				  d3.selectAll("." + d.type.split(" ").join("_")).style('fill', oldColor)
+					self.attr('cursor', 'default')
 				}
 			})
 
