@@ -118,7 +118,7 @@ function getLineCSS(lineTypeSelected, zoomIn){
 			var thisMinZoom = lineLegend[i].minZoom
 			var thisMaxZoom = lineLegend[i].maxZoom
 			if ((zoomIn <= thisMaxZoom) && (zoomIn >= thisMinZoom)){
-			 thisStyle ="[line_type='" + lineLegend[i].type + "']{line-color: " + lineLegend[i].color + "; line-opacity: 1;}"
+			 thisStyle ="[line_type='" + lineLegend[i].type + "']{" + lineLegend[i].css + "}"
 			}else{
 				 thisStyle = "[line_type='" + lineLegend[i].type + "']{line-opacity: 0;}"
 			}
@@ -132,7 +132,7 @@ function getLineCSS(lineTypeSelected, zoomIn){
 		for (var i=0; i < lineLegend.length; i++){
 			var thisLineType = lineLegend[i].type
 			if (lineTypeSelected.toLowerCase() === thisLineType.toLowerCase()){
-				var thisStyle = "[line_type='" + thisLineType + "']{line-opacity: 1; line-color: " + lineLegend[i].color + ";}; "
+				var thisStyle = "[line_type='" + thisLineType + "']{" + lineLegend[i].css + "};"
 				style += thisStyle
 			}//end if
 		} //end loop
