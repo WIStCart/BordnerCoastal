@@ -27,7 +27,7 @@ var infowindowVars = ['cov1','cov2', 'cov3', 'cov4', 'cov5',
 var polygonLegend; //svg polygon legend
 var level1Colors;
 var level2Colors;
-var polygonLegendFactor = 1e6;
+var polygonLegendFactor = 0.000247105;
 var isInfowindowOpen = false;
 var isTOCOpen = false;
 var infowindow;
@@ -774,7 +774,7 @@ function onLineOver(e, latln, pxPos, data, layer){
 	if (legendType == "lines"){
 		var lineName = getPointOrLineNameFromCode(data.line_type, 'lines');
 		//only dispaly the infobox if the feature is within its zoom level
-		if (isFeatureInZoom(data.line_type, 'lines') && (showInfoboxOnHover)){
+		if (isFeatureInZoom(data.line_type, 'lines') && (showInfoboxOnHover) && desktopMode){
 			if (typeof(lineTypeSelected) == "undefined"){
 			$(".infobox").show()
 			$("#level1-set").html(lineName)
@@ -798,7 +798,7 @@ function onPointOver(e, latln, pxPos, data, layer){
 	if (legendType == "points"){
 			var pointName = getPointOrLineNameFromCode(data.point_type, 'points');
 			if (isFeatureInZoom(data.point_type, 'points') && (showInfoboxOnHover)){
-				if ((typeof(pointTypeSelected) != "undefined") && (data.point_type != pointTypeSelected)){
+				if ((typeof(pointTypeSelected) != "undefined") && (data.point_type != pointTypeSelected) && desktopMode){
 					return;
 				}
 				$(".infobox").show()
@@ -814,7 +814,7 @@ function onPointOut(e, latln, pxPos, data, layer){
 }
 
 function onPolyOver(e, latln, pxPos, data, layer){
-	if ((legendType == "polygons") && showInfoboxOnHover ){
+	if ((legendType == "polygons") && showInfoboxOnHover && desktopMode){
 		if (typeof(level1Selected) == 'undefined'){
 			$(".infobox").show()
 			level1 = getLevel1FromCode(data.cov1)
@@ -929,21 +929,22 @@ function setupGeocoderSearch(){
 	//render the template
 	var v = cdb.vis.Overlay.create("search", map.viz, {})
 	v.show();
-	$("#geocodeButton").html(v.render().el)
-	//jquery magic to make it look nicer
-	$("geocodeButton").width('100%');
-	$(".cartodb-searchbox").width('100%');
+	// $("#geocodeButton").append(v.render().el)
+	var searcher = v.render().el
+	// jquery magic to make it look nicer
+	// $("geocodeButton").width('100%');
+	// $(".cartodb-searchbox").width('100%');
 	$(".text").hide();
 	$("#geocodeButton").on('mouseover', function(){
-		$(this).width("200%")
-		$(".cartodb-searchbox").width('200%');
 		$(".text").show();
+		$("#geocodeButtonIcon").replaceWith(searcher);
 	})
-	$("#geocodeButton").on("mouseout", function(){
-		$(this).width("28px")
-		$(".cartodb-searchbox").width('28px')
-		$('.text').val("")
-		$(".text").hide();
+	//close the geocoder when the map's been clicked or moved
+	map.on('click', function(){
+		$(".cartodb-searchbox").replaceWith('<span id="geocodeButtonIcon" class="button-icon-class glyphicon glyphicon-globe"></span>');
+	})
+	map.on('moveend', function(){
+		$(".cartodb-searchbox").replaceWith('<span id="geocodeButtonIcon" class="button-icon-class glyphicon glyphicon-globe"></span>');
 	})
 }
 
@@ -966,9 +967,10 @@ function setUpMap(){
 				'<span id="layerListButtonIcon" class="button-icon-class glyphicon glyphicon-menu-hamburger">' +
 			'</div></br>' +
 			'<div data-toggle="tooltip" title="legend" class="leaflet-bar leaflet-control leaflet-control-custom" id="legendButton" onClick="dispatchButtonClick(this.id)">' +
-				'<span id="legendButtonIcon" class="button-icon-class glyphicon glyphicon-option-horizontal">' +
+				'<span id="legendButtonIcon" class="button-icon-class glyphicon glyphicon-stats">' +
 			'</div></br>' +
-			'<div data-toggle="tooltip" title="search" class="leaflet-bar leaflet-control leaflet-control-custom leaflet-search-control" id="geocodeButton">' +
+			'<div data-toggle="tooltip" title="Search" class="leaflet-bar leaflet-control leaflet-control-custom" id="geocodeButton" onClick="dispatchButtonClick(this.id)">' +
+				'<span id="geocodeButtonIcon" class="button-icon-class glyphicon glyphicon-globe"></span>' +
 			'</div></br>' +
 			'<div class="leaflet-bar leaflet-control layer-list-holder-closed transition-class closed" id="layerListHolder"></div></br>'
 		)
@@ -978,7 +980,7 @@ function setUpMap(){
 			'<div class="layer-list-view transition-class row clearfix" id="layerList">' +
 			'<button class="btn btn-primary btn-sm btn-close layer-list-close-btn pull-right"><span class="glyphicon glyphicon-remove"></span></button>' +
 		'<h4 class="layer-list-header">Table of Contents</h4>' +
-		'<div class="col-xs-12">' +
+		'<div class="col-xs-12" id="layerListBody">' +
 		'<label class="legend-label">Feature Type</label>' +
 			'<div class="feature-type-radio-group">' +
 				'<div class="radio">' +
@@ -1004,7 +1006,7 @@ function setUpMap(){
 			'<div class="checkbox">' +
 				'<label><input type="checkbox" name="overlayType" id="density1">Class 1 Density</label>' +
 			'</div>' +
-			'<label class="legend-label">Basemap</label>' + 
+			'<label class="legend-label">Basemap</label>' +
 			'<div class="radio">' +
 				'<label><input type="radio" name="basemapType" id="streetsBasemap">Streets</label>' +
 			'</div>' +
@@ -1014,11 +1016,11 @@ function setUpMap(){
 			'<div class="radio">' +
 				'<label><input type="radio" name="basemapType" id="basemapC" disabled>Historic Imagery</label>' +
 			'</div>' +
-			"</div>" +
 			'<div class="col-xs-12">' +
 			'<label class="legend-label">Overlay Opacity</label>' +
 				'<input type="text" value="50" id="rangeSlider" data-slider-min="0" data-slider-max="100" data-slider-step="1" data-slider-value="' +  layerOpacity*100 + '" data-slider-ticks="[0, 100]" data-slider-ticks-labels="[0, 100]">' +
 				'</div>' +
+						"</div>" +
 		'</div>')
 
 	$('input[name=featureType]').click(function(){ turnOnFeatureType(this.id) });
@@ -1108,8 +1110,8 @@ function setUpMap(){
 		$("#labelsOverlay").trigger("click")
 	}
 
-	//close the layer list when the close button is clicked
-	$(".layer-list-close-btn").click(closeLayerList)
+	// //close the layer list when the close button is clicked
+	// $(".layer-list-close-btn").click(closeLayerList)
 
 	// Done, tell the console!
 	console.log("setUpMap() complete. desktopMode = " + desktopMode)
@@ -1150,18 +1152,18 @@ function turnOnFeatureType(featureTypeCalled){
 	switch(featureTypeCalled) {
 		case "featurePolygons":
 			legendType = "polygons";
-			$(".legend-header").text("Area Features")
+			$("#legend-header").text("Area Features")
 			manageURLToPolygons();
 			break;
 		case "featureLines":
 			legendType = "lines"
-			$(".legend-header").text("Line Features")
+			$("#legend-header").text("Line Features")
 			manageURLToLines();
 			break;
 		case "featurePoints":
 			replaceQueryValue("featureType", "points");
 			legendType = "points"
-			$(".legend-header").text("Point Features")
+			$("#legend-header").text("Point Features")
 			manageURLToPoints();
 			break;
 		default:
@@ -1304,6 +1306,11 @@ function toggleTOC(evt){
 		$( "#tocIcon" ).addClass( "glyphicon-chevron-down" );
 		$( "#tocIcon" ).removeClass( "glyphicon-chevron-up" );
 		$("#neatline").hide()
+		setTimeout(function(){
+			console.log(levelEngaged)
+			console.log(level1Selected)
+			drawThisView(map.getBounds(), map.getZoom(), levelEngaged, level1Selected)
+		}, 500)
 	}
 }
 
@@ -1320,102 +1327,174 @@ function transformToDesktop(){
 		$( "#tocModal" ).modal('hide');
 		$("#map").append($(".leaflet-control-container").addClass( "leaflet-control-container-tablet-custom" ));
 	}
+
+	$("#infoboxHolder").show();
+	$("#infoboxHolder").show();
+
+	$("#level1Label").css({'bottom': '200px'})
 }
 
 // To configure tablet view (is called upon pageload)
 function transformToTablet(){
-	map.removeControl(map.zoomControl); //Remove the zoom
-	$( "#toc" ).appendTo( $( "#tocModalDialogue" ) );
-	$( ".feature-type-radio-group" ).appendTo( $( "#legend" ) );
-	$( ".level-1-label-text").removeClass( "shade-level-1-label-text" );
-	if ($('.modal.in').length > 0){
-		$( "#tocModal" ).modal('hide');
-	}
+	// console.log(typeomap.zoomControl)
+	// map.removeControl(map.zoomControl); //Remove the zoom
+	// $( "#toc" ).appendTo( $( "#tocModalDialogue" ) );
+	// setupMobileTOC()
+	// $( ".feature-type-radio-group" ).appendTo( $( "#legend" ) );
+	// $( ".level-1-label-text").removeClass( "shade-level-1-label-text" );
+	// if ($('.modal.in').length > 0){
+	// 	$( "#tocModal" ).modal('hide');
+	// }
+
+	$("#infoboxHolder").hide();
+	$("#infobox").hide();
+
+	$("#level1Label").css({'bottom': '10px'})
 }
 
 // Handles all click events from the 4 main UI buttons
 function dispatchButtonClick(buttonClicked){
-	// If modal is not already open, then open it
-	if ($('.modal.in').length <= 0){
-		if ((desktopMode == true)&&((buttonClicked == "layerListButton") || (buttonClicked == "locateMeButton"))){
-
+	if (desktopMode == true){
+		console.log("Dispatching button click in DESKTOP MODE")
+		if (buttonClicked == 'locateMeButton'){
+			geoLocate();
+		}else if (buttonClicked == "layerListButton"){
+			toggleLayerListDesktop();
+		} else if (buttonClicked == "infoButton"){
+			 configInfoShareModal();
+		}else if (buttonClicked == "shareButton"){
+			 configInfoShareModal();
+		}else if (buttonClicked == geocodeButton){
+			//auto dispatches to the geocoder
 		}else{
-			$( "#tocModal" ).modal();
-			// If the table of contents is collapsed and we are in tablet mode, then open it by toggleTOC()
-			if (($( "#toc" ).hasClass( "toc-view-closed" )) && (desktopMode == false)){
-				toggleTOC();
-			}
-			modalAttachTOC();
-		}
-	} //end if
-	// Specific button events...
-	switch(buttonClicked) {
-		case "legendButton":
-			console.log("Legend TOC")
-			$( "#legend" ).removeClass( "legend-off" );
-			$( "#layerList" ).addClass( "layer-list-off" );
-			break;
-		case "layerListButton":
-
-			if ((desktopMode == true)&&(buttonClicked == "layerListButton")){
-				if ($( "#layerList" ).hasClass( "open" )){
-					closeLayerList();
-				}else{
-					openLayerList();
-				}
-			}else{
-				$( "#legend" ).addClass( "legend-off" );
-				$( "#layerList" ).removeClass( "layer-list-off" );
-			}
-			break;
-		case "infoButton":
-			console.log("Info")
-			configInfoShareModal();
-			break;
-		case "shareButton":
-			console.log("Share")
-			configInfoShareModal();
-			break;
-		case "geocodeButton":
-			break;
-		case "locateMeButton":
-				geoLocate();
-		default:
+			console.log("Unknown button, returning...")
 			return;
+		}
+	}else{
+		console.log("Dispatching button click in TABLET MODE")
+		//tablet mode
+		if (buttonClicked == 'locateMeButton'){
+			geoLocate();
+		}else if (buttonClicked == "legendButton"){
+
+		}else if (buttonClicked == "layerListButton"){
+			openLayerListTablet();
+		} else if (buttonClicked == "infoButton"){
+			 configInfoShareModal();
+		}else if (buttonClicked == "shareButton"){
+			 configInfoShareModal();
+		}else if (buttonClicked == 'geocodeButton'){
+			//auto dispatches to the geocoder
+		}else{
+			console.log("Unknown button, returning...")
+			return;
+		}
+	}
+
+
+
+	//
+	// // If modal is not already open, then open it
+	// if ($('.modal.in').length <= 0){
+	// 	if ((desktopMode == true)&&((buttonClicked == "layerListButton") || (buttonClicked == "locateMeButton"))){
+	//
+	// 	}else{
+	// 		if (buttonClicked != 'locateMeButton'){
+	// 			// $( "#tocModal" ).modal();
+	// 			// If the table of contents is collapsed and we are in tablet mode, then open it by toggleTOC()
+	// 			// if (($( "#toc" ).hasClass( "toc-view-closed" )) && (desktopMode == false)){
+	// 			// 	toggleTOC();
+	// 			// }
+	// 			// modalAttachTOC();
+	// 		}
+	// 	}
+	// } //end if
+	// // Specific button events...
+	// switch(buttonClicked) {
+	// 	case "legendButton":
+	// 		// console.log("Legend TOC")
+	// 		// $( "#legend" ).removeClass( "legend-off" );
+	// 		// $( "#layerList" ).addClass( "layer-list-off" );
+	// 		break;
+	// 	case "layerListButton":
+	// 		console.log("Layer list button");
+	// 		// if ((desktopMode == true)&&(buttonClicked == "layerListButton")){
+	// 		// 	if ($( "#layerList" ).hasClass( "open" )){
+	// 		// 		closeLayerList();
+	// 		// 	}else{
+	// 		// 		openLayerList();
+	// 		// 	}
+	// 		// }else{
+	// 		// 	// $( "#legend" ).addClass( "legend-off" );
+	// 		// 	// $( "#layerList" ).removeClass( "layer-list-off" );
+	// 		// }
+	// 		break;
+	// 	case "infoButton":
+	// 		console.log("Info")
+	// 		// configInfoShareModal();
+	// 		break;
+	// 	case "shareButton":
+	// 		console.log("Share")
+	// 		// configInfoShareModal();
+	// 		break;
+	// 	case "geocodeButton":
+	// 		break;
+	// 	case "locateMeButton":
+	// 			geoLocate();
+	// 	default:
+	// 		return;
+	// }
+}
+
+function toggleLayerListDesktop(){
+	if (isTOCOpen){
+		closeLayerListDesktop()
+	}else{
+		openLayerListDesktop();
 	}
 }
 
-function closeLayerList(){
-	isTOCOpen = false;
-	$("#layerList").addClass('closed').removeClass('open')
-	$("#layerListHolder").hide();
+function closeLayerListDesktop(){
+	// isTOCOpen = false;
+	// $("#layerList").addClass('closed').removeClass('open')
+	// $("#layerListHolder").hide();
 }
 
-function openLayerList(){
-	isTOCOpen = true;
-	$("#layerList").addClass('open').removeClass('closed')
-	$("#layerListHolder").show();
+function openLayerListDesktop(){
+	// isTOCOpen = true;
+	// $("#layerList").addClass('open').removeClass('closed')
+	// $("#layerListHolder").show();
+}
+
+
+function openLayerListTablet(){
+	$("#layerListBody").appendTo("#modal-layerListHolder")
+	$("#layerListModal").modal('show')
+	$("#modal-layerListHolder").height('350px')
+	$(".radio").css({'color': 'black'})
+	$(".checkbox").css({'color': 'black'})
+}
+
+function closeLayerListTablet(){
+	$("#modal-layerListHolder").empty();
 }
 
 // ...
 function modalAttachTOC(){
-	if (desktopMode){
-		// nothing, yet
-	}else{
-		$( "#toc" ).appendTo( $( "#tocModalDialogue" ) );
-		$( "#toc" ).append($(".leaflet-control-container").addClass( "leaflet-control-container-tablet-custom" ));
-	}
+	// if (desktopMode){
+	// 	// nothing, yet
+	// }else{
+	// 	$( "#toc" ).appendTo( $( "#tocModalDialogue" ) );
+	// 	$( "#toc" ).append($(".leaflet-control-container").addClass( "leaflet-control-container-tablet-custom" ));
+	// }
 }
 
 // ...
 function configInfoShareModal(){
-	if (desktopMode){
-		$( "#legend" ).removeClass( "legend-off" );
-		$( "#layerList" ).removeClass( "layer-list-off" );
-	}else{
-		$( "#legend" ).addClass( "legend-off" );
-		$( "#layerList" ).addClass( "layer-list-off" );
-	}
+		if (isTOCOpen){
+			toggleLayerListDesktop();
+		}
+		$("#infoModal").modal('show');
 }
 
 
@@ -1430,6 +1509,7 @@ function displayUserLocation(pos){
 		// var point = new L.latLng(lat, lng);
 		theLocation = L.circleMarker([lat, lng], {radius: 10}).bindPopup("<h6>You are here</h6>").addTo(map)
 		navIsOn = true;
+		map.setView([lat, lng])
 	}else{
 		map.removeLayer(theLocation)
 		navIsOn = false;
@@ -1551,7 +1631,7 @@ function drawThisView(boundsIn, zoomIn, _levelEngaged, _level1Selected){
 }
 
 function generateAllLayersQuery(boundsIn){
-	var cartoQuery = "SELECT cov1, area FROM final_coastal_polygons WHERE the_geom && ST_SetSRID(ST_MakeBox2D(ST_Point(" +
+	var cartoQuery = "SELECT cov1, shape_area FROM final_coastal_polygons WHERE the_geom && ST_SetSRID(ST_MakeBox2D(ST_Point(" +
 		String(boundsIn._northEast.lng)+","+String(boundsIn._northEast.lat)+"), ST_Point(" +
 		String(boundsIn._southWest.lng)+","+String(boundsIn._southWest.lat)+")), 4326) ORDER BY cov1 DESC"
 		return cartoQuery
@@ -1559,7 +1639,7 @@ function generateAllLayersQuery(boundsIn){
 
 function generateSpecificLayerQuery(boundsIn, _level1Selected){
 	var classesSelected = getLevel1MemberSearch(_level1Selected)
-	var cartoQuery = "SELECT cov1, area FROM final_coastal_polygons WHERE (" + classesSelected +
+	var cartoQuery = "SELECT cov1, shape_area FROM final_coastal_polygons WHERE (" + classesSelected +
 		") AND the_geom && ST_SetSRID(ST_MakeBox2D(ST_Point(" +
 		String(boundsIn._northEast.lng)+","+String(boundsIn._northEast.lat)+"), ST_Point(" +
 		String(boundsIn._southWest.lng)+","+String(boundsIn._southWest.lat)+")), 4326) ORDER BY cov1 DESC"
@@ -1686,15 +1766,29 @@ function shadeRGBColor(color, percent) {
 
 
 function drawPolygonHistogram(data, _levelEngaged, el, histogramScale){
-	console.log("Drawing with a ", histogramScale)
 	var summary = summarize(data, _levelEngaged)
 
 	// console.log(summary)
-	var width = $(el).width();
+	var margins = {top: 20, left: 75, right: 30, bottom: 30}
+
 	var height = $(el).height() - 50;
+	if (height < 0){
+		return;
+	}
+
+	if (_levelEngaged == 2){
+		//make the histogram scrunched to the left on detail
+		var numClasses = summary.length;
+		var barWidth = 125;
+		var width = barWidth * numClasses;
+		width += margins.left + margins.right;
+		height+= 25;
+	}else{
+		//make it fill the whole legend box
+		var width = $(el).width();
+	}
 
 	//dimension setup
-	var margins = {top: 20, left: 75, right: 30, bottom: 30}
 	height = height - margins.top - margins.bottom;
 	width = width - margins.left - margins.right;
 
@@ -1706,6 +1800,9 @@ function drawPolygonHistogram(data, _levelEngaged, el, histogramScale){
 		var yScale = d3.scale.log().range([height, 0])
 	}
 
+	console.log(yScale.range())
+	console.log()
+
 	var xAxis = d3.svg.axis()
 		.scale(xScale)
 		.orient('bottom')
@@ -1715,6 +1812,12 @@ function drawPolygonHistogram(data, _levelEngaged, el, histogramScale){
 		.orient('left')
 		.ticks(5)
 
+	if (histogramScale == "log"){ //make the ticks natural numbers instead of exp
+				yAxis.tickFormat(function (d) {
+		        return yScale.tickFormat(4,d3.format(",d"))(d)
+		})
+	}
+
 	var svg = d3.select(el)
 		.append('svg')
 		.attr('width', width + margins.left + margins.right)
@@ -1722,10 +1825,8 @@ function drawPolygonHistogram(data, _levelEngaged, el, histogramScale){
 		.append('g')
 			.attr('transform', "translate(" + margins.left + "," + margins.top + ")")
 
-	xScale.domain(summary.map(function(d){
-		// console.log(d)
-		return d.type }))
-	yScale.domain([0.1, d3.max(summary, function(d){return d.area / polygonLegendFactor})])
+	xScale.domain(summary.map(function(d){return d.type }))
+	yScale.domain([0.1, d3.max(summary, function(d){return d.area * polygonLegendFactor})])
 
 
 	svg.append("g")
@@ -1739,6 +1840,9 @@ function drawPolygonHistogram(data, _levelEngaged, el, histogramScale){
 		.attr('class', 'y axis')
 		.call(yAxis)
 
+		console.log(height)
+		console.log(margins)
+
 	//add a background rectange to listen for click events
 	svg.selectAll("background")
 		.data(summary)
@@ -1747,7 +1851,7 @@ function drawPolygonHistogram(data, _levelEngaged, el, histogramScale){
 			.attr('class', function(d){ return "background " + d.type.split(" ").join("_")})
 			.style('fill', function(d){return d.color})
 			.style('fill-opacity', 0.15)
-			.attr('x', function(d){ return xScale(d.type)})
+			.attr('x', function(d){return xScale(d.type)})
 			.attr('width', xScale.rangeBand())
 			.attr('y', 0)
 			.attr('height', height)
@@ -1791,10 +1895,10 @@ function drawPolygonHistogram(data, _levelEngaged, el, histogramScale){
 		.attr('x', function(d){ return xScale(d.type)})
 		.attr('width', xScale.rangeBand())
 		.attr('y', function(d){
-			var scaledY = yScale(d.area / polygonLegendFactor);
+			var scaledY = yScale(d.area * polygonLegendFactor);
 			return scaledY})
 		.attr('height', function(d){
-			var scaledHeight = height - yScale(d.area / polygonLegendFactor)
+			var scaledHeight = height - yScale(d.area * polygonLegendFactor)
 			return scaledHeight})
 			.on('click', function(d){
 				level1Selected = d.type.toLowerCase()
@@ -1830,7 +1934,7 @@ function drawPolygonHistogram(data, _levelEngaged, el, histogramScale){
 		.attr('text-anchor', 'middle')
 		.attr('fill', 'white')
 		.attr('text-shadow', 'black 0.1em 0.1em 0.2em')
-		.text("Square Kilometers")
+		.text("Acres")
 } //end of the draw polygon legend function
 
 function getColor1FromLevel1(level1){
@@ -1870,7 +1974,9 @@ function summarize(data, level){
 	})
 	var grouped = _.groupBy(mapped, prop)
 	var summed = _.map(grouped, function(g, key){
-		var item =  {type: key, color: colorFn(key), area : _(g).reduce(function(m, x){ return m + x.area;}, 0)}
+		var item =  {type: key,
+			color: colorFn(key),
+			area : _(g).reduce(function(m, x){ return m + x.shape_area;}, 0)}
 		return item
 	})
 	var sorted = _.sortBy(summed, "area")
@@ -1878,7 +1984,7 @@ function summarize(data, level){
 	if (sorted[0].area == 0){
 		sorted.shift();
 	}
-	// console.log(sorted)
+	console.log(sorted)
 	return sorted
 }
 
@@ -1915,13 +2021,13 @@ function dispatchLegendClick(level1Selected){
 		//go from level one to level 2
 		levelEngaged = 2;
 		$("#legend-back").show();
-		$(".legend-header").hide();
+		$("#legend-header").hide();
 		replaceQueryValue("polygonFilter", level1Selected.split(" ").join("_"))
 	}else{
 		//go from level 2 to level 1
 		levelEngaged = 1;
 		$("#legend-back").hide();
-		$(".legend-header").show();
+		$("#legend-header").show();
 		replaceQueryValue("polygonFilter", undefined)
 	}
 	// level1Selected = level1Selected;
@@ -1955,7 +2061,7 @@ function listenToLineLegend(){
 		var child = $($(this).children()[0])
 		child.addClass('active')
 		child.css({"opacity": 1})
-		$(".legend-header").hide();
+		$("#legend-header").hide();
 		$("#legend-back").show();
 		$("#legend-back").unbind('click')
 		$("#legend-back").bind('click', function(){
@@ -1963,7 +2069,7 @@ function listenToLineLegend(){
 			$(".legend-media").css({'opacity': 1})
 			$(".legend-media").removeClass('active');
 			$("#level1Label").hide();
-			$(".legend-header").show()
+			$("#legend-header").show()
 			$("#legend-back").hide();
 			lineTypeSelected = undefined
 		})
@@ -2022,7 +2128,7 @@ function listenToPointLegend(){
 		var child = $($(this).children()[0])
 		child.addClass('active')
 		child.css({"opacity": 1})
-		$(".legend-header").hide();
+		$("#legend-header").hide();
 		$("#legend-back").show();
 		$("#legend-back").unbind('click')
 		$("#legend-back").bind('click', function(){
@@ -2030,7 +2136,7 @@ function listenToPointLegend(){
 			$(".legend-media").css({'opacity': 1})
 			$(".legend-media").removeClass('active');
 			$("#level1Label").hide();
-			$(".legend-header").show();
+			$("#legend-header").show();
 			$("#legend-back").hide();
 			pointTypeSelected = undefined
 		})
@@ -2065,7 +2171,7 @@ function showOnePoint(pointType){
 
 
 function makePointOrLineLegendItem(item){
-	var legendItem = "<div class='col-xs-12 col-sm-6 col-md-3 col-lg-2 legend-item'  data-type='" + item.type + "' data-name='" + item.name + "'>"
+	var legendItem = "<div class='col-xs-6 col-sm-3 col-md-2 col-lg-1 legend-item'  data-type='" + item.type + "' data-name='" + item.name + "'>"
 	legendItem += "<div class='media legend-media'>"
 	legendItem += "<div class='media-left'><img class='media-object' src='" + item.icon + "'/></div>"
 	legendItem += "<div class='media-body'>" + item.name + "</div>"

@@ -71,6 +71,7 @@ body{
 		height: 500% !important;
 		overflow-y: auto!important;
 	}
+
 }
 
 /* for css when *PHONE* mode is engaged */
@@ -101,7 +102,7 @@ body{
 	}
 	#layerListHolder{
 	    position: relative;
-		top: -90px;
+		top: -75px;
 		left: 12px;
 	}
 
@@ -311,7 +312,8 @@ input:checked + .slider:before {
 	overflow:auto;
 	/*padding-top: 10px;
 	padding-bottom: 10px;*/
-	margin-top: 10px;
+	/*margin-top: 10px;*/
+
 }
 
 
@@ -330,7 +332,9 @@ input:checked + .slider:before {
 	height: 28px;
 	background-color: #fff;
 	cursor: pointer !important;
-    text-align: center;
+  text-align: center;
+	margin-top: 5px!important;
+	float: none;
 }
 
 /*Aligns zoom controls with other custom controls*/
@@ -448,6 +452,9 @@ td{
 
 .cartodb-searchbox{
 	float: none!important;
+	/*margin-left: 25px;
+	margin-top: 25px;*/
+	margin: 0px!important;
 }
 
 .leaflet-search-control{
@@ -489,7 +496,7 @@ td{
 #level1Label{
 	color: white;
 	text-shadow: black 0.1em 0.1em 0.2em;
-	z-index: 10000000;
+	z-index: 999;
 	position: absolute;
 	bottom: 200px;
 	left: 10px;
@@ -523,11 +530,15 @@ td{
 	text-shadow: black 0.1em 0.1em 0.2em;
 }
 
-.legend-header{
+#legend-header{
 	color: white;
 	text-shadow: black 0.1em 0.1em 0.2em;
-	padding:0px!important;
-	margin: 0px!important
+}
+
+.legend-bar{
+	margin: 0px!important;
+	padding: 0px!important;
+		font: 14px sans-serif;
 }
 
 .legend-item{
@@ -538,7 +549,7 @@ td{
 }
 
 .media{
-	height: 50px;
+	height: 60px;
 	cursor: pointer;
 }
 
@@ -675,4 +686,8 @@ button.active{
 #showInfoboxLabel{
 	padding-left: 5px!important;
 	height: 25px;
+}
+
+#modal-layerListHolder{
+	overflow-y: auto;
 }

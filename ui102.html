@@ -8,7 +8,7 @@
 	<!-- meta /\ -->
     <title>Bordner User Interface - Template</title>
     <!-- css \/ -->
-    <link rel='stylesheet' href="css/pace.css">
+    <link rel=stylesheet href="css/pace.css">
 	<link href="css/bootstrap.min.css" rel="stylesheet"> <!-- Currently using Bootstrap 3.3.7 -->
 	<link href="css/bootstrap-slider.min.css" rel="stylesheet"> <!--For transparency slider -->
     <link href="css/app102.css" rel="stylesheet">
@@ -27,33 +27,71 @@
 					<span id="tocIcon" class="icon-class glyphicon glyphicon-chevron-down transition-class"></span>
 				</div>
 				<div class="col-sm-12 legend-view transition-class clearfix" id="legend">
-          <div id='legend-back'><span class='glyphicon glyphicon-chevron-left pull-left'></span>Back to overview</div>
-          <h5 class='pull-left legend-header'>Legend</h5>
-          <div id="legendHolder" class='col-xs-12'></div>
+          <div id='legend-back' class='legend-bar'><span class="glyphicon glyphicon-chevron-left pull-left"></span>Back to overview</div>
+          <div class='legend-bar' id='legend-header'>Legend</div>
+          <div id="legendHolder" class="col-xs-12>"</div>
 				</div>
 			</div>
 		</div>
 		<h1 class="sampleClass"></h1>
 	</div>
 
-	<div id="tocModal" class="modal fade" role="dialog">
-		<div class="modal-dialog" id="tocModalDialogue">
-		</div>
+	<div id="layerListModal" class="modal fade" role="dialog">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <h3 class='page-header'>Table of Contents</h3>
+        <div class="modal-body layerListModalBody layerListTablet" id="layerListModalBody">
+          <div id='modal-layerListHolder'></div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Done</button>
+        </div>
+      </div>
+    </div>
 	</div>
-<h1 id='level1Label'>Class Label</h1>
-  <div id='neatline'></div>
 
-  <div id='infobox' class='infobox'>
+  <div class="modal fade" id=infoModal>
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3 class="modal-title">The Bordner Survey</h3>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <p>Here is some info about the map</p>
+          <i>Share me!</i>
+          <div class=btn-group>
+            <button class=btn btn-lg><span class=glyphicon glyphicon-envelope></span></button>
+            <button class=btn btn-lg><span class=glyphicon glyphicon-fire></span></button>
+            <button class=btn btn-lg><span class=glyphicon glyphicon-plane></span></button>
+            <button class=btn btn-lg><span class=glyphicon glyphicon-thumbs-up></span></button>
+            <button class=btn btn-lg><span class=glyphicon glyphicon-send></span></button>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+<h1 id=level1Label>Class Label</h1>
+  <div id=neatline></div>
+
+  <div id=infobox class=infobox>
     <p id="level1-set"></p>
   </div>
 
-  <div class='checkbox' id='infoboxHolder'>
-  <input type="checkbox" name="showInfobox" id="showInfobox" checked/> <label id='showInfoboxLabel'>Show details</label>
+  <div class=checkbox id=infoboxHolder>
+  <input type="checkbox" name="showInfobox" id="showInfobox" checked/> <label id=showInfoboxLabel>Show details</label>
   </div>
 
 
-  <label class="legend-label">Basemap</label>
-  <!-- <div id='infowindow'></div> -->
+
+  <!-- <div id=infowindow></div> -->
   <!-- Templating using the underscore templating functions included in Carto -->
   <!-- //make a table with the properties -->
   <!-- //all props are container in the object fed here via the _.template function-->
