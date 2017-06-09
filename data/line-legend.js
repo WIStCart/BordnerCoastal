@@ -1,6 +1,22 @@
-var lineLegend = [
-  {name: "Road", icon: "/img/icons/road.svg", color: "green", minZoom: 8, maxZoom: 15, type:"ARR"},
-  {name: "Highway", icon: "/img/icons/highway.svg", color: "yellow", minZoom:8, maxZoom: 15, type:"ID"},
-  {name: "Powerlines", icon: "/img/icons/powerlines.svg", color: "red", minZoom: 8, maxZoom: 15, type:"UD"},
-  {name: "Telephone Line", icon: "/img/icons/telephone.svg", color: "blue", minZoom: 8, maxZoom: 15, type:"R"}
-]
+var lineLegend = [{"type":" ","name":"Unknown","icon":"/img/icons/road.svg","maxZoom":21,"minZoom":13,"css":"line-color: #b2b2b2; line-width: 1; line-opacity: 1;"},
+{"type":"ARR","name":"Abandoned Railroad","icon":"/img/icons/road.svg","maxZoom":21,"minZoom":13,"css":"::line, ::hatch { line-color: #9d9d9d; } ::line { line-width:1; } ::hatch {line-width: 4; line-dasharray: 1, 24;}"},
+{"type":"BL","name":"?","icon":"/img/icons/road.svg","maxZoom":21,"minZoom":13,"css":"line-color: #b2b2b2; line-width: 1; line-opacity: 1;"},
+{"type":"BS","name":"?","icon":"/img/icons/road.svg","maxZoom":21,"minZoom":13,"css":"line-color: #b2b2b2; line-width: 1; line-opacity: 1;"},
+{"type":"CB","name":"Civil Town Boundary","icon":"/img/icons/road.svg","maxZoom":21,"minZoom":13,"css":"line-color: #e4dd51; line-width: 3; line-opacity: .65;"},
+{"type":"CL","name":"Cliff","icon":"/img/icons/road.svg","maxZoom":21,"minZoom":13,"css":"line-color: #7d9027; line-width: 1; line-opacity: 1; line-dasharray: 0.9;"},
+{"type":"Cliff","name":"Cliff","icon":"/img/icons/road.svg","maxZoom":21,"minZoom":13,"css":"line-color: #7d9027; line-width: 1; line-opacity: 1; line-dasharray: 0.9;"},
+{"type":"DD","name":"Drainage Ditch","icon":"/img/icons/road.svg","maxZoom":21,"minZoom":13,"css":"line-color: #3a708a; line-width: 1; line-opacity: 1; line-dasharray: 15, 10, 5, 10, 15;"},
+{"type":"DFL","name":"Drivable Fire Lane","icon":"/img/icons/road.svg","maxZoom":21,"minZoom":13,"css":"line-color: #aa2521; line-width: 1; line-opacity: 1;"},
+{"type":"FL","name":"Non-drivable Fire Lane","icon":"/img/icons/road.svg","maxZoom":21,"minZoom":13,"css":"line-color: #aa2521; line-width: 1; line-opacity: 1; line-dasharray: 10, 5;"},
+{"type":"HR","name":"Hard Surfaced Road","icon":"/img/icons/road.svg","maxZoom":21,"minZoom":13,"css":"line-color: #404040; line-width: 2; line-opacity: 1;"},
+{"type":"I","name":"Intermittent Stream","icon":"/img/icons/road.svg","maxZoom":21,"minZoom":13,"css":"line-color: #85c5d3; line-width: 1; line-opacity: 1;"},
+{"type":"ID","name":"Imporved Dirt Road","icon":"/img/icons/road.svg","maxZoom":21,"minZoom":13,"css":"::case {line-width: 4; line-color:#ffd700;} ::fill {line-width: 2; line-color:#916e40;}"},
+{"type":"IG","name":"Improved Gravel Road","icon":"/img/icons/road.svg","maxZoom":21,"minZoom":13,"css":"::case {line-width: 4; line-color:#ffd700;} ::fill {line-width: 2; line-color:#567c0f;}"},
+{"type":"PL","name":"Power Line","icon":"/img/icons/road.svg","maxZoom":21,"minZoom":13,"css":"line-color: #9f6bad; line-width: 1; line-opacity: 1;"},
+{"type":"R","name":"Stream","icon":"/img/icons/road.svg","maxZoom":21,"minZoom":13,"css":"line-color: #4daabf; line-width: 1.5; line-opacity: 1;"},
+{"type":"RR","name":"Railroad","icon":"/img/icons/road.svg","maxZoom":21,"minZoom":13,"css":"::line, ::hatch { line-color: #363636; } ::line { line-width:1; } ::hatch {line-width: 4; line-dasharray: 1, 24;}"},
+{"type":"TL","name":"Telephone Line","icon":"/img/icons/road.svg","maxZoom":21,"minZoom":13,"css":"line-color: #ffc266; line-width: 1; line-opacity: 1;"},
+{"type":"TR","name":"Trail","icon":"/img/icons/road.svg","maxZoom":21,"minZoom":13,"css":"line-color: #836c4b; line-width: 1; line-opacity: 1; line-dasharray: 5,10;"},
+{"type":"U","name":"Unknown","icon":"/img/icons/road.svg","maxZoom":21,"minZoom":13,"css":"line-color: #b2b2b2; line-width: 1; line-opacity: 1;"},
+{"type":"UD","name":"Unimproved Dirt Road","icon":"/img/icons/road.svg","maxZoom":21,"minZoom":13,"css":"line-width: 2; line-color:#916e40;"},
+{"type":"UG","name":"Unimproved Gravel Road","icon":"/img/icons/road.svg","maxZoom":21,"minZoom":13,"css":"line-width: 2; line-color:#650c46;"}]
