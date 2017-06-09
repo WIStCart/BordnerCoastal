@@ -269,7 +269,7 @@ window.onload = function() {
 	  "line-opacity: 0.5;" +
 	  "line-comp-op: soft-light;" +
 	  "[zoom > 10]{" +
-		"text-name: [twp];" +
+		"text-name: 'T'+[twp]+'N R'+[rng]+[dirchar];" +
 		"text-face-name: 'Open Sans Regular';" +
 	    "text-size: 13;"+
 	    "text-fill: #fff;"+
