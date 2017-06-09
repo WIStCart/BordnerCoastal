@@ -274,6 +274,7 @@ window.onload = function() {
 	    "text-size: 13;"+
 	    "text-fill: #fff;"+
 	    "text-halo-fill: #000000;"+
+	    "text-halo-radius: 0.75;"+
 	  "}"+
 	"}"
 	cartodb.createLayer(map, {
