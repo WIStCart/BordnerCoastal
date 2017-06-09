@@ -43,9 +43,16 @@
 <h1 id='level1Label'>Class Label</h1>
   <div id='neatline'></div>
 
-  <div id='infobox' class='infobox infobox-custom floating top right cartodb--content-wrapper'>
-    <p><span id="level1-set"></span></p>
+  <div id='infobox' class='infobox'>
+    <p id="level1-set"></p>
   </div>
+
+  <div class='checkbox' id='infoboxHolder'>
+  <input type="checkbox" name="showInfobox" id="showInfobox" checked/> <label id='showInfoboxLabel'>Show details</label>
+  </div>
+
+
+  <label class="legend-label">Basemap</label>
   <!-- <div id='infowindow'></div> -->
   <!-- Templating using the underscore templating functions included in Carto -->
   <!-- //make a table with the properties -->

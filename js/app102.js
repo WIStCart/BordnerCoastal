@@ -1004,9 +1004,7 @@ function setUpMap(){
 			'<div class="checkbox">' +
 				'<label><input type="checkbox" name="overlayType" id="density1">Class 1 Density</label>' +
 			'</div>' +
-			"<div class='checkbox'>"+
-			'<label><input type="checkbox" name="showInfobox" id="showInfobox" checked>Show Info on Hover</label></div>' +
-			'<label class="legend-label">Basemap</label>' +
+			'<label class="legend-label">Basemap</label>' + 
 			'<div class="radio">' +
 				'<label><input type="radio" name="basemapType" id="streetsBasemap">Streets</label>' +
 			'</div>' +
@@ -1029,7 +1027,12 @@ function setUpMap(){
 	$("#showInfobox").change(function(){
 		var isChecked = $(this).prop('checked');
 		showInfoboxOnHover = isChecked
-		replaceQueryValue("showInfo", isChecked)
+		replaceQueryValue("showInfo", isChecked);
+		if (isChecked){
+			$("#infoboxHolder").css({'top': '40px'})
+		}else{
+			$("#infoboxHolder").css({'top': '10px'})
+		}
 	})
 
 	// Hide point, line or poly legend as appropriate
