@@ -29,7 +29,7 @@ var level1Colors;
 var level2Colors;
 var polygonLegendFactor = 0.000247105;
 var isInfowindowOpen = false;
-var isTOCOpen = false;
+var isTOCOpen = true;
 var infowindow;
 var semanticZoomLevel = 13;
 var lineTypeSelected;
@@ -1294,40 +1294,57 @@ function reflectChangeLayerInQueryString(overlayCalled, didAdd){
 // To dock/undock the table of contents from bottom
 function toggleTOC(evt){
 	// evt.preventDefault();
-	if ($( "#toc" ).hasClass( "toc-view-open" )){
+	if (isTOCOpen){
 		isTOCOpen = false;
-		$( ".level-1-label-text").removeClass( "shade-level-1-label-text" );
-		$( "#toc" ).removeClass( "toc-view-open" );
-		$( "#toc" ).addClass( "toc-view-closed" );
-		$( "#map" ).removeClass( "map-view-toc" );
-		$( "#map" ).addClass( "map-view-full" );
-		$( "#tocButton" ).removeClass( "toc-button-open" );
-		$( "#tocButton" ).addClass( "toc-button-closed" );
-		$( "#tocIcon" ).removeClass( "glyphicon-chevron-down" );
-		$( "#tocIcon" ).addClass( "glyphicon-chevron-up" );
+		$("#toc").hide()
+		$("#tocButton").css({'bottom': '4px'})
+		$("#tocButton").html("<span class='glyphicon glyphicon-chevron-up'></span>")
+		$("#map").height("100%");
+		// $( ".level-1-label-text").removeClass( "shade-level-1-label-text" );
+		// $( "#toc" ).removeClass( "toc-view-open" );
+		// $( "#toc" ).addClass( "toc-view-closed" );
+
+		// $( "#map" ).removeClass( "map-view-toc" );
+		// $( "#map" ).addClass( "map-view-full" );
+		// $( "#tocButton" ).removeClass( "toc-button-open" );
+		// $( "#tocButton" ).addClass( "toc-button-closed" );
+		// $( "#tocIcon" ).removeClass( "glyphicon-chevron-down" );
+		// $( "#tocIcon" ).addClass( "glyphicon-chevron-up" );
 		if (desktopMode){
 			$("#neatline").show();
 		}
 			setTimeout(function(){ map.invalidateSize()}, 450)
 	}else{ //is open
 		isTOCOpen = true;
-		if (desktopMode){
-			$( ".level-1-label-text").addClass( "shade-level-1-label-text" );
+		$("#toc").show();
+		$("#tocButton").css({'bottom': '20%'})
+		$("#tocButton").html("<span class='glyphicon glyphicon-chevron-down'></span>");
+		$("#map").height("80%");
+
+		// if (desktopMode){
+		// 	$( ".level-1-label-text").addClass( "shade-level-1-label-text" );
+		// }
+		// $( "#toc" ).addClass( "toc-view-open" );
+		// $( "#toc" ).removeClass( "toc-view-closed" );
+		// $( "#map" ).addClass( "map-view-toc" );
+		// $( "#map" ).removeClass( "map-view-full" );
+		// $( "#tocButton" ).addClass( "toc-button-open" );
+		// $( "#tocButton" ).removeClass( "toc-button-closed" );
+		// $( "#tocIcon" ).addClass( "glyphicon-chevron-down" );
+		// $( "#tocIcon" ).removeClass( "glyphicon-chevron-up" );
+		// $("#neatline").hide()
+		if (legendType == "polygons"){
+			setTimeout(function(){
+				console.log(levelEngaged)
+				console.log(level1Selected)
+				drawThisView(map.getBounds(), map.getZoom(), levelEngaged, level1Selected)
+			}, 500)
+		}else if (legendType == "lines"){
+			drawLineLegend();
+		}else if (legendType == "points"){
+			drawPointLegend();
 		}
-		$( "#toc" ).addClass( "toc-view-open" );
-		$( "#toc" ).removeClass( "toc-view-closed" );
-		$( "#map" ).addClass( "map-view-toc" );
-		$( "#map" ).removeClass( "map-view-full" );
-		$( "#tocButton" ).addClass( "toc-button-open" );
-		$( "#tocButton" ).removeClass( "toc-button-closed" );
-		$( "#tocIcon" ).addClass( "glyphicon-chevron-down" );
-		$( "#tocIcon" ).removeClass( "glyphicon-chevron-up" );
-		$("#neatline").hide()
-		setTimeout(function(){
-			console.log(levelEngaged)
-			console.log(level1Selected)
-			drawThisView(map.getBounds(), map.getZoom(), levelEngaged, level1Selected)
-		}, 500)
+
 	}
 }
 
@@ -1669,7 +1686,7 @@ function drawPolyFilter(el, _levelEngaged, _level1Selected){
 		}
 
 		if (height < 100){
-			height = 200;
+			height = 150;
 			margins.bottom = 50;
 		}
 
@@ -1785,6 +1802,8 @@ function shadeRGBColor(color, percent) {
 function drawPolygonHistogram(data, _levelEngaged, el, histogramScale){
 	var summary = summarize(data, _levelEngaged)
 
+
+
 	if (_levelEngaged == 2){
 		summary.reverse();
 	}
@@ -1792,13 +1811,13 @@ function drawPolygonHistogram(data, _levelEngaged, el, histogramScale){
 	// console.log(summary)
 	var margins = {top: 20, left: 75, right: 30, bottom: 30}
 
-	var height = $(el).height() - 50;
+	var height = $(el).height() - 100;
 	if (height < 0){
 		return;
 	}
 
 	if (height < 100){
-		height = 200;
+		height = 150;
 		margins.bottom = 50;
 	}
 
