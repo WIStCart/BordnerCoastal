@@ -1062,19 +1062,19 @@ function setUpMap(){
 	map.addControl(new tabletCustomControl({position: "topleft"})); //Could also be: 'topleft', 'topright', 'bottomleft', 'bottomright'
 	$(".tablet-custom-control")
 		.attr("id", "tabletCustomControl")
-		.html('<div data-toggle="tooltip" title="info" class="leaflet-bar leaflet-control leaflet-control-custom" id="infoButton" onClick="dispatchButtonClick(this.id)">' +
+		.html('<div data-toggle="tooltip" title="info" class="leaflet-bar leaflet-control leaflet-control-custom" id="infoButton" onClick="dispatchButtonClick(event, this, this.id)">' +
 				'<span id="infoButtonIcon" class="button-icon-class glyphicon glyphicon-info-sign"></span>' +
 			'</div></br>' +
-			'<div data-toggle="tooltip" title="share" class="leaflet-bar leaflet-control leaflet-control-custom" id="shareButton" onClick="dispatchButtonClick(this.id)">' +
+			'<div data-toggle="tooltip" title="share" class="leaflet-bar leaflet-control leaflet-control-custom" id="shareButton" onClick="dispatchButtonClick(event, this.id)">' +
 				'<span id="shareButtonIcon" class="button-icon-class glyphicon glyphicon-share-alt">' +
 			'</div></br>' +
-			'<div data-toggle="tooltip" title="layers" class="leaflet-bar leaflet-control leaflet-control-custom" id="layerListButton" onClick="dispatchButtonClick(this.id)">' +
+			'<div data-toggle="tooltip" title="layers" class="leaflet-bar leaflet-control leaflet-control-custom" id="layerListButton" onClick="dispatchButtonClick(event, this.id)">' +
 				'<span id="layerListButtonIcon" class="button-icon-class glyphicon glyphicon-menu-hamburger">' +
 			'</div></br>' +
-			'<div data-toggle="tooltip" title="legend" class="leaflet-bar leaflet-control leaflet-control-custom" id="legendButton" onClick="dispatchButtonClick(this.id)">' +
+			'<div data-toggle="tooltip" title="legend" class="leaflet-bar leaflet-control leaflet-control-custom" id="legendButton" onClick="dispatchButtonClick(event, this.id)">' +
 				'<span id="legendButtonIcon" class="button-icon-class glyphicon glyphicon-stats">' +
 			'</div></br>' +
-			'<div data-toggle="tooltip" title="Search" class="leaflet-bar leaflet-control leaflet-control-custom" id="geocodeButton" onClick="dispatchButtonClick(this.id)">' +
+			'<div data-toggle="tooltip" title="Search" class="leaflet-bar leaflet-control leaflet-control-custom" id="geocodeButton" onClick="dispatchButtonClick(event, this.id)">' +
 				'<span id="geocodeButtonIcon" class="button-icon-class glyphicon glyphicon-globe"></span>' +
 			'</div></br>'
 		)
@@ -1487,7 +1487,9 @@ function transformToTablet(){
 }
 
 // Handles all click events from the 4 main UI buttons
-function dispatchButtonClick(buttonClicked){
+function dispatchButtonClick(e, buttonClicked){
+	e.preventDefault()
+	e.stopPropagation()
 	if (desktopMode == true){
 		console.log("Dispatching button click in DESKTOP MODE")
 		if (buttonClicked == 'locateMeButton'){
@@ -2289,8 +2291,11 @@ function dispatchLegendClick(level1Selected){
 
 function drawLineLegend(){
 	$("#legendHolder").empty();
-	for (var i=0; i < lineLegend.length; i++){
-		var symbol = lineLegend[i];
+	lineLegendSorted = _.chain(lineLegend).sortBy("frequency").sortBy("class").value()
+	console.log(lineLegendSorted)
+	for (var i=0; i < lineLegendSorted.length; i++){
+		var symbol = lineLegendSorted[i];
+		console.log(symbol)
 		var legendEntry = makePointOrLineLegendItem(symbol);
 		$("#legendHolder").append(legendEntry)
 	}
@@ -2355,8 +2360,10 @@ function showOneLine(lineType){
 
 function drawPointLegend(){
 	$("#legendHolder").empty();
-	for (var i=0; i < pointLegend.length; i++){
-		var symbol = pointLegend[i];
+
+	var pointlegendSorted = _.chain().sortBy("frequency").sortBy("class").value()
+	for (var i=0; i < pointlegendSorted.length; i++){
+		var symbol = pointlegendSorted[i];
 		var legendEntry = makePointOrLineLegendItem(symbol);
 		$("#legendHolder").append(legendEntry)
 	}
