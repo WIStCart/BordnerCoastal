@@ -379,6 +379,7 @@ div.cartodb-tooltip-content-wrapper p{
 	border-radius: 5px!important;
 }
 
+
 /* set styles to the custom infowindow */
 .infowindow-custom{
 	position: relative;
@@ -391,6 +392,25 @@ div.cartodb-tooltip-content-wrapper p{
 	background-color: #FFF;
 	color: #2c5875;
 	border-radius: 10px;
+}
+
+.infobox-mobile{
+	padding: 0px!important;
+	max-width: 50%;
+}
+
+#mobile-clickwindow{
+	background-color: white!important;
+	width: 100%!important;
+}
+
+#mobile-clickwindow td{
+	/*display: inline-block;*/
+	max-width: 75px;
+}
+
+th, td{
+	border-bottom: 1px solid #ddd;
 }
 
 .cartodb-popup-content .content h3{

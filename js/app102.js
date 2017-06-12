@@ -371,7 +371,7 @@ var cartoCSSLines = getLineCSS('none')
       sublayers: [{type: "cartodb",
 			sql: 'SELECT * FROM final_coastal_polygons',
 			cartocss: cartoCSSRules,
-			interactivity: ['cov1', 'cov2'],
+			interactivity: infowindowVars,
 			layerIndex:1
 	},{type: "cartodb",
 			sql: 'SELECT * FROM final_coastal_polygons',
@@ -725,18 +725,7 @@ function formatCoverageForInfowindow(data){
 function setupInteraction(layer, _levelEngaged, _visibility){
 	//////////////////////////////////////////////////////
 	/* To construct a rudimentary popup on click (check .html for #infowindow_template) */
-	infowindow = cdb.vis.Vis.addInfowindow(map, layer, infowindowVars,{
-		'sanitizeTemplate':false
-	}).model.set({
-		'template' :  function(obj){
-			//!! important
-			//modify the object here before sending to templating engine
-			//lookup the classname
-			content = obj.content
-			windowContent = formatCoverageForInfowindow(content.data)
-			return _.template($('#infowindow_template').html())(windowContent);
-		}
-	});
+	// setupInfoWindow(layer)
 
 	layer.bind('featureClick', onMapFeatureClick)
 	//manage the population of the infobox
@@ -761,19 +750,40 @@ function setupInteraction(layer, _levelEngaged, _visibility){
 
 } //end setup interaction
 
-function onMapClick(){
-	//close the info window on basemap click
-	setTimeout(function(){
-		if(!isInfowindowOpen){
-			infowindow.set('visibility', false);
+
+function setupInfoWindow(layer){
+	//layer here should be bordner
+	infowindow = cdb.vis.Vis.addInfowindow(map, layer, infowindowVars,{
+		'sanitizeTemplate':false
+	}).model.set({
+		'template' :  function(obj){
+			//!! important
+			//modify the object here before sending to templating engine
+			//lookup the classname
+			content = obj.content
+			windowContent = formatCoverageForInfowindow(content.data)
+			return _.template($('#infowindow_template').html())(windowContent);
 		}
-			isInfowindowOpen = false;
-	}, 250) //timeout is important here in maintaining correct popup state
+	});
 }
 
+function destroyInfoWindow(){
+	$(".cartodb-infowindow").remove(); //just take it off the dom
+}
+
+function onMapClick(){
+	//close the info window on basemap click
+	if (desktopMode){
+		setTimeout(function(){
+			if(!isInfowindowOpen){
+				infowindow.set('visibility', false);
+			}
+				isInfowindowOpen = false;
+		}, 250) //timeout is important here in maintaining correct popup state
+	}
+}
 
 //functions for events on particular feature types
-
 function onLineOver(e, latln, pxPos, data, layer){
 	if (legendType == "lines"){
 		var lineName = getPointOrLineNameFromCode(data.line_type, 'lines');
@@ -915,7 +925,19 @@ function onMapFeatureClick(e, latln, pxPos, data, layer){
 		$(".cartodb-infowindow").hide()
 		isInfowindowOpen = false;
 	}
+
+	if (!desktopMode){
+		$("#infobox").show();
+		windowContent = formatCoverageForInfowindow(data)
+		$("#infobox").html(_.template($('#infowindow_template_mobile').html())(windowContent));
+	}
 }
+
+
+
+
+
+
 
 function disableMapInteractionEvents(){
 	map._handlers.forEach(function(handler) {
@@ -1206,6 +1228,7 @@ function turnOnFeatureType(featureTypeCalled){
 		}else{
 			showOnlyLines();
 			$("#rangeSlider").slider('setValue', layerOpacity*100);
+			resetPolygons();
 		}
 
 	}else if (legendType == "points"){
@@ -1213,11 +1236,17 @@ function turnOnFeatureType(featureTypeCalled){
 		if ((typeof(lines) == "undefined") || (typeof(bordner) == "undefined")){
 			setTimeout(function(featureTypeCalled){turnOnFeatureType(featureTypeCalled)}, 50) //this prevents on init load issues with undefined values
 		}else{
+			resetPolygons();
 			showOnlyPoints();
 			$("#rangeSlider").slider('setValue', layerOpacity*100);
 		}
-
 	}
+}
+
+function resetPolygons(){
+	levelEngaged = 1;
+	level1Selected = undefined;
+	hideLevel1Label();
 }
 
 function manageURLToPolygons(){
@@ -1257,11 +1286,13 @@ function showOnlyPoints(){
 }
 
 function showNoPolygons(){
-		bordner.setCartoCSS(getPolyStyle("none"))
+		// bordner.setCartoCSS(getPolyStyle("none"))
+		bordner.hide();
 }
 
 function showAllPolygons(){
-	bordner.setCartoCSS(getPolyStyle("level1"))
+	// bordner.setCartoCSS(getPolyStyle("level1"))
+	bordner.show();
 }
 
 // To turn on the appropriate basemap, note, the radio button's id must match the basemap's variable name
@@ -1307,16 +1338,6 @@ function toggleLegend(evt){
 		$("#tocButton").css({'bottom': '4px'})
 		$("#tocButton").html("<span class='glyphicon glyphicon-chevron-up'></span>")
 		$("#map").height("100%");
-		// $( ".level-1-label-text").removeClass( "shade-level-1-label-text" );
-		// $( "#toc" ).removeClass( "toc-view-open" );
-		// $( "#toc" ).addClass( "toc-view-closed" );
-
-		// $( "#map" ).removeClass( "map-view-toc" );
-		// $( "#map" ).addClass( "map-view-full" );
-		// $( "#tocButton" ).removeClass( "toc-button-open" );
-		// $( "#tocButton" ).addClass( "toc-button-closed" );
-		// $( "#tocIcon" ).removeClass( "glyphicon-chevron-down" );
-		// $( "#tocIcon" ).addClass( "glyphicon-chevron-up" );
 		if (desktopMode){
 			$("#neatline").show();
 		}
@@ -1328,18 +1349,6 @@ function toggleLegend(evt){
 		$("#tocButton").html("<span class='glyphicon glyphicon-chevron-down'></span>");
 		$("#map").height("80%");
 
-		// if (desktopMode){
-		// 	$( ".level-1-label-text").addClass( "shade-level-1-label-text" );
-		// }
-		// $( "#toc" ).addClass( "toc-view-open" );
-		// $( "#toc" ).removeClass( "toc-view-closed" );
-		// $( "#map" ).addClass( "map-view-toc" );
-		// $( "#map" ).removeClass( "map-view-full" );
-		// $( "#tocButton" ).addClass( "toc-button-open" );
-		// $( "#tocButton" ).removeClass( "toc-button-closed" );
-		// $( "#tocIcon" ).addClass( "glyphicon-chevron-down" );
-		// $( "#tocIcon" ).removeClass( "glyphicon-chevron-up" );
-		// $("#neatline").hide()
 		if (legendType == "polygons"){
 			setTimeout(function(){
 				console.log(levelEngaged)
@@ -1351,23 +1360,11 @@ function toggleLegend(evt){
 		}else if (legendType == "points"){
 			drawPointLegend();
 		}
-
 	}
 }
 
 // To configure desktop view (not called upon pageload - all HTML defaults to desktop styles)
 function transformToDesktop(){
-	// $( "#toc" ).appendTo( $( "#tocParent" ) );
-	// $( ".feature-type-radio-group" ).prependTo( $( "#layerList" ) );
-	// $( "#legend" ).removeClass( "legend-off" );
-	// $( "#layerList" ).removeClass( "layer-list-off" );
-  //   if ($( "#toc" ).hasClass( "toc-view-open" )){
-	// 	$( ".level-1-label-text").addClass( "shade-level-1-label-text" );
-	// }
-	// if ($('.modal.in').length > 0){
-	// 	$( "#tocModal" ).modal('hide');
-	// 	$("#map").append($(".leaflet-control-container").addClass( "leaflet-control-container-tablet-custom" ));
-	// }
 
 	$("#tocModal").modal('hide');
 	$("#infoModal").modal('hide');
@@ -1381,7 +1378,12 @@ function transformToDesktop(){
 
 	drawThisView(map.getBounds(), map.getZoom(), levelEngaged, level1Selected);
 
-	$("#legend").appendTo("#toc")
+	$("#legend").appendTo("#toc");
+
+	setupInfoWindow(bordner);
+
+	$("#infobox").removeClass("infobox-mobile")
+
 }
 
 // To configure tablet view (is called upon pageload)
@@ -1395,6 +1397,10 @@ function transformToTablet(){
 	$("#toc").hide();
 
 	isLegendOpen = false;
+
+	destroyInfoWindow();
+
+	$("#infobox").addClass("infobox-mobile")
 }
 
 // Handles all click events from the 4 main UI buttons
