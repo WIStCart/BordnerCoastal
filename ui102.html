@@ -106,72 +106,76 @@
   </div>
 
 
+<!--
+  <div class='cartodb-infowindow'>
+    <div class='infowindow-custom'>
+      <a href="#close" class="cartodb-popup-close-button close">x</a>
+			<div class="cartodb-popup-content">
+        <h1>Hello!</h1>
+      </div>
+      <div class="cartodb-popup-tip-container"></div>
+    </div>
+  </div> -->
 
   <!-- <div id=infowindow></div> -->
   <!-- Templating using the underscore templating functions included in Carto -->
   <!-- //make a table with the properties -->
   <!-- //all props are container in the object fed here via the _.template function-->
 	<script type="infowindow/html" id="infowindow_template">
-		<div class="infowindow-custom">
-			<a href="#close" class="cartodb-popup-close-button close">x</a>
 			<div class="cartodb-popup-content">
 				<div class="content" style="padding:20px">
-        <h5 class="page-header infowindow-header"><%= levelname %></h5>
-        <table>
-        <thead><tr><th>Name</th><th>Density</th><th>Min. Diameter (in)</th><th>Max Diameter (in)</th></tr></thead>
+          <h5 class="page-header infowindow-header"><%= levelname %></h5>
+          <table id='infowindow-table-desktop'>
+          <thead><tr><th>Name</th><th>Density</th><th>Min. Diameter (in)</th><th>Max Diameter (in)</th></tr></thead>
 
-        <% if ((typeof(coverage1.name) !== "undefined") && (coverage1.name != "Other")) { %>
-            <tr><td><%= coverage1.name %></td>
-            <% if (coverage1.density == 0) { %>
-              <td>--</td><td>--</td><td>--</td>
-            <% } else { %>
-                <td><%= coverage1.densityTranslate %></td><td><%= coverage1.minDiameter %></td><td><%= coverage1.maxDiameter %></td>
-            <% } %>
-            </tr>
-        <% } %>
-        <% if ((typeof(coverage2.name) !== "undefined") && (coverage2.name != "Other")) { %>
-            <tr><td><%= coverage2.name %></td>
-            <% if (coverage2.density == 0) { %>
-              <td>--</td><td>--</td><td>--</td>
-            <% } else { %>
-                <td><%= coverage2.densityTranslate %></td><td><%= coverage2.minDiameter %></td><td><%= coverage2.maxDiameter %></td>
-            <% } %>
-            </tr>
-        <% } %>
-        <% if ((typeof(coverage3.name) !== "undefined") && (coverage3.name != "Other")) { %>
-            <tr><td><%= coverage3.name %></td>
-            <% if (coverage3.density == 0) { %>
-              <td>--</td><td>--</td><td>--</td>
-            <% } else { %>
-                <td><%= coverage3.densityTranslate %></td><td><%= coverage3.minDiameter %></td><td><%= coverage3.maxDiameter %></td>
-            <% } %>
-            </tr>
-        <% } %>
-        <% if ((typeof(coverage4.name) !== "undefined") && (coverage4.name != "Other")) { %>
-            <tr><td><%= coverage4.name %></td>
-            <% if (coverage4.density == 0) { %>
-              <td>--</td><td>--</td><td>--</td>
-            <% } else { %>
-                <td><%= coverage4.densityTranslate %></td><td><%= coverage4.minDiameter %></td><td><%= coverage4.maxDiameter %></td>
-            <% } %>
-            </tr>
-        <% } %>
-        <% if ((typeof(coverage5.name) !== "undefined") && (coverage5.name != "Other")) { %>
-            <tr><td><%= coverage5.name %></td>
-            <% if (coverage5.density == 0) { %>
-              <td>--</td><td>--</td><td>--</td>
-            <% } else { %>
-                <td><%= coverage5.densityTranslate %></td><td><%= coverage5.minDiameter %></td><td><%= coverage5.maxDiameter %></td>
-            <% } %>
-            </tr>
-        <% } %>
-
-				<div>
+          <% if ((typeof(coverage1.name) !== "undefined") && (coverage1.name != "Other")) { %>
+              <tr><td><%= coverage1.name %></td>
+              <% if (coverage1.density == 0) { %>
+                <td>--</td><td>--</td><td>--</td>
+              <% } else { %>
+                  <td><%= coverage1.densityTranslate %></td><td><%= coverage1.minDiameter %></td><td><%= coverage1.maxDiameter %></td>
+              <% } %>
+              </tr>
+          <% } %>
+          <% if ((typeof(coverage2.name) !== "undefined") && (coverage2.name != "Other")) { %>
+              <tr><td><%= coverage2.name %></td>
+              <% if (coverage2.density == 0) { %>
+                <td>--</td><td>--</td><td>--</td>
+              <% } else { %>
+                  <td><%= coverage2.densityTranslate %></td><td><%= coverage2.minDiameter %></td><td><%= coverage2.maxDiameter %></td>
+              <% } %>
+              </tr>
+          <% } %>
+          <% if ((typeof(coverage3.name) !== "undefined") && (coverage3.name != "Other")) { %>
+              <tr><td><%= coverage3.name %></td>
+              <% if (coverage3.density == 0) { %>
+                <td>--</td><td>--</td><td>--</td>
+              <% } else { %>
+                  <td><%= coverage3.densityTranslate %></td><td><%= coverage3.minDiameter %></td><td><%= coverage3.maxDiameter %></td>
+              <% } %>
+              </tr>
+          <% } %>
+          <% if ((typeof(coverage4.name) !== "undefined") && (coverage4.name != "Other")) { %>
+              <tr><td><%= coverage4.name %></td>
+              <% if (coverage4.density == 0) { %>
+                <td>--</td><td>--</td><td>--</td>
+              <% } else { %>
+                  <td><%= coverage4.densityTranslate %></td><td><%= coverage4.minDiameter %></td><td><%= coverage4.maxDiameter %></td>
+              <% } %>
+              </tr>
+          <% } %>
+          <% if ((typeof(coverage5.name) !== "undefined") && (coverage5.name != "Other")) { %>
+              <tr><td><%= coverage5.name %></td>
+              <% if (coverage5.density == 0) { %>
+                <td>--</td><td>--</td><td>--</td>
+              <% } else { %>
+                  <td><%= coverage5.densityTranslate %></td><td><%= coverage5.minDiameter %></td><td><%= coverage5.maxDiameter %></td>
+              <% } %>
+              </tr>
+          <% } %>
+          </table>
+  				<div>
 			<div>
-		<div>
-		<div>
-		  <div class="cartodb-popup-tip-container"></div>
-		</div>
 	</script>
 
   <script type="infowindow/html" id="infowindow_template_mobile">

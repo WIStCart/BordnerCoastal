@@ -60,7 +60,7 @@ body{
 	bottom: 0px;
 	left:0px;
 	overflow-y: auto;
-	background-color: #619ec7 !important;
+	background-color: white !important;
 	padding: 4px;
 	border: solid 4px;
 	min-height: 150px;
@@ -412,6 +412,11 @@ div.cartodb-tooltip-content-wrapper p{
 	border-radius: 10px;
 }
 
+
+#infowindow-table-desktop{
+	padding-right: 25px!important
+}
+
 #mobile-clickwindow td{
 	/*display: inline-block;*/
 	max-width: 75px;
@@ -432,6 +437,10 @@ div.cartodb-tooltip-content-wrapper p{
   font-size: 8pt;
   color:#2c5875;
   margin-left: 1px;
+}
+
+.leaflet-popup-wrapper{
+	width: 1000px!important;
 }
 
 /* set styles to the custom infowindow -> close button */
@@ -466,10 +475,10 @@ div.cartodb-tooltip-content-wrapper p{
 
 
 th{
-	padding-left: 25px!important;
+	padding-right: 25px!important;
 }
 td{
-	padding-left: 25px!important;
+	padding-right: 25px!important;
 	text-align: left;
 }
 
@@ -544,6 +553,7 @@ td{
 
 .infowindow-header{
 	margin-top: 5px;
+	margin-bottom: 0px!important;
 }
 
 .selector-axis path{
@@ -730,4 +740,26 @@ button.active{
 .slider{
 	margin-top: 25px;
 	display: block;
+}
+
+
+.cartodb-popup-content .content{
+	padding-left: 0px!important;
+	width: 100%;
+}
+
+/*.leaflet-popup-content-wrapper td{
+	background-color: red;
+}*/
+
+.leaflet-popup-content-wrapper{
+	padding-right: 25px!important;
+	text-align: left;
+	font-size: 8pt;
+	color:#2c5875;
+	margin-left: 1px;
+}
+
+.content{
+	padding:0px!important;
 }

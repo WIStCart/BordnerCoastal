@@ -286,12 +286,11 @@ window.onload = function() {
 	  "line-opacity: 0.5;" +
 	  "line-comp-op: soft-light;" +
 	  "[zoom > 10]{" +
-		"text-name: 'T'+[twp]+'N R'+[rng]+[dirchar];" +
+		"text-name: [twp];" +
 		"text-face-name: 'Open Sans Regular';" +
 	    "text-size: 13;"+
 	    "text-fill: #fff;"+
 	    "text-halo-fill: #000000;"+
-	    "text-halo-radius: 0.75;"+
 	  "}"+
 	"}"
 	cartodb.createLayer(map, {
@@ -791,21 +790,20 @@ function enableDesktopMouseover(){
 
 function setupInfoWindow(layer){
 	// layer here should be bordner
-	infowindow = cdb.vis.Vis.addInfowindow(map, layer, infowindowVars, {
-		triggerEvent: "featureClick",
-		cursorInteraction: false
-	}).model.set({
-		'template' :  function(obj){
-			//!! important
-			//modify the object here before sending to templating engine
-			//lookup the classname
-			content = obj.content
-			windowContent = formatCoverageForInfowindow(content.data)
-			return _.template($('#infowindow_template').html())(windowContent);
-		},
-		'maxHeight': '1px'
-	});
-
+	// infowindow = cdb.vis.Vis.addInfowindow(map, layer, infowindowVars, {
+	// 	triggerEvent: "featureClick",
+	// 	cursorInteraction: false
+	// }).model.set({
+	// 	'template' :  function(obj){
+	// 		//!! important
+	// 		//modify the object here before sending to templating engine
+	// 		//lookup the classname
+	// 		content = obj.content
+	// 		windowContent = formatCoverageForInfowindow(content.data)
+	// 		return _.template($('#infowindow_template').html())(windowContent);
+	// 	}
+	// });
+	//
 
 
 }
@@ -815,6 +813,8 @@ function destroyInfoWindow(){
 }
 
 function onMapClick(){
+
+
 	//close the info window on basemap click
 	// if (desktopMode){
 	// 	setTimeout(function(){
@@ -948,10 +948,11 @@ function getLevelProps(level, level1Selected){
 	}
 	var names = _.pluck(set, nameKey)
 	var colors = _.pluck(set, colorKey)
-	var props = _.zip(names, colors).map(function(pair){
-		return _.object(["name", "color"], pair)
+	var className = _.pluck(set, "class");
+	var props = _.zip(names, colors, className).map(function(obj){
+		return _.object(["name", "color","class"], obj)
 	})
-	var props = _.sortBy(_.unique(props, function(d){return d.name}), "name");
+	var props = _.sortBy(_.unique(props, function(d){return d.name}), "class");
 	return props
 }
 
@@ -961,6 +962,8 @@ function getLevelProps(level, level1Selected){
 
 
 function onMapFeatureClick(e, latln, pxPos, data, layer){
+	map.panTo(latln)
+
 	//mark the infowindow as open
 	isInfowindowOpen = true;
 	//hide the infowindow if it's been filtered out by legend interaction
@@ -971,12 +974,7 @@ function onMapFeatureClick(e, latln, pxPos, data, layer){
 		isAMember = _.contains(level1MemberCodes, data.cov1)
 		if (!isAMember){
 			// infowindow.set('visibility', false)
-			$(".cartodb-infowindow").hide()
-			isInfowindowOpen = false;
-		}else{
-			$(".cartodb-infowindow").show()
-			isInfowindowOpen = true;
-			// infowindow.set('visibility', true)
+			return
 		}
 	}
 	if(legendType == "points"){
@@ -995,6 +993,13 @@ function onMapFeatureClick(e, latln, pxPos, data, layer){
 		$("#dock-mobile-info").click(function(){
 			 toggleMobileClickWindow();
 		})
+	}else if (desktopMode){
+		var linked = formatCoverageForInfowindow(data)
+		var formatted = _.template($('#infowindow_template').html())(linked)
+		p = L.popup({maxWidth: '300'})
+			.setLatLng(latln)
+			.setContent(formatted)
+			.openOn(map)
 	}
 }
 
@@ -1477,6 +1482,8 @@ function transformToTablet(){
 	isLegendOpen = false;
 
 	$("#infobox").addClass("infobox-mobile")
+
+	map.closePopup();
 }
 
 // Handles all click events from the 4 main UI buttons
@@ -1778,16 +1785,10 @@ function generateSpecificLayerQuery(boundsIn, _level1Selected){
 function drawPolyFilterDesktop(el, _levelEngaged, _level1Selected){
 		$(el).empty();
 		var props = getLevelProps(_levelEngaged, _level1Selected);
-		if (_levelEngaged == 1){
-			var width = $(el).width();
-		}else{
-			var barwidth = 75;
-			width = props.length * barwidth;
-		}
+		var width = $(el).width();
 		var height = $(el).height() - 15;
 
 		var margins = {top: 20, left: 30, right: 30, bottom: 100}
-
 
 		if (height < 0){
 			return;
@@ -1835,7 +1836,7 @@ function drawPolyFilterDesktop(el, _levelEngaged, _level1Selected){
 			.style('fill', function(d){return d.color})
 			.attr('x', function(d){ return xScale(d.name)})
 			.attr('data-name', function(d){return d.name})
-			.attr('class', function(d){ return d.name.split(" ").join("_") + " filter-swatch"})
+			.attr('class', function(d){ return d.class.split(" ").join("_") + " filter-swatch"})
 			.attr('width', xScale.rangeBand())
 			.attr('data-fill', function(d){return d.color})
 			.attr('y', 0)
@@ -1843,16 +1844,6 @@ function drawPolyFilterDesktop(el, _levelEngaged, _level1Selected){
 			.style('fill', function(d){
 				return d.color
 		})
-		// .style('opacity', function(d){
-		// 	if (levelEngaged == 2){
-		// 		level1Key = _level1Selected.toLowerCase().split(" ").join("_")
-		// 		dKey = d.name.toLowerCase().split(" ").join("_")
-		// 		if (level1Key == dKey){
-		// 			return 1
-		// 		}
-		// 		return 0.25
-		// 	}
-		// })
 		.on('click', function(d){
 			if (levelEngaged == 1){
 					dispatchLegendClick(d.name.toLowerCase())
