@@ -30,6 +30,7 @@ var level2Colors;
 var polygonLegendFactor = 0.000247105;
 var isInfowindowOpen = false;
 var isTOCOpen = true;
+var isLayerListOpen = false;
 var infowindow;
 var semanticZoomLevel = 13;
 var lineTypeSelected;
@@ -1293,7 +1294,8 @@ function reflectChangeLayerInQueryString(overlayCalled, didAdd){
 
 // To dock/undock the table of contents from bottom
 function toggleTOC(evt){
-	// evt.preventDefault();
+	evt.preventDefault();
+	console.log(isTOCOpen)
 	if (isTOCOpen){
 		isTOCOpen = false;
 		$("#toc").hide()
@@ -1392,12 +1394,16 @@ function dispatchButtonClick(buttonClicked){
 			geoLocate();
 		}else if (buttonClicked == "layerListButton"){
 			toggleLayerListDesktop();
+			return
 		} else if (buttonClicked == "infoButton"){
 			 configInfoShareModal();
+			 return
 		}else if (buttonClicked == "shareButton"){
 			 configInfoShareModal();
+			 return
 		}else if (buttonClicked == geocodeButton){
-			//auto dispatches to the geocoder
+			//auto dispatches to the geocoderr
+			return
 		}else{
 			console.log("Unknown button, returning...")
 			return;
@@ -1407,16 +1413,22 @@ function dispatchButtonClick(buttonClicked){
 		//tablet mode
 		if (buttonClicked == 'locateMeButton'){
 			geoLocate();
+			return
 		}else if (buttonClicked == "legendButton"){
 			openLegendTablet();
+			return
 		}else if (buttonClicked == "layerListButton"){
 			openLayerListTablet();
+			return
 		} else if (buttonClicked == "infoButton"){
 			 configInfoShareModal();
+			 return
 		}else if (buttonClicked == "shareButton"){
 			 configInfoShareModal();
+			 return
 		}else if (buttonClicked == 'geocodeButton'){
 			//auto dispatches to the geocoder
+			return
 		}else{
 			console.log("Unknown button, returning...")
 			return;
@@ -1426,7 +1438,7 @@ function dispatchButtonClick(buttonClicked){
 }
 
 function toggleLayerListDesktop(){
-	if (isTOCOpen){
+	if (isLayerListOpen){
 		closeLayerListDesktop()
 	}else{
 		openLayerListDesktop();
@@ -1434,13 +1446,13 @@ function toggleLayerListDesktop(){
 }
 
 function closeLayerListDesktop(){
-	isTOCOpen = false;
+	isLayerListOpen = false;
 	$("#layerList").addClass('closed').removeClass('open')
 	$("#layerList").hide();
 }
 
 function openLayerListDesktop(){
-	isTOCOpen = true;
+	isLayerListOpen = true;
 	$("#layerList").addClass('open').removeClass('closed')
 	$("#layerList").show();
 }
@@ -1503,7 +1515,7 @@ function modalAttachTOC(){
 
 // ...
 function configInfoShareModal(){
-		if (isTOCOpen){
+		if (isLayerListOpen){
 			toggleLayerListDesktop();
 		}
 		$("#infoModal").modal('show');
@@ -2215,7 +2227,7 @@ function showOnePoint(pointType){
 
 
 function makePointOrLineLegendItem(item){
-	var legendItem = "<div class='col-xs-6 col-sm-3 col-md-2 col-lg-1 legend-item'  data-type='" + item.type + "' data-name='" + item.name + "'>"
+	var legendItem = "<div class='col-xs-6 col-sm-3 col-md-3 col-lg-2 legend-item'  data-type='" + item.type + "' data-name='" + item.name + "'>"
 	legendItem += "<div class='media legend-media'>"
 	legendItem += "<div class='media-left'><img class='media-object' src='" + item.icon + "'/></div>"
 	legendItem += "<div class='media-body'>" + item.name + "</div>"
