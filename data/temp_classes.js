@@ -229,7 +229,7 @@ classes:[{"code":"C","name":"C - Cleared Cropland","level2":"Cleared cropland","
 {"code":"Duuu","name":"Duuu - ","level2":"Unknown forest","level1":"Unknown Forest","class":"forest","color1":"#5ac88b","color2":"#5ac88b"},
 {"code":"C1uu","name":"C1uu - ","level2":"Unknown forest","level1":"Unknown Forest","class":"forest","color1":"#5ac88b","color2":"#5ac88b"},
 {"code":"NF","name":"National Forest","level2":"Unknown forest","level1":"Unknown Forest","class":"forest","color1":"#5ac88b","color2":"#5ac88b"},
-{"code":"C4b","name":"C4b","level2":"Unknown forest","level1":"Unknown forest","class":"forest","color1":"#5ac88b","color2":"#5ac88b"},
+{"code":"C4b","name":"C4b","level2":"Unknown forest","level1":"Unknown Forest","class":"forest","color1":"#5ac88b","color2":"#5ac88b"},
 {"code":"D2","name":"D2 - Jack Pine","level2":"Jack pine","level1":"Upland Coniferous Forest","class":"forest","color1":"#548900","color2":"#d97b44"},
 {"code":"C2","name":"C2 - Norway Pine","level2":"Norway pine","level1":"Upland Coniferous Forest","class":"forest","color1":"#548900","color2":"#548900"},
 {"code":"B2","name":"B2 - White Pine","level2":"White pine","level1":"Upland Coniferous Forest","class":"forest","color1":"#548900","color2":"#549ce2"},
