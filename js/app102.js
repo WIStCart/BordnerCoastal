@@ -54,8 +54,10 @@ var canDoGeolocation;
 var isMobileClickWindowOpen = true;
 
 // Overlay definitions:
-var labelsOverlay = L.tileLayer('http://{s}.tile.stamen.com/toner-labels/{z}/{x}/{y}.png', {
-	attribution: 'stamen toner labels'
+var labelsOverlay = L.tileLayer('http://{s}.basemaps.cartocdn.com/light_only_labels/{z}/{x}/{y}.png', {
+	attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="http://cartodb.com/attributions">CartoDB</a>',
+	subdomains: 'abcd',
+	maxZoom: 23
 });
 
 var terrainOverlay = L.tileLayer('http://{s}.tiles.wmflabs.org/hillshading/{z}/{x}/{y}.png', {
@@ -1763,11 +1765,6 @@ function drawPolyFilterDesktop(el, _levelEngaged, _level1Selected){
 			var barwidth = 75;
 			width = props.length * barwidth;
 		}
-
-
-
-
-
 		var height = $(el).height() - 15;
 
 		var margins = {top: 20, left: 30, right: 30, bottom: 100}
