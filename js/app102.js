@@ -53,6 +53,8 @@ var canDoGeolocation;
 
 var isMobileClickWindowOpen = true;
 
+var bounds;
+
 // Overlay definitions:
 var labelsOverlay = L.tileLayer('http://{s}.basemaps.cartocdn.com/light_only_labels/{z}/{x}/{y}.png', {
 	attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="http://cartodb.com/attributions">CartoDB</a>',
@@ -226,9 +228,18 @@ window.onload = function() {
 		cartodb_logo: false,
 		center: [43.7844,-88.7879],
 		zoom: 7,
-		minZoom:6,
+		minZoom:7,
 		maxZoom: 18
 	});
+
+	//limit panning
+	var north = 47.5
+	var south = 42
+	var east = -86.5
+	var west = -93
+
+	bounds = L.latLngBounds([south, west], [north, east])
+	map.setMaxBounds(bounds)
 
 
 	// Add county layer
@@ -751,6 +762,10 @@ function setupInteraction(layer, _levelEngaged, _visibility){
 	$("#map").click(onMapClick)
 
 	$('#legendModal').on('hidden.bs.modal', closeLegendTablet);
+
+	map.on('drag', function(){
+		map.panInsideBounds(bounds, {animate: false})
+	})
 
 } //end setup interaction
 
