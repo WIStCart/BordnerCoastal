@@ -53,7 +53,13 @@ var canDoGeolocation;
 
 var isMobileClickWindowOpen = true;
 
-var bounds;
+
+//limit panning
+var north = 47.5
+var south = 42
+var east = -85
+var west = -93
+var bounds = new L.latLngBounds(L.latLng(north, east), L.latLng(south, west));
 
 // Overlay definitions:
 var labelsOverlay = L.tileLayer('http://{s}.basemaps.cartocdn.com/light_only_labels/{z}/{x}/{y}.png', {
@@ -222,6 +228,9 @@ function makeVariableFromString(stringIn){
 
 // Load the Carto map:
 window.onload = function() {
+
+
+
 	//Create the leaflet map
 	map = L.map('map', {
 		zoomControl: true,
@@ -229,17 +238,9 @@ window.onload = function() {
 		center: [43.7844,-88.7879],
 		zoom: 7,
 		minZoom:7,
-		maxZoom: 18
+		maxZoom: 18,
+		maxBounds: bounds
 	});
-
-	//limit panning
-	var north = 47.5
-	var south = 42
-	var east = -86.5
-	var west = -93
-
-	bounds = L.latLngBounds([south, west], [north, east])
-	map.setMaxBounds(bounds)
 
 
 	// Add county layer
@@ -415,6 +416,7 @@ var cartoCSSLines = getLineCSS('none')
 		if ((typeof(level1Selected) != "undefined") && (legendType == "polygons")){
 			dispatchLegendClick(level1Selected)
 		}
+		setupInfoWindow(bordner);
 	});
 
 	var cartoCSSPoints = getPointCSS('none')
@@ -513,10 +515,10 @@ function parseURL(){
 	var lat = $.query.get('latitude')
 	var lng =  $.query.get('longitude')
 
+
 	if ((lat != '') && (lng != '') && (!isNaN(+lat)) && (!isNaN(+lng))){
 		var center = new L.latLng(lat, lng)
-		console.log(center)
-		map.getCenter(center)
+		map.panTo(center)
 	}
 
 	//set feature type queries
@@ -787,9 +789,10 @@ function enableDesktopMouseover(){
 
 
 function setupInfoWindow(layer){
-	//layer here should be bordner
-	infowindow = cdb.vis.Vis.addInfowindow(map, layer, infowindowVars,{
-		'sanitizeTemplate':false
+	// layer here should be bordner
+	infowindow = cdb.vis.Vis.addInfowindow(map, layer, infowindowVars, {
+		triggerEvent: "featureClick",
+		cursorInteraction: false
 	}).model.set({
 		'template' :  function(obj){
 			//!! important
@@ -798,8 +801,12 @@ function setupInfoWindow(layer){
 			content = obj.content
 			windowContent = formatCoverageForInfowindow(content.data)
 			return _.template($('#infowindow_template').html())(windowContent);
-		}
+		},
+		'maxHeight': '1px'
 	});
+
+
+
 }
 
 function destroyInfoWindow(){
@@ -808,14 +815,14 @@ function destroyInfoWindow(){
 
 function onMapClick(){
 	//close the info window on basemap click
-	if (desktopMode && (typeof(undefined) != "undefined")){
-		setTimeout(function(){
-			if(!isInfowindowOpen){
-				infowindow.set('visibility', false);
-			}
-				isInfowindowOpen = false;
-		}, 250) //timeout is important here in maintaining correct popup state
-	}
+	// if (desktopMode){
+	// 	setTimeout(function(){
+	// 		if(!isInfowindowOpen){
+	// 			infowindow.set('visibility', false);
+	// 		}
+	// 			isInfowindowOpen = false;
+	// 	}, 250) //timeout is important here in maintaining correct popup state
+	// }
 }
 
 //functions for events on particular feature types
@@ -1246,17 +1253,14 @@ function refreshPoints(){
 var jsMediaQuery = function() {
 	console.log("Called")
 	if (window.matchMedia('(max-width: 768px)').matches){
-		if (desktopMode){
 			desktopMode = false;
 			console.log("~~ tablet mode engaged")
+			console.log("Transforming to tablet")
 			transformToTablet();
-		}
 	}else{
-		if (desktopMode === false){
-			desktopMode = true;
-			console.log("~~ desktop mode engaged")
-			transformToDesktop();
-		}
+		desktopMode = true;
+		console.log("~~ desktop mode engaged")
+		transformToDesktop();
 	}
 };
 
@@ -1434,7 +1438,7 @@ function toggleLegend(evt){
 
 // To configure desktop view (not called upon pageload - all HTML defaults to desktop styles)
 function transformToDesktop(){
-
+	console.log("Transforming to desktop")
 	$("#tocModal").modal('hide');
 	$("#infoModal").modal('hide');
 
@@ -1449,13 +1453,14 @@ function transformToDesktop(){
 
 	$("#legend").appendTo("#toc");
 
-	setupInfoWindow(bordner);
-
 	$("#infobox").removeClass("infobox-mobile")
 
-	destroyMobileInfowindow();
+	// destroyMobileInfowindow();
 	enableDesktopMouseover();
-	console.log("Desktop transform")
+	// if (typeof(bordner) != "undefined"){
+	// 	//happens tablet --> desktop
+	// 	setupInfoWindow(bordner);
+	// }
 }
 
 // To configure tablet view (is called upon pageload)
@@ -1469,8 +1474,6 @@ function transformToTablet(){
 	$("#toc").hide();
 
 	isLegendOpen = false;
-
-	destroyInfoWindow();
 
 	$("#infobox").addClass("infobox-mobile")
 }
