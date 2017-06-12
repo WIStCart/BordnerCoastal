@@ -53,9 +53,19 @@ var canDoGeolocation;
 
 var isMobileClickWindowOpen = true;
 
+
+//limit panning
+var north = 47.5
+var south = 42
+var east = -85
+var west = -93
+var bounds = new L.latLngBounds(L.latLng(north, east), L.latLng(south, west));
+
 // Overlay definitions:
-var labelsOverlay = L.tileLayer('http://{s}.tile.stamen.com/toner-labels/{z}/{x}/{y}.png', {
-	attribution: 'stamen toner labels'
+var labelsOverlay = L.tileLayer('http://{s}.basemaps.cartocdn.com/light_only_labels/{z}/{x}/{y}.png', {
+	attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="http://cartodb.com/attributions">CartoDB</a>',
+	subdomains: 'abcd',
+	maxZoom: 23
 });
 
 var terrainOverlay = L.tileLayer('http://{s}.tiles.wmflabs.org/hillshading/{z}/{x}/{y}.png', {
@@ -218,14 +228,18 @@ function makeVariableFromString(stringIn){
 
 // Load the Carto map:
 window.onload = function() {
+
+
+
 	//Create the leaflet map
 	map = L.map('map', {
 		zoomControl: true,
 		cartodb_logo: false,
 		center: [43.7844,-88.7879],
 		zoom: 7,
-		minZoom:6,
-		maxZoom: 18
+		minZoom:7,
+		maxZoom: 18,
+		maxBounds: bounds
 	});
 
 
@@ -272,12 +286,11 @@ window.onload = function() {
 	  "line-opacity: 0.5;" +
 	  "line-comp-op: soft-light;" +
 	  "[zoom > 10]{" +
-		"text-name: 'T'+[twp]+'N R'+[rng]+[dirchar];" +
+		"text-name: [twp];" +
 		"text-face-name: 'Open Sans Regular';" +
 	    "text-size: 13;"+
 	    "text-fill: #fff;"+
 	    "text-halo-fill: #000000;"+
-	    "text-halo-radius: 0.75;"+
 	  "}"+
 	"}"
 	cartodb.createLayer(map, {
@@ -403,6 +416,7 @@ var cartoCSSLines = getLineCSS('none')
 		if ((typeof(level1Selected) != "undefined") && (legendType == "polygons")){
 			dispatchLegendClick(level1Selected)
 		}
+		setupInfoWindow(bordner);
 	});
 
 	var cartoCSSPoints = getPointCSS('none')
@@ -501,10 +515,10 @@ function parseURL(){
 	var lat = $.query.get('latitude')
 	var lng =  $.query.get('longitude')
 
+
 	if ((lat != '') && (lng != '') && (!isNaN(+lat)) && (!isNaN(+lng))){
 		var center = new L.latLng(lat, lng)
-		console.log(center)
-		map.getCenter(center)
+		map.panTo(center)
 	}
 
 	//set feature type queries
@@ -751,6 +765,10 @@ function setupInteraction(layer, _levelEngaged, _visibility){
 
 	$('#legendModal').on('hidden.bs.modal', closeLegendTablet);
 
+	map.on('drag', function(){
+		map.panInsideBounds(bounds, {animate: false})
+	})
+
 } //end setup interaction
 
 function dockMobileInfowindow(){
@@ -771,19 +789,23 @@ function enableDesktopMouseover(){
 
 
 function setupInfoWindow(layer){
-	//layer here should be bordner
-	infowindow = cdb.vis.Vis.addInfowindow(map, layer, infowindowVars,{
-		'sanitizeTemplate':false
-	}).model.set({
-		'template' :  function(obj){
-			//!! important
-			//modify the object here before sending to templating engine
-			//lookup the classname
-			content = obj.content
-			windowContent = formatCoverageForInfowindow(content.data)
-			return _.template($('#infowindow_template').html())(windowContent);
-		}
-	});
+	// layer here should be bordner
+	// infowindow = cdb.vis.Vis.addInfowindow(map, layer, infowindowVars, {
+	// 	triggerEvent: "featureClick",
+	// 	cursorInteraction: false
+	// }).model.set({
+	// 	'template' :  function(obj){
+	// 		//!! important
+	// 		//modify the object here before sending to templating engine
+	// 		//lookup the classname
+	// 		content = obj.content
+	// 		windowContent = formatCoverageForInfowindow(content.data)
+	// 		return _.template($('#infowindow_template').html())(windowContent);
+	// 	}
+	// });
+	//
+
+
 }
 
 function destroyInfoWindow(){
@@ -791,15 +813,17 @@ function destroyInfoWindow(){
 }
 
 function onMapClick(){
+
+
 	//close the info window on basemap click
-	if (desktopMode){
-		setTimeout(function(){
-			if(!isInfowindowOpen){
-				infowindow.set('visibility', false);
-			}
-				isInfowindowOpen = false;
-		}, 250) //timeout is important here in maintaining correct popup state
-	}
+	// if (desktopMode){
+	// 	setTimeout(function(){
+	// 		if(!isInfowindowOpen){
+	// 			infowindow.set('visibility', false);
+	// 		}
+	// 			isInfowindowOpen = false;
+	// 	}, 250) //timeout is important here in maintaining correct popup state
+	// }
 }
 
 //functions for events on particular feature types
@@ -854,10 +878,15 @@ function onPolyOver(e, latln, pxPos, data, layer){
 			$("#level1-set").html(level1)
 		}else{
 			var lev1 = getLevel1FromCode(data.cov1)
+			var lev2 = getLevel2FromCode(data.cov1)
+			if (levelEngaged == 1){
+				var theLabel = lev1
+			}else{
+				var theLabel = lev2
+			}
 			if (lev1.toLowerCase() == level1Selected.toLowerCase()){
 				$(".infobox").show()
-				level1 = getLevel1FromCode(data.cov1)
-				$("#level1-set").html(level1)
+				$("#level1-set").html(theLabel)
 			}
 		}
 	}
@@ -907,17 +936,34 @@ function getZoomLevelsFromCode(code, featureType){
 }
 
 
-function getLevel1Props(){
-	var level1names = _.pluck(tempClasses2.classes, "level1")
-	var level1colors = _.pluck(tempClasses2.classes, "color1")
-	var props = _.zip(level1names, level1colors).map(function(pair){
-		return _.object(["name", "color"], pair)
+function getLevelProps(level, level1Selected){
+	if (level == 1){
+		var set = tempClasses2.classes
+		var colorKey = "color1"
+		var nameKey = "level1"
+	}else if (level == 2){
+		var set = level1Membership[level1Selected.toLowerCase().split(" ").join("_")]
+		var colorKey = "color2"
+		var nameKey = "level2"
+	}
+	var names = _.pluck(set, nameKey)
+	var colors = _.pluck(set, colorKey)
+	var className = _.pluck(set, "class");
+	var props = _.zip(names, colors, className).map(function(obj){
+		return _.object(["name", "color","class"], obj)
 	})
-	var props = _.sortBy(_.unique(props, function(d){return d.name}), "name");
+	var props = _.sortBy(_.unique(props, function(d){return d.name}), "class");
 	return props
 }
 
+
+
+
+
+
 function onMapFeatureClick(e, latln, pxPos, data, layer){
+	map.panTo(latln)
+
 	//mark the infowindow as open
 	isInfowindowOpen = true;
 	//hide the infowindow if it's been filtered out by legend interaction
@@ -928,12 +974,7 @@ function onMapFeatureClick(e, latln, pxPos, data, layer){
 		isAMember = _.contains(level1MemberCodes, data.cov1)
 		if (!isAMember){
 			// infowindow.set('visibility', false)
-			$(".cartodb-infowindow").hide()
-			isInfowindowOpen = false;
-		}else{
-			$(".cartodb-infowindow").show()
-			isInfowindowOpen = true;
-			// infowindow.set('visibility', true)
+			return
 		}
 	}
 	if(legendType == "points"){
@@ -952,6 +993,13 @@ function onMapFeatureClick(e, latln, pxPos, data, layer){
 		$("#dock-mobile-info").click(function(){
 			 toggleMobileClickWindow();
 		})
+	}else if (desktopMode){
+		var linked = formatCoverageForInfowindow(data)
+		var formatted = _.template($('#infowindow_template').html())(linked)
+		p = L.popup({maxWidth: '300'})
+			.setLatLng(latln)
+			.setContent(formatted)
+			.openOn(map)
 	}
 }
 
@@ -1211,17 +1259,14 @@ function refreshPoints(){
 var jsMediaQuery = function() {
 	console.log("Called")
 	if (window.matchMedia('(max-width: 768px)').matches){
-		if (desktopMode){
 			desktopMode = false;
 			console.log("~~ tablet mode engaged")
+			console.log("Transforming to tablet")
 			transformToTablet();
-		}
 	}else{
-		if (desktopMode === false){
-			desktopMode = true;
-			console.log("~~ desktop mode engaged")
-			transformToDesktop();
-		}
+		desktopMode = true;
+		console.log("~~ desktop mode engaged")
+		transformToDesktop();
 	}
 };
 
@@ -1399,7 +1444,7 @@ function toggleLegend(evt){
 
 // To configure desktop view (not called upon pageload - all HTML defaults to desktop styles)
 function transformToDesktop(){
-
+	console.log("Transforming to desktop")
 	$("#tocModal").modal('hide');
 	$("#infoModal").modal('hide');
 
@@ -1414,13 +1459,14 @@ function transformToDesktop(){
 
 	$("#legend").appendTo("#toc");
 
-	setupInfoWindow(bordner);
-
 	$("#infobox").removeClass("infobox-mobile")
 
-	destroyMobileInfowindow();
+	// destroyMobileInfowindow();
 	enableDesktopMouseover();
-	console.log("Desktop transform")
+	// if (typeof(bordner) != "undefined"){
+	// 	//happens tablet --> desktop
+	// 	setupInfoWindow(bordner);
+	// }
 }
 
 // To configure tablet view (is called upon pageload)
@@ -1435,9 +1481,9 @@ function transformToTablet(){
 
 	isLegendOpen = false;
 
-	destroyInfoWindow();
-
 	$("#infobox").addClass("infobox-mobile")
+
+	map.closePopup();
 }
 
 // Handles all click events from the 4 main UI buttons
@@ -1737,15 +1783,12 @@ function generateSpecificLayerQuery(boundsIn, _level1Selected){
 }
 
 function drawPolyFilterDesktop(el, _levelEngaged, _level1Selected){
-	$(el).empty();
-	var level1Props = getLevel1Props();
-		// console.log(summary)
+		$(el).empty();
+		var props = getLevelProps(_levelEngaged, _level1Selected);
 		var width = $(el).width();
 		var height = $(el).height() - 15;
 
 		var margins = {top: 20, left: 30, right: 30, bottom: 100}
-		console.log(el)
-
 
 		if (height < 0){
 			return;
@@ -1776,7 +1819,7 @@ function drawPolyFilterDesktop(el, _levelEngaged, _level1Selected){
 			.append('g')
 				.attr('transform', "translate(" + margins.left + "," + margins.top + ")")
 
-		xScale.domain(_.pluck(level1Props, "name"))
+		xScale.domain(_.pluck(props, "name"))
 
 
 		svg.append("g")
@@ -1788,28 +1831,18 @@ function drawPolyFilterDesktop(el, _levelEngaged, _level1Selected){
 
 				//these are the data-driven bars proportional to the area in the screen
 		svg.selectAll('filter-swatch')
-			.data(level1Props)
+			.data(props)
 			.enter().append('rect')
 			.style('fill', function(d){return d.color})
 			.attr('x', function(d){ return xScale(d.name)})
 			.attr('data-name', function(d){return d.name})
-			.attr('class', function(d){ return d.name.split(" ").join("_") + " filter-swatch"})
+			.attr('class', function(d){ return d.class.split(" ").join("_") + " filter-swatch"})
 			.attr('width', xScale.rangeBand())
 			.attr('data-fill', function(d){return d.color})
 			.attr('y', 0)
 			.attr('height', 75)
 			.style('fill', function(d){
 				return d.color
-		})
-		.style('opacity', function(d){
-			if (levelEngaged == 2){
-				level1Key = _level1Selected.toLowerCase().split(" ").join("_")
-				dKey = d.name.toLowerCase().split(" ").join("_")
-				if (level1Key == dKey){
-					return 1
-				}
-				return 0.25
-			}
 		})
 		.on('click', function(d){
 			if (levelEngaged == 1){
@@ -1843,8 +1876,10 @@ function drawPolyFilterDesktop(el, _levelEngaged, _level1Selected){
 
 function drawPolyFilterTablet(el, _levelEngaged, _level1Selected){
 	//draw the filter swatches vertically instead of horizontally to improve readability of labels
+
+	var props = getLevelProps(_levelEngaged, _level1Selected)
+
 	$(el).empty();
-	var level1Props = getLevel1Props();
 		// console.log(summary)
 		var width = $(el).width();
 		var height = $(el).height() - 25;
@@ -1855,7 +1890,6 @@ function drawPolyFilterTablet(el, _levelEngaged, _level1Selected){
 		height = height - margins.top - margins.bottom;
 		width = width - margins.left - margins.right;
 
-		console.log(height)
 
 		var barWidth = width;
 
@@ -1874,7 +1908,7 @@ function drawPolyFilterTablet(el, _levelEngaged, _level1Selected){
 			.append('g')
 				.attr('transform', "translate(" + margins.left + "," + margins.top + ")")
 
-		yScale.domain(_.pluck(level1Props, "name"))
+		yScale.domain(_.pluck(props, "name"))
 
 
 		svg.append("g")
@@ -1885,7 +1919,7 @@ function drawPolyFilterTablet(el, _levelEngaged, _level1Selected){
 
 				//these are the data-driven bars proportional to the area in the screen
 		svg.selectAll('filter-swatch')
-			.data(level1Props)
+			.data(props)
 			.enter().append('rect')
 			.style('fill', function(d){return d.color})
 			.attr('y', function(d){ return yScale(d.name)})
@@ -1942,11 +1976,9 @@ function drawPolyFilterTablet(el, _levelEngaged, _level1Selected){
 
 function drawPolyFilter(el, _levelEngaged, _level1Selected){
 	if (desktopMode){
-		console.log("Drawing in desktop mode.")
 		drawPolyFilterDesktop(el, _levelEngaged, _level1Selected)
 	}else{
 		//tablet mode has different orientation
-		console.log("Drawing in tablet mode")
 		if (isLegendOpen){
 					drawPolyFilterTablet(el, _levelEngaged, _level1Selected)
 		}
@@ -1980,13 +2012,10 @@ function shadeRGBColor(color, percent) {
 function drawPolygonHistogram(data, _levelEngaged, el, histogramScale){
 	var summary = summarize(data, _levelEngaged)
 
-
-
 	if (_levelEngaged == 2){
 		summary.reverse();
 	}
 
-	// console.log(summary)
 	var margins = {top: 20, left: 75, right: 30, bottom: 30}
 
 	var height = $(el).height() - 100;
