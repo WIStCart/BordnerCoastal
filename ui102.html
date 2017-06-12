@@ -8,7 +8,7 @@
 	<!-- meta /\ -->
     <title>Bordner User Interface - Template</title>
     <!-- css \/ -->
-    <link rel='stylesheet' href="css/pace.css">
+    <link rel=stylesheet href="css/pace.css">
 	<link href="css/bootstrap.min.css" rel="stylesheet"> <!-- Currently using Bootstrap 3.3.7 -->
 	<link href="css/bootstrap-slider.min.css" rel="stylesheet"> <!--For transparency slider -->
     <link href="css/app102.css" rel="stylesheet">
@@ -22,38 +22,92 @@
 		<div class="col-sm-12 map-view map-view-toc transition-class" id="map"></div>
 	  </div>
 	  <div class="row" id="tocParent">
-			<div class="col-sm-12 toc-view toc-view-open transition-class" id="toc">
-				<div class="col-sm-4 toc-button toc-button-open transition-class" id="tocButton">
-					<span id="tocIcon" class="icon-class glyphicon glyphicon-chevron-down transition-class"></span>
-				</div>
-				<div class="col-sm-12 legend-view transition-class clearfix" id="legend">
-          <div id='legend-back'><span class='glyphicon glyphicon-chevron-left pull-left'></span>Back to overview</div>
-          <h5 class='pull-left legend-header'>Legend</h5>
-          <div id="legendHolder" class='col-xs-12'></div>
+      <div class="col-sm-4 toc-button toc-button-open transition-class" id="tocButton">
+        <span id="tocIcon" class="icon-class glyphicon glyphicon-chevron-down transition-class"></span>
+      </div>
+			<div class="col-sm-12  transition-class" id="toc">
+				<div class="col-sm-12 transition-class clearfix" id="legend">
+          <div id='legend-back' class='legend-bar'><span class="glyphicon glyphicon-chevron-left pull-left"></span>Back to overview</div>
+          <div class='legend-bar' id='legend-header'>Legend</div>
+          <div id="legendHolder" class="col-xs-12 stylescroll"</div>
 				</div>
 			</div>
 		</div>
-		<h1 class="sampleClass"></h1>
 	</div>
 
-	<div id="tocModal" class="modal fade" role="dialog">
-		<div class="modal-dialog" id="tocModalDialogue">
-		</div>
+	<div id="layerListModal" class="modal fade" role="dialog">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <h3 class='page-header'>Table of Contents</h3>
+        <div class="modal-body layerListModalBody layerListTablet" id="layerListModalBody">
+          <div id='modal-layerListHolder' class='stylescroll'></div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Done</button>
+        </div>
+      </div>
+    </div>
 	</div>
-<h1 id='level1Label'>Class Label</h1>
-  <div id='neatline'></div>
 
-  <div id='infobox' class='infobox'>
+  <div id="legendModal" class="modal fade" role="dialog">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <h3 class='page-header'>The Legend</h3>
+        <div class="modal-body" id="legendModalBody">
+          <div id='modal-layerListHolder'></div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Done</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id='layerList' class='transiton transition-class row clearfix stylescroll'>
+  </div>
+
+  <div class="modal fade" id=infoModal>
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3 class="modal-title">The Bordner Survey</h3>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <p>Here is some info about the map</p>
+          <i>Share me!</i>
+          <div class="btn-group btn-group-vertical">
+            <button class="btn btn-lg"><span class="glyphicon glyphicon-envelope"></span></button>
+            <button class="btn btn-lg"><span class="glyphicon glyphicon-fire"></span></button>
+            <button class="btn btn-lg"><span class="glyphicon glyphicon-plane"></span></button>
+            <button class="btn btn-lg"><span class="glyphicon glyphicon-thumbs-up"></span></button>
+            <button class="btn btn-lg"><span class="glyphicon glyphicon-send"></span></button>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+<h1 id=level1Label>Class Label</h1>
+  <div id=neatline></div>
+
+  <div id=infobox class=infobox>
     <p id="level1-set"></p>
   </div>
 
-  <div class='checkbox' id='infoboxHolder'>
-  <input type="checkbox" name="showInfobox" id="showInfobox" checked/> <label id='showInfoboxLabel'>Show details</label>
+  <div class=checkbox id=infoboxHolder>
+  <input type="checkbox" name="showInfobox" id="showInfobox" checked/> <label id=showInfoboxLabel>Show details</label>
   </div>
 
 
-  <label class="legend-label">Basemap</label>
-  <!-- <div id='infowindow'></div> -->
+
+  <!-- <div id=infowindow></div> -->
   <!-- Templating using the underscore templating functions included in Carto -->
   <!-- //make a table with the properties -->
   <!-- //all props are container in the object fed here via the _.template function-->
@@ -118,9 +172,65 @@
 		<div>
 		  <div class="cartodb-popup-tip-container"></div>
 		</div>
-
-
 	</script>
+
+  <script type="infowindow/html" id="infowindow_template_mobile">
+  <div class='clearfix' id='mobile-clickwindow-holder'>
+  <a id='dock-mobile-info' class='pull-right'><span class='glyphicon glyphicon-chevron-right'></span></a>
+        <table id='mobile-clickwindow' class='transition transition-class'>
+        <thead><tr><th>Name</th><th>Density</th><th>Min. Diameter (in)</th><th>Max Diameter (in)</th></tr></thead>
+
+        <% if ((typeof(coverage1.name) !== "undefined") && (coverage1.name != "Other")) { %>
+            <tr><td><%= coverage1.name %></td>
+            <% if (coverage1.density == 0) { %>
+              <td>--</td><td>--</td><td>--</td>
+            <% } else { %>
+                <td><%= coverage1.densityTranslate %></td><td><%= coverage1.minDiameter %></td><td><%= coverage1.maxDiameter %></td>
+            <% } %>
+            </tr>
+        <% } %>
+        <% if ((typeof(coverage2.name) !== "undefined") && (coverage2.name != "Other")) { %>
+            <tr><td><%= coverage2.name %></td>
+            <% if (coverage2.density == 0) { %>
+              <td>--</td><td>--</td><td>--</td>
+            <% } else { %>
+                <td><%= coverage2.densityTranslate %></td><td><%= coverage2.minDiameter %></td><td><%= coverage2.maxDiameter %></td>
+            <% } %>
+            </tr>
+        <% } %>
+        <% if ((typeof(coverage3.name) !== "undefined") && (coverage3.name != "Other")) { %>
+            <tr><td><%= coverage3.name %></td>
+            <% if (coverage3.density == 0) { %>
+              <td>--</td><td>--</td><td>--</td>
+            <% } else { %>
+                <td><%= coverage3.densityTranslate %></td><td><%= coverage3.minDiameter %></td><td><%= coverage3.maxDiameter %></td>
+            <% } %>
+            </tr>
+        <% } %>
+        <% if ((typeof(coverage4.name) !== "undefined") && (coverage4.name != "Other")) { %>
+            <tr><td><%= coverage4.name %></td>
+            <% if (coverage4.density == 0) { %>
+              <td>--</td><td>--</td><td>--</td>
+            <% } else { %>
+                <td><%= coverage4.densityTranslate %></td><td><%= coverage4.minDiameter %></td><td><%= coverage4.maxDiameter %></td>
+            <% } %>
+            </tr>
+        <% } %>
+        <% if ((typeof(coverage5.name) !== "undefined") && (coverage5.name != "Other")) { %>
+            <tr><td><%= coverage5.name %></td>
+            <% if (coverage5.density == 0) { %>
+              <td>--</td><td>--</td><td>--</td>
+            <% } else { %>
+                <td><%= coverage5.densityTranslate %></td><td><%= coverage5.minDiameter %></td><td><%= coverage5.maxDiameter %></td>
+            <% } %>
+            </tr>
+        <% } %>
+
+        </table>
+        </div>
+	</script>
+
+
   <script src="js/pace.min.js"></script>
     <!-- js \/ -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>

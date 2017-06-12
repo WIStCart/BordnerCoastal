@@ -27,9 +27,10 @@ var infowindowVars = ['cov1','cov2', 'cov3', 'cov4', 'cov5',
 var polygonLegend; //svg polygon legend
 var level1Colors;
 var level2Colors;
-var polygonLegendFactor = 1e6;
+var polygonLegendFactor = 0.000247105;
 var isInfowindowOpen = false;
-var isTOCOpen = false;
+var isLegendOpen = true;
+var isLayerListOpen = false;
 var infowindow;
 var semanticZoomLevel = 13;
 var lineTypeSelected;
@@ -49,6 +50,8 @@ var densityIsOn = false;
 var navIsOn = false;
 var theLocation;
 var canDoGeolocation;
+
+var isMobileClickWindowOpen = true;
 
 // Overlay definitions:
 var labelsOverlay = L.tileLayer('http://{s}.tile.stamen.com/toner-labels/{z}/{x}/{y}.png', {
@@ -371,7 +374,7 @@ var cartoCSSLines = getLineCSS('none')
       sublayers: [{type: "cartodb",
 			sql: 'SELECT * FROM final_coastal_polygons',
 			cartocss: cartoCSSRules,
-			interactivity: ['cov1', 'cov2'],
+			interactivity: infowindowVars,
 			layerIndex:1
 	},{type: "cartodb",
 			sql: 'SELECT * FROM final_coastal_polygons',
@@ -725,18 +728,7 @@ function formatCoverageForInfowindow(data){
 function setupInteraction(layer, _levelEngaged, _visibility){
 	//////////////////////////////////////////////////////
 	/* To construct a rudimentary popup on click (check .html for #infowindow_template) */
-	infowindow = cdb.vis.Vis.addInfowindow(map, layer, infowindowVars,{
-		'sanitizeTemplate':false
-	}).model.set({
-		'template' :  function(obj){
-			//!! important
-			//modify the object here before sending to templating engine
-			//lookup the classname
-			content = obj.content
-			windowContent = formatCoverageForInfowindow(content.data)
-			return _.template($('#infowindow_template').html())(windowContent);
-		}
-	});
+	// setupInfoWindow(layer)
 
 	layer.bind('featureClick', onMapFeatureClick)
 	//manage the population of the infobox
@@ -756,26 +748,66 @@ function setupInteraction(layer, _levelEngaged, _visibility){
 	})
 
 	$("#map").click(onMapClick)
+
+	$('#legendModal').on('hidden.bs.modal', closeLegendTablet);
+
 } //end setup interaction
 
-function onMapClick(){
-	//close the info window on basemap click
-	setTimeout(function(){
-		if(!isInfowindowOpen){
-			infowindow.set('visibility', false);
-		}
-			isInfowindowOpen = false;
-	}, 250) //timeout is important here in maintaining correct popup state
+function dockMobileInfowindow(){
+	$("#mobile-clickwindow").hide();
+}
+
+function expandMobileInfowindow(){
+	$("#mobile-clickwindow").show();
+}
+
+function destroyMobileInfowindow(){
+	$("#mobile-clickwindow-holder").remove();
+}
+
+function enableDesktopMouseover(){
+	$(".infobox").append("<p id='level1-set'></p>")
 }
 
 
-//functions for events on particular feature types
+function setupInfoWindow(layer){
+	//layer here should be bordner
+	infowindow = cdb.vis.Vis.addInfowindow(map, layer, infowindowVars,{
+		'sanitizeTemplate':false
+	}).model.set({
+		'template' :  function(obj){
+			//!! important
+			//modify the object here before sending to templating engine
+			//lookup the classname
+			content = obj.content
+			windowContent = formatCoverageForInfowindow(content.data)
+			return _.template($('#infowindow_template').html())(windowContent);
+		}
+	});
+}
 
+function destroyInfoWindow(){
+	$(".cartodb-infowindow").remove(); //just take it off the dom
+}
+
+function onMapClick(){
+	//close the info window on basemap click
+	if (desktopMode){
+		setTimeout(function(){
+			if(!isInfowindowOpen){
+				infowindow.set('visibility', false);
+			}
+				isInfowindowOpen = false;
+		}, 250) //timeout is important here in maintaining correct popup state
+	}
+}
+
+//functions for events on particular feature types
 function onLineOver(e, latln, pxPos, data, layer){
 	if (legendType == "lines"){
 		var lineName = getPointOrLineNameFromCode(data.line_type, 'lines');
 		//only dispaly the infobox if the feature is within its zoom level
-		if (isFeatureInZoom(data.line_type, 'lines') && (showInfoboxOnHover)){
+		if (isFeatureInZoom(data.line_type, 'lines') && (showInfoboxOnHover) && desktopMode){
 			if (typeof(lineTypeSelected) == "undefined"){
 			$(".infobox").show()
 			$("#level1-set").html(lineName)
@@ -790,7 +822,7 @@ function onLineOver(e, latln, pxPos, data, layer){
 }
 
 function onLineOut(e, latln, pxPos, data, layer){
-	if (legendType == "lines"){
+	if (legendType == "lines" &&(!showInfoboxOnHover)){
 		$(".infobox").hide()
 	}
 }
@@ -799,7 +831,7 @@ function onPointOver(e, latln, pxPos, data, layer){
 	if (legendType == "points"){
 			var pointName = getPointOrLineNameFromCode(data.point_type, 'points');
 			if (isFeatureInZoom(data.point_type, 'points') && (showInfoboxOnHover)){
-				if ((typeof(pointTypeSelected) != "undefined") && (data.point_type != pointTypeSelected)){
+				if ((typeof(pointTypeSelected) != "undefined") && (data.point_type != pointTypeSelected) && desktopMode){
 					return;
 				}
 				$(".infobox").show()
@@ -809,13 +841,13 @@ function onPointOver(e, latln, pxPos, data, layer){
 }
 
 function onPointOut(e, latln, pxPos, data, layer){
-	if(legendType == "points"){
+	if(legendType == "points" &&(!showInfoboxOnHover)){
 		$(".infobox").hide();
 	}
 }
 
 function onPolyOver(e, latln, pxPos, data, layer){
-	if ((legendType == "polygons") && showInfoboxOnHover ){
+	if ((legendType == "polygons") && showInfoboxOnHover && desktopMode){
 		if (typeof(level1Selected) == 'undefined'){
 			$(".infobox").show()
 			level1 = getLevel1FromCode(data.cov1)
@@ -832,7 +864,7 @@ function onPolyOver(e, latln, pxPos, data, layer){
 }
 
 function onPolyOut(e, latln, pxPos, data, layer){
-	if (legendType == "polygons"){
+	if (legendType == "polygons" &&(!showInfoboxOnHover)){
 		$(".infobox").hide()
 	}
 }
@@ -912,39 +944,67 @@ function onMapFeatureClick(e, latln, pxPos, data, layer){
 		$(".cartodb-infowindow").hide()
 		isInfowindowOpen = false;
 	}
+
+	if (!desktopMode){
+		$("#infobox").show();
+		windowContent = formatCoverageForInfowindow(data)
+		$("#infobox").html(_.template($('#infowindow_template_mobile').html())(windowContent));
+		$("#dock-mobile-info").click(function(){
+			 toggleMobileClickWindow();
+		})
+	}
 }
 
+
+function toggleMobileClickWindow(){
+	if (isMobileClickWindowOpen){
+		dockMobileInfowindow();
+		$("#dock-mobile-info").html("<span class='glyphicon glyphicon-chevron-left'></span>")
+		isMobileClickWindowOpen = false;
+	}else{
+		isMobileClickWindowOpen = true;
+		$("#dock-mobile-info").html("<span class='glyphicon glyphicon-chevron-right'></span>")
+		expandMobileInfowindow();
+	}
+}
+
+
+
+
+
+
 function disableMapInteractionEvents(){
-	map.dragging.disable();
-	map.touchZoom.disable();
-	map.doubleClickZoom.disable();
+	map._handlers.forEach(function(handler) {
+	    handler.disable();
+	});
 }
 
 function enableMapInteractionEvents(){
-	map.dragging.enable();
-	map.touchZoom.enable();
-	map.doubleClickZoom.enable();
+	map._handlers.forEach(function(handler) {
+	    handler.enable();
+	});
 }
 
 function setupGeocoderSearch(){
 	//render the template
 	var v = cdb.vis.Overlay.create("search", map.viz, {})
 	v.show();
-	$("#geocodeButton").html(v.render().el)
-	//jquery magic to make it look nicer
-	$("geocodeButton").width('100%');
-	$(".cartodb-searchbox").width('100%');
+	// $("#geocodeButton").append(v.render().el)
+	var searcher = v.render().el
+	// jquery magic to make it look nicer
+	// $("geocodeButton").width('100%');
+	// $(".cartodb-searchbox").width('100%');
 	$(".text").hide();
 	$("#geocodeButton").on('mouseover', function(){
-		$(this).width("200%")
-		$(".cartodb-searchbox").width('200%');
 		$(".text").show();
+		$("#geocodeButtonIcon").replaceWith(searcher);
 	})
-	$("#geocodeButton").on("mouseout", function(){
-		$(this).width("28px")
-		$(".cartodb-searchbox").width('28px')
-		$('.text').val("")
-		$(".text").hide();
+	//close the geocoder when the map's been clicked or moved
+	map.on('click', function(){
+		$(".cartodb-searchbox").replaceWith('<span id="geocodeButtonIcon" class="button-icon-class glyphicon glyphicon-globe"></span>');
+	})
+	map.on('moveend', function(){
+		$(".cartodb-searchbox").replaceWith('<span id="geocodeButtonIcon" class="button-icon-class glyphicon glyphicon-globe"></span>');
 	})
 }
 
@@ -960,26 +1020,29 @@ function setUpMap(){
 			'<div data-toggle="tooltip" title="share" class="leaflet-bar leaflet-control leaflet-control-custom" id="shareButton" onClick="dispatchButtonClick(this.id)">' +
 				'<span id="shareButtonIcon" class="button-icon-class glyphicon glyphicon-share-alt">' +
 			'</div></br>' +
-			'<div data-toggle="tooltip" title="Locate Me" class="leaflet-bar leaflet-control leaflet-control-custom" id="locateMeButton" onClick="dispatchButtonClick(this.id)">' +
-				'<span id="shareButtonIcon" class="button-icon-class glyphicon glyphicon-map-marker">' +
-			'</div></br>' +
 			'<div data-toggle="tooltip" title="layers" class="leaflet-bar leaflet-control leaflet-control-custom" id="layerListButton" onClick="dispatchButtonClick(this.id)">' +
 				'<span id="layerListButtonIcon" class="button-icon-class glyphicon glyphicon-menu-hamburger">' +
 			'</div></br>' +
 			'<div data-toggle="tooltip" title="legend" class="leaflet-bar leaflet-control leaflet-control-custom" id="legendButton" onClick="dispatchButtonClick(this.id)">' +
-				'<span id="legendButtonIcon" class="button-icon-class glyphicon glyphicon-option-horizontal">' +
+				'<span id="legendButtonIcon" class="button-icon-class glyphicon glyphicon-stats">' +
 			'</div></br>' +
-			'<div data-toggle="tooltip" title="search" class="leaflet-bar leaflet-control leaflet-control-custom leaflet-search-control" id="geocodeButton">' +
-			'</div></br>' +
-			'<div class="leaflet-bar leaflet-control layer-list-holder-closed transition-class closed" id="layerListHolder"></div></br>'
+			'<div data-toggle="tooltip" title="Search" class="leaflet-bar leaflet-control leaflet-control-custom" id="geocodeButton" onClick="dispatchButtonClick(this.id)">' +
+				'<span id="geocodeButtonIcon" class="button-icon-class glyphicon glyphicon-globe"></span>' +
+			'</div></br>'
 		)
 
-	$("#layerListHolder")
+	map.addControl(new geolocationControl({position: 'bottomright'}));
+	$(".geolocation-control").html(
+		'<div data-toggle="tooltip" title="Locate Me" class="leaflet-bar leaflet-control leaflet-control-custom" id="locateMeButton" onClick="dispatchButtonClick(this.id)">' +
+		'<span id="shareButtonIcon" class="button-icon-class glyphicon glyphicon-map-marker">' +
+		'</div></br>'
+	)
+
+	$("#layerList")
 		.html(
-			'<div class="layer-list-view transition-class row clearfix" id="layerList">' +
-			'<button class="btn btn-primary btn-sm btn-close layer-list-close-btn pull-right"><span class="glyphicon glyphicon-remove"></span></button>' +
+		'<button class="btn btn-primary btn-sm btn-close layer-list-close-btn pull-right"><span class="glyphicon glyphicon-remove"></span></button>' +
 		'<h4 class="layer-list-header">Table of Contents</h4>' +
-		'<div class="col-xs-12">' +
+		'<div class="col-xs-12" id="layerListBody">' +
 		'<label class="legend-label">Feature Type</label>' +
 			'<div class="feature-type-radio-group">' +
 				'<div class="radio">' +
@@ -1005,7 +1068,7 @@ function setUpMap(){
 			'<div class="checkbox">' +
 				'<label><input type="checkbox" name="overlayType" id="density1">Class 1 Density</label>' +
 			'</div>' +
-			'<label class="legend-label">Basemap</label>' + 
+			'<label class="legend-label">Basemap</label>' +
 			'<div class="radio">' +
 				'<label><input type="radio" name="basemapType" id="streetsBasemap">Streets</label>' +
 			'</div>' +
@@ -1015,11 +1078,8 @@ function setUpMap(){
 			'<div class="radio">' +
 				'<label><input type="radio" name="basemapType" id="basemapC" disabled>Historic Imagery</label>' +
 			'</div>' +
-			"</div>" +
-			'<div class="col-xs-12">' +
 			'<label class="legend-label">Overlay Opacity</label>' +
-				'<input type="text" value="50" id="rangeSlider" data-slider-min="0" data-slider-max="100" data-slider-step="1" data-slider-value="' +  layerOpacity*100 + '" data-slider-ticks="[0, 100]" data-slider-ticks-labels="[0, 100]">' +
-				'</div>' +
+			'<input type="text" value="50" id="rangeSlider" data-slider-min="0" data-slider-max="100" data-slider-step="1" data-slider-value="' +  layerOpacity*100 + '" data-slider-ticks="[0, 100]"  / >' +
 		'</div>')
 
 	$('input[name=featureType]').click(function(){ turnOnFeatureType(this.id) });
@@ -1033,6 +1093,7 @@ function setUpMap(){
 			$("#infoboxHolder").css({'top': '40px'})
 		}else{
 			$("#infoboxHolder").css({'top': '10px'})
+			$("#infobox").hide();
 		}
 	})
 
@@ -1070,7 +1131,7 @@ function setUpMap(){
 
 	// Fade-in the toc button and give it a click handler
 	$("#tocButton").addClass( "toc-button-unfade" );
-	$("#tocButton").click(function(evt) { toggleTOC(evt) });
+	$("#tocButton").click(function(evt) { toggleLegend(evt) });
 	// Engage Bootstrap-style tooltips
 	$('[data-toggle="tooltip"]').tooltip();
 
@@ -1104,13 +1165,30 @@ function setUpMap(){
 	});
 
 	$("#layerList").addClass("closed")
+	isLayerListOpen = false;
+
+	if (!desktopMode){
+		isLegendOpen = false;
+	}
 
 	if (labelsAreOn){
 		$("#labelsOverlay").trigger("click")
 	}
 
-	//close the layer list when the close button is clicked
-	$(".layer-list-close-btn").click(closeLayerList)
+	// //close the layer list when the close button is clicked
+	$(".layer-list-close-btn").click(function(){
+		console.log("been clicked")
+		if (desktopMode){
+			closeLayerListDesktop();
+		}
+	})
+
+
+	map.on('move', function(){
+		if (desktopMode){
+			closeLayerListDesktop();
+		}
+	})
 
 	// Done, tell the console!
 	console.log("setUpMap() complete. desktopMode = " + desktopMode)
@@ -1131,6 +1209,7 @@ function refreshPoints(){
 
 // Media query for when the app traverses the tablet/desktop threshold
 var jsMediaQuery = function() {
+	console.log("Called")
 	if (window.matchMedia('(max-width: 768px)').matches){
 		if (desktopMode){
 			desktopMode = false;
@@ -1151,18 +1230,18 @@ function turnOnFeatureType(featureTypeCalled){
 	switch(featureTypeCalled) {
 		case "featurePolygons":
 			legendType = "polygons";
-			$(".legend-header").text("Area Features")
+			$("#legend-header").text("Area Features")
 			manageURLToPolygons();
 			break;
 		case "featureLines":
 			legendType = "lines"
-			$(".legend-header").text("Line Features")
+			$("#legend-header").text("Line Features")
 			manageURLToLines();
 			break;
 		case "featurePoints":
 			replaceQueryValue("featureType", "points");
 			legendType = "points"
-			$(".legend-header").text("Point Features")
+			$("#legend-header").text("Point Features")
 			manageURLToPoints();
 			break;
 		default:
@@ -1183,6 +1262,7 @@ function turnOnFeatureType(featureTypeCalled){
 		}else{
 			showOnlyLines();
 			$("#rangeSlider").slider('setValue', layerOpacity*100);
+			resetPolygons();
 		}
 
 	}else if (legendType == "points"){
@@ -1190,11 +1270,17 @@ function turnOnFeatureType(featureTypeCalled){
 		if ((typeof(lines) == "undefined") || (typeof(bordner) == "undefined")){
 			setTimeout(function(featureTypeCalled){turnOnFeatureType(featureTypeCalled)}, 50) //this prevents on init load issues with undefined values
 		}else{
+			resetPolygons();
 			showOnlyPoints();
 			$("#rangeSlider").slider('setValue', layerOpacity*100);
 		}
-
 	}
+}
+
+function resetPolygons(){
+	levelEngaged = 1;
+	level1Selected = undefined;
+	hideLevel1Label();
 }
 
 function manageURLToPolygons(){
@@ -1234,11 +1320,13 @@ function showOnlyPoints(){
 }
 
 function showNoPolygons(){
-		bordner.setCartoCSS(getPolyStyle("none"))
+		// bordner.setCartoCSS(getPolyStyle("none"))
+		bordner.hide();
 }
 
 function showAllPolygons(){
-	bordner.setCartoCSS(getPolyStyle("level1"))
+	// bordner.setCartoCSS(getPolyStyle("level1"))
+	bordner.show();
 }
 
 // To turn on the appropriate basemap, note, the radio button's id must match the basemap's variable name
@@ -1275,148 +1363,217 @@ function reflectChangeLayerInQueryString(overlayCalled, didAdd){
 }
 
 // To dock/undock the table of contents from bottom
-function toggleTOC(evt){
-	// evt.preventDefault();
-	if ($( "#toc" ).hasClass( "toc-view-open" )){
-		isTOCOpen = false;
-		$( ".level-1-label-text").removeClass( "shade-level-1-label-text" );
-		$( "#toc" ).removeClass( "toc-view-open" );
-		$( "#toc" ).addClass( "toc-view-closed" );
-		$( "#map" ).removeClass( "map-view-toc" );
-		$( "#map" ).addClass( "map-view-full" );
-		$( "#tocButton" ).removeClass( "toc-button-open" );
-		$( "#tocButton" ).addClass( "toc-button-closed" );
-		$( "#tocIcon" ).removeClass( "glyphicon-chevron-down" );
-		$( "#tocIcon" ).addClass( "glyphicon-chevron-up" );
+function toggleLegend(evt){
+	evt.preventDefault();
+	console.log(isLegendOpen)
+	if (isLegendOpen){
+		isLegendOpen = false;
+		$("#toc").hide()
+		$("#tocButton").css({'bottom': '4px'})
+		$("#tocButton").html("<span class='glyphicon glyphicon-chevron-up'></span>")
+		$("#map").height("100%");
 		if (desktopMode){
 			$("#neatline").show();
 		}
+			setTimeout(function(){ map.invalidateSize()}, 450)
 	}else{ //is open
-		isTOCOpen = true;
-		if (desktopMode){
-			$( ".level-1-label-text").addClass( "shade-level-1-label-text" );
+		isLegendOpen = true;
+		$("#toc").show();
+		$("#tocButton").css({'bottom': '20%'})
+		$("#tocButton").html("<span class='glyphicon glyphicon-chevron-down'></span>");
+		$("#map").height("80%");
+
+		if (legendType == "polygons"){
+			setTimeout(function(){
+				console.log(levelEngaged)
+				console.log(level1Selected)
+				drawThisView(map.getBounds(), map.getZoom(), levelEngaged, level1Selected)
+			}, 500)
+		}else if (legendType == "lines"){
+			drawLineLegend();
+		}else if (legendType == "points"){
+			drawPointLegend();
 		}
-		$( "#toc" ).addClass( "toc-view-open" );
-		$( "#toc" ).removeClass( "toc-view-closed" );
-		$( "#map" ).addClass( "map-view-toc" );
-		$( "#map" ).removeClass( "map-view-full" );
-		$( "#tocButton" ).addClass( "toc-button-open" );
-		$( "#tocButton" ).removeClass( "toc-button-closed" );
-		$( "#tocIcon" ).addClass( "glyphicon-chevron-down" );
-		$( "#tocIcon" ).removeClass( "glyphicon-chevron-up" );
-		$("#neatline").hide()
 	}
 }
 
 // To configure desktop view (not called upon pageload - all HTML defaults to desktop styles)
 function transformToDesktop(){
-	$( "#toc" ).appendTo( $( "#tocParent" ) );
-	$( ".feature-type-radio-group" ).prependTo( $( "#layerList" ) );
-	$( "#legend" ).removeClass( "legend-off" );
-	$( "#layerList" ).removeClass( "layer-list-off" );
-    if ($( "#toc" ).hasClass( "toc-view-open" )){
-		$( ".level-1-label-text").addClass( "shade-level-1-label-text" );
-	}
-	if ($('.modal.in').length > 0){
-		$( "#tocModal" ).modal('hide');
-		$("#map").append($(".leaflet-control-container").addClass( "leaflet-control-container-tablet-custom" ));
-	}
+
+	$("#tocModal").modal('hide');
+	$("#infoModal").modal('hide');
+
+	$("#infoboxHolder").show();
+	$("#infoboxHolder").show();
+
+	$("#level1Label").css({'bottom': '200px'})
+
+	$("#toc").show();
+
+	drawThisView(map.getBounds(), map.getZoom(), levelEngaged, level1Selected);
+
+	$("#legend").appendTo("#toc");
+
+	setupInfoWindow(bordner);
+
+	$("#infobox").removeClass("infobox-mobile")
+
+	destroyMobileInfowindow();
+	enableDesktopMouseover();
+	console.log("Desktop transform")
 }
 
 // To configure tablet view (is called upon pageload)
 function transformToTablet(){
-	map.removeControl(map.zoomControl); //Remove the zoom
-	$( "#toc" ).appendTo( $( "#tocModalDialogue" ) );
-	$( ".feature-type-radio-group" ).appendTo( $( "#legend" ) );
-	$( ".level-1-label-text").removeClass( "shade-level-1-label-text" );
-	if ($('.modal.in').length > 0){
-		$( "#tocModal" ).modal('hide');
-	}
+
+	$("#infoboxHolder").hide();
+	$("#infobox").hide();
+
+	$("#level1Label").css({'bottom': '10px'})
+
+	$("#toc").hide();
+
+	isLegendOpen = false;
+
+	destroyInfoWindow();
+
+	$("#infobox").addClass("infobox-mobile")
 }
 
 // Handles all click events from the 4 main UI buttons
 function dispatchButtonClick(buttonClicked){
-	// If modal is not already open, then open it
-	if ($('.modal.in').length <= 0){
-		if ((desktopMode == true)&&((buttonClicked == "layerListButton") || (buttonClicked == "locateMeButton"))){
-
+	if (desktopMode == true){
+		console.log("Dispatching button click in DESKTOP MODE")
+		if (buttonClicked == 'locateMeButton'){
+			geoLocate();
+		}else if (buttonClicked == "layerListButton"){
+			toggleLayerListDesktop();
+			return
+		} else if (buttonClicked == "infoButton"){
+			 configInfoShareModal();
+			 return
+		}else if (buttonClicked == "shareButton"){
+			 configInfoShareModal();
+			 return
+		}else if (buttonClicked == geocodeButton){
+			//auto dispatches to the geocoderr
+			return
 		}else{
-			$( "#tocModal" ).modal();
-			// If the table of contents is collapsed and we are in tablet mode, then open it by toggleTOC()
-			if (($( "#toc" ).hasClass( "toc-view-closed" )) && (desktopMode == false)){
-				toggleTOC();
-			}
-			modalAttachTOC();
-		}
-	} //end if
-	// Specific button events...
-	switch(buttonClicked) {
-		case "legendButton":
-			console.log("Legend TOC")
-			$( "#legend" ).removeClass( "legend-off" );
-			$( "#layerList" ).addClass( "layer-list-off" );
-			break;
-		case "layerListButton":
-
-			if ((desktopMode == true)&&(buttonClicked == "layerListButton")){
-				if ($( "#layerList" ).hasClass( "open" )){
-					closeLayerList();
-				}else{
-					openLayerList();
-				}
-			}else{
-				$( "#legend" ).addClass( "legend-off" );
-				$( "#layerList" ).removeClass( "layer-list-off" );
-			}
-			break;
-		case "infoButton":
-			console.log("Info")
-			configInfoShareModal();
-			break;
-		case "shareButton":
-			console.log("Share")
-			configInfoShareModal();
-			break;
-		case "geocodeButton":
-			break;
-		case "locateMeButton":
-				geoLocate();
-		default:
+			console.log("Unknown button, returning...")
 			return;
+		}
+	}else{
+		console.log("Dispatching button click in TABLET MODE")
+		//tablet mode
+		if (buttonClicked == 'locateMeButton'){
+			geoLocate();
+			return
+		}else if (buttonClicked == "legendButton"){
+			openLegendTablet();
+			return
+		}else if (buttonClicked == "layerListButton"){
+			openLayerListTablet();
+			return
+		} else if (buttonClicked == "infoButton"){
+			 configInfoShareModal();
+			 return
+		}else if (buttonClicked == "shareButton"){
+			 configInfoShareModal();
+			 return
+		}else if (buttonClicked == 'geocodeButton'){
+			//auto dispatches to the geocoder
+			return
+		}else{
+			console.log("Unknown button, returning...")
+			return;
+		}
+	}
+
+}
+
+function toggleLayerListDesktop(){
+	if (isLayerListOpen){
+		closeLayerListDesktop()
+	}else{
+		openLayerListDesktop();
 	}
 }
 
-function closeLayerList(){
-	isTOCOpen = false;
+function closeLayerListDesktop(){
+	isLayerListOpen = false;
 	$("#layerList").addClass('closed').removeClass('open')
-	$("#layerListHolder").hide();
+	$("#layerList").hide();
 }
 
-function openLayerList(){
-	isTOCOpen = true;
+function openLayerListDesktop(){
+	isLayerListOpen = true;
 	$("#layerList").addClass('open').removeClass('closed')
-	$("#layerListHolder").show();
+	$("#layerList").show();
+}
+
+
+function openLayerListTablet(){
+	$("#layerListBody").appendTo("#modal-layerListHolder")
+	$("#layerListModal").modal('show')
+	$("#modal-layerListHolder").height('350px')
+	$(".radio").css({'color': 'black'})
+	$(".checkbox").css({'color': 'black'})
+}
+
+function closeLayerListTablet(){
+	$("#modal-layerListHolder").empty();
+}
+
+function openLegendTablet(){
+	$("#legendModal").modal('show');
+	$("#legend").appendTo("#legendModalBody")
+	$("legendHolder").addClass("legend-holder-modal")
+	isLegendOpen = true;
+	drawTabletLegend();
+}
+
+
+
+function drawTabletLegend(){
+	setTimeout(function(){ //wait for modal to be open
+		if (legendType == "polygons"){
+			drawThisView(map.getBounds(), map.getZoom(), levelEngaged, level1Selected);
+		}else if (legendType == "lines"){
+			drawLineLegend()
+		}else if (legendType == "points"){
+			drawPointLegend();
+		}
+	}, 250)
+	setTimeout(adjustTabletLegend, 500);
+}
+
+
+function adjustTabletLegend(){
+	d3.selectAll(".axis").style("fill", "black");
+	d3.selectAll(".axis").style("text-shadow", "none");
+	d3.selectAll(" text").style("fill", "black");
+}
+
+function closeLegendTablet(){
+	isLegendOpen = false;
 }
 
 // ...
 function modalAttachTOC(){
-	if (desktopMode){
-		// nothing, yet
-	}else{
-		$( "#toc" ).appendTo( $( "#tocModalDialogue" ) );
-		$( "#toc" ).append($(".leaflet-control-container").addClass( "leaflet-control-container-tablet-custom" ));
-	}
+	// if (desktopMode){
+	// 	// nothing, yet
+	// }else{
+	// 	$( "#toc" ).appendTo( $( "#tocModalDialogue" ) );
+	// 	$( "#toc" ).append($(".leaflet-control-container").addClass( "leaflet-control-container-tablet-custom" ));
+	// }
 }
 
 // ...
 function configInfoShareModal(){
-	if (desktopMode){
-		$( "#legend" ).removeClass( "legend-off" );
-		$( "#layerList" ).removeClass( "layer-list-off" );
-	}else{
-		$( "#legend" ).addClass( "legend-off" );
-		$( "#layerList" ).addClass( "layer-list-off" );
-	}
+		if (isLayerListOpen){
+			toggleLayerListDesktop();
+		}
+		$("#infoModal").modal('show');
 }
 
 
@@ -1425,16 +1582,16 @@ function geoLocate(){
 }
 
 function displayUserLocation(pos){
-	if (!navIsOn){
-		var lat = pos.coords.latitude;
-		var lng = pos.coords.longitude
-		// var point = new L.latLng(lat, lng);
-		theLocation = L.circleMarker([lat, lng], {radius: 10}).bindPopup("<h6>You are here</h6>").addTo(map)
-		navIsOn = true;
-	}else{
+	if (navIsOn){
 		map.removeLayer(theLocation)
-		navIsOn = false;
 	}
+
+	var lat = pos.coords.latitude;
+	var lng = pos.coords.longitude
+	// var point = new L.latLng(lat, lng);
+	theLocation = L.circleMarker([lat, lng], {radius: 10}).bindPopup("<h6>You are here</h6>").addTo(map)
+	navIsOn = true;
+	map.setView([lat, lng])
 }
 
 // Whenever the modal is closed...
@@ -1455,6 +1612,16 @@ var tabletCustomControl = L.Control.extend({
 	},
 	onAdd: function (map) {
 		var container = L.DomUtil.create('div', 'tablet-custom-control');
+		return container;
+	}
+})
+
+var geolocationControl = L.Control.extend({
+	options: {
+		position: "bottomright"
+	},
+	onAdd: function(map){
+		var container = L.DomUtil.create("div", "geolocation-control")
 		return container;
 	}
 })
@@ -1541,6 +1708,7 @@ function drawThisView(boundsIn, zoomIn, _levelEngaged, _level1Selected){
 						$("#linearHist").addClass('active')
 					}
 					drawPolygonHistogram(data, _levelEngaged, "#legendHolder", histogramScale);
+					adjustTabletLegend()
 				})
 				.error(function(errors) {
 					console.log("errors:" + errors);
@@ -1548,11 +1716,12 @@ function drawThisView(boundsIn, zoomIn, _levelEngaged, _level1Selected){
 		}else{
 			//zoom < 13
 			drawPolyFilter("#legendHolder", _levelEngaged, _level1Selected)
+			adjustTabletLegend()
 		}
 }
 
 function generateAllLayersQuery(boundsIn){
-	var cartoQuery = "SELECT cov1, area FROM final_coastal_polygons WHERE the_geom && ST_SetSRID(ST_MakeBox2D(ST_Point(" +
+	var cartoQuery = "SELECT cov1, shape_area FROM final_coastal_polygons WHERE the_geom && ST_SetSRID(ST_MakeBox2D(ST_Point(" +
 		String(boundsIn._northEast.lng)+","+String(boundsIn._northEast.lat)+"), ST_Point(" +
 		String(boundsIn._southWest.lng)+","+String(boundsIn._southWest.lat)+")), 4326) ORDER BY cov1 DESC"
 		return cartoQuery
@@ -1560,31 +1729,41 @@ function generateAllLayersQuery(boundsIn){
 
 function generateSpecificLayerQuery(boundsIn, _level1Selected){
 	var classesSelected = getLevel1MemberSearch(_level1Selected)
-	var cartoQuery = "SELECT cov1, area FROM final_coastal_polygons WHERE (" + classesSelected +
+	var cartoQuery = "SELECT cov1, shape_area FROM final_coastal_polygons WHERE (" + classesSelected +
 		") AND the_geom && ST_SetSRID(ST_MakeBox2D(ST_Point(" +
 		String(boundsIn._northEast.lng)+","+String(boundsIn._northEast.lat)+"), ST_Point(" +
 		String(boundsIn._southWest.lng)+","+String(boundsIn._southWest.lat)+")), 4326) ORDER BY cov1 DESC"
 		return cartoQuery
 }
 
-function drawPolyFilter(el, _levelEngaged, _level1Selected){
+function drawPolyFilterDesktop(el, _levelEngaged, _level1Selected){
 	$(el).empty();
 	var level1Props = getLevel1Props();
 		// console.log(summary)
 		var width = $(el).width();
 		var height = $(el).height() - 15;
 
-		//dimension setup
 		var margins = {top: 20, left: 30, right: 30, bottom: 100}
+		console.log(el)
+
+
+		if (height < 0){
+			return;
+		}
+
+		if (height < 100){
+			height = 150;
+			margins.bottom = 50;
+		}
+
+		//dimension setup
 		height = height - margins.top - margins.bottom;
 		width = width - margins.left - margins.right;
 
 		//axes setup
 		var xScale = d3.scale.ordinal().rangeRoundBands([0, width], 0.05)
 
-			var yScale = d3.scale.linear().range([height, 0])
-
-
+		var yScale = d3.scale.linear().range([height, 0])
 
 		var xAxis = d3.svg.axis()
 			.scale(xScale)
@@ -1602,7 +1781,7 @@ function drawPolyFilter(el, _levelEngaged, _level1Selected){
 
 		svg.append("g")
 			.attr("class", " x axis selector-axis")
-			.attr("transform", "translate(0," + height + ")")
+			.attr("transform", "translate(0,75)")
 			.call(xAxis)
 			.selectAll(".tick text")
 				.call(wrap, xScale.rangeBand())
@@ -1618,7 +1797,104 @@ function drawPolyFilter(el, _levelEngaged, _level1Selected){
 			.attr('width', xScale.rangeBand())
 			.attr('data-fill', function(d){return d.color})
 			.attr('y', 0)
-			.attr('height', 50)
+			.attr('height', 75)
+			.style('fill', function(d){
+				return d.color
+		})
+		.style('opacity', function(d){
+			if (levelEngaged == 2){
+				level1Key = _level1Selected.toLowerCase().split(" ").join("_")
+				dKey = d.name.toLowerCase().split(" ").join("_")
+				if (level1Key == dKey){
+					return 1
+				}
+				return 0.25
+			}
+		})
+		.on('click', function(d){
+			if (levelEngaged == 1){
+					dispatchLegendClick(d.name.toLowerCase())
+			}
+		})
+		//change colors on hover
+		.on('mouseover', function(d){
+			if (_levelEngaged == 1){
+				var self = d3.select(this)
+				//set old color so we can recover it
+				var oldColor = self.style('fill')
+				self.attr('data-fill', oldColor)
+				var newColor = shadeRGBColor(oldColor, -0.25)
+				self.style('fill', newColor)
+				d3.selectAll("." + d.name.split(" ").join("_")).style('fill', newColor)
+			}
+			//make taller
+			// self.attr('y', 0)
+			// self.attr('height', height)
+		})
+		.on('mouseout', function(d){
+			if (_levelEngaged == 1){
+				var self = d3.select(this)
+				var oldColor = self.attr('data-fill')
+				self.style('fill', oldColor)
+			 d3.selectAll("." + d.name.split(" ").join("_")).style('fill', oldColor)
+			}
+		})
+}
+
+function drawPolyFilterTablet(el, _levelEngaged, _level1Selected){
+	//draw the filter swatches vertically instead of horizontally to improve readability of labels
+	$(el).empty();
+	var level1Props = getLevel1Props();
+		// console.log(summary)
+		var width = $(el).width();
+		var height = $(el).height() - 25;
+
+		var margins = {top: 10, left: 200, right: 30, bottom: 10}
+
+		//dimension setup
+		height = height - margins.top - margins.bottom;
+		width = width - margins.left - margins.right;
+
+		console.log(height)
+
+		var barWidth = width;
+
+		//axes setup
+		var yScale = d3.scale.ordinal().rangeRoundBands([0, height], 0.05)
+
+
+		var yAxis = d3.svg.axis()
+			.scale(yScale)
+			.orient('left')
+
+		var svg = d3.select(el)
+			.append('svg')
+			.attr('width', width + margins.left + margins.right)
+			.attr('height', height + margins.top + margins.bottom)
+			.append('g')
+				.attr('transform', "translate(" + margins.left + "," + margins.top + ")")
+
+		yScale.domain(_.pluck(level1Props, "name"))
+
+
+		svg.append("g")
+			.attr("class", "yx axis selector-axis")
+			.call(yAxis)
+			// .selectAll(".tick text")
+			// 	.call(wrap, yScale.rangeBand())
+
+				//these are the data-driven bars proportional to the area in the screen
+		svg.selectAll('filter-swatch')
+			.data(level1Props)
+			.enter().append('rect')
+			.style('fill', function(d){return d.color})
+			.attr('y', function(d){ return yScale(d.name)})
+			.attr('data-name', function(d){return d.name})
+			.attr('class', function(d){ return d.name.split(" ").join("_") + " filter-swatch"})
+			.attr('height', yScale.rangeBand())
+			.attr('data-fill', function(d){return d.color})
+			.attr('x', 0)
+			.attr('width', barWidth)
 			.style('fill', function(d){
 				return d.color
 		})
@@ -1663,6 +1939,21 @@ function drawPolyFilter(el, _levelEngaged, _level1Selected){
 }
 
 
+
+function drawPolyFilter(el, _levelEngaged, _level1Selected){
+	if (desktopMode){
+		console.log("Drawing in desktop mode.")
+		drawPolyFilterDesktop(el, _levelEngaged, _level1Selected)
+	}else{
+		//tablet mode has different orientation
+		console.log("Drawing in tablet mode")
+		if (isLegendOpen){
+					drawPolyFilterTablet(el, _levelEngaged, _level1Selected)
+		}
+	}
+}
+
+
 function getLevel1MemberSearch(_level1Selected){
 	//get all of the cov1 codes that fall within the level1 label
 	var classesSelected = "";
@@ -1687,17 +1978,46 @@ function shadeRGBColor(color, percent) {
 
 
 function drawPolygonHistogram(data, _levelEngaged, el, histogramScale){
-	console.log("Drawing with a ", histogramScale)
 	var summary = summarize(data, _levelEngaged)
 
+
+
+	if (_levelEngaged == 2){
+		summary.reverse();
+	}
+
 	// console.log(summary)
-	var width = $(el).width();
-	var height = $(el).height() - 50;
+	var margins = {top: 20, left: 75, right: 30, bottom: 30}
+
+	var height = $(el).height() - 100;
+	if (height < 0){
+		return;
+	}
+
+	if (height < 100){
+		height = 150;
+		margins.bottom = 50;
+	}
+
+	if (_levelEngaged == 2){
+		//make the histogram scrunched to the left on detail
+		var numClasses = summary.length;
+		var barWidth = 125;
+		var width = barWidth * numClasses;
+		width += margins.left + margins.right;
+		height+= 25;
+	}else{
+		//make it fill the whole legend box
+		var width = $(el).width();
+	}
+
+
 
 	//dimension setup
-	var margins = {top: 20, left: 75, right: 30, bottom: 30}
 	height = height - margins.top - margins.bottom;
 	width = width - margins.left - margins.right;
+
+
 
 	//axes setup
 	var xScale = d3.scale.ordinal().rangeRoundBands([0, width], 0.05)
@@ -1716,6 +2036,12 @@ function drawPolygonHistogram(data, _levelEngaged, el, histogramScale){
 		.orient('left')
 		.ticks(5)
 
+	if (histogramScale == "log"){ //make the ticks natural numbers instead of exp
+				yAxis.tickFormat(function (d) {
+		        return yScale.tickFormat(4,d3.format(",d"))(d)
+		})
+	}
+
 	var svg = d3.select(el)
 		.append('svg')
 		.attr('width', width + margins.left + margins.right)
@@ -1723,10 +2049,8 @@ function drawPolygonHistogram(data, _levelEngaged, el, histogramScale){
 		.append('g')
 			.attr('transform', "translate(" + margins.left + "," + margins.top + ")")
 
-	xScale.domain(summary.map(function(d){
-		// console.log(d)
-		return d.type }))
-	yScale.domain([0.1, d3.max(summary, function(d){return d.area / polygonLegendFactor})])
+	xScale.domain(summary.map(function(d){return d.type }))
+	yScale.domain([0.1, d3.max(summary, function(d){return d.area * polygonLegendFactor})])
 
 
 	svg.append("g")
@@ -1748,7 +2072,7 @@ function drawPolygonHistogram(data, _levelEngaged, el, histogramScale){
 			.attr('class', function(d){ return "background " + d.type.split(" ").join("_")})
 			.style('fill', function(d){return d.color})
 			.style('fill-opacity', 0.15)
-			.attr('x', function(d){ return xScale(d.type)})
+			.attr('x', function(d){return xScale(d.type)})
 			.attr('width', xScale.rangeBand())
 			.attr('y', 0)
 			.attr('height', height)
@@ -1768,10 +2092,8 @@ function drawPolygonHistogram(data, _levelEngaged, el, histogramScale){
 					var newColor = shadeRGBColor(oldColor, -0.25)
 					self.style('fill', newColor)
 					d3.selectAll("." + d.type.split(" ").join("_")).style('fill', newColor)
+					self.attr('cursor', 'pointer')
 				}
-				//make taller
-				// self.attr('y', 0)
-				// self.attr('height', height)
 			})
 			.on('mouseout', function(d){
 				if (_levelEngaged == 1){
@@ -1779,6 +2101,7 @@ function drawPolygonHistogram(data, _levelEngaged, el, histogramScale){
 					var oldColor = self.attr('data-fill')
 					self.style('fill', oldColor)
 				 d3.selectAll("." + d.type.split(" ").join("_")).style('fill', oldColor)
+				 self.attr('cursor', 'default')
 				}
 			})
 
@@ -1792,10 +2115,10 @@ function drawPolygonHistogram(data, _levelEngaged, el, histogramScale){
 		.attr('x', function(d){ return xScale(d.type)})
 		.attr('width', xScale.rangeBand())
 		.attr('y', function(d){
-			var scaledY = yScale(d.area / polygonLegendFactor);
+			var scaledY = yScale(d.area * polygonLegendFactor);
 			return scaledY})
 		.attr('height', function(d){
-			var scaledHeight = height - yScale(d.area / polygonLegendFactor)
+			var scaledHeight = height - yScale(d.area * polygonLegendFactor)
 			return scaledHeight})
 			.on('click', function(d){
 				level1Selected = d.type.toLowerCase()
@@ -1812,6 +2135,7 @@ function drawPolygonHistogram(data, _levelEngaged, el, histogramScale){
 					self.attr('data-fill', oldColor)
 					var newColor = shadeRGBColor(oldColor, -0.25)
 					d3.selectAll("." + d.type.split(" ").join("_")).style('fill', newColor)
+					self.attr('cursor', 'pointer')
 				}
 			})
 			.on('mouseout', function(d){
@@ -1819,6 +2143,7 @@ function drawPolygonHistogram(data, _levelEngaged, el, histogramScale){
 					var self = d3.select(this)
 					var oldColor = self.attr('data-fill')
 				  d3.selectAll("." + d.type.split(" ").join("_")).style('fill', oldColor)
+					self.attr('cursor', 'default')
 				}
 			})
 
@@ -1831,7 +2156,7 @@ function drawPolygonHistogram(data, _levelEngaged, el, histogramScale){
 		.attr('text-anchor', 'middle')
 		.attr('fill', 'white')
 		.attr('text-shadow', 'black 0.1em 0.1em 0.2em')
-		.text("Square Kilometers")
+		.text("Acres")
 } //end of the draw polygon legend function
 
 function getColor1FromLevel1(level1){
@@ -1871,7 +2196,9 @@ function summarize(data, level){
 	})
 	var grouped = _.groupBy(mapped, prop)
 	var summed = _.map(grouped, function(g, key){
-		var item =  {type: key, color: colorFn(key), area : _(g).reduce(function(m, x){ return m + x.area;}, 0)}
+		var item =  {type: key,
+			color: colorFn(key),
+			area : _(g).reduce(function(m, x){ return m + x.shape_area;}, 0)}
 		return item
 	})
 	var sorted = _.sortBy(summed, "area")
@@ -1879,7 +2206,7 @@ function summarize(data, level){
 	if (sorted[0].area == 0){
 		sorted.shift();
 	}
-	// console.log(sorted)
+	console.log(sorted)
 	return sorted
 }
 
@@ -1916,13 +2243,13 @@ function dispatchLegendClick(level1Selected){
 		//go from level one to level 2
 		levelEngaged = 2;
 		$("#legend-back").show();
-		$(".legend-header").hide();
+		$("#legend-header").hide();
 		replaceQueryValue("polygonFilter", level1Selected.split(" ").join("_"))
 	}else{
 		//go from level 2 to level 1
 		levelEngaged = 1;
 		$("#legend-back").hide();
-		$(".legend-header").show();
+		$("#legend-header").show();
 		replaceQueryValue("polygonFilter", undefined)
 	}
 	// level1Selected = level1Selected;
@@ -1956,7 +2283,7 @@ function listenToLineLegend(){
 		var child = $($(this).children()[0])
 		child.addClass('active')
 		child.css({"opacity": 1})
-		$(".legend-header").hide();
+		$("#legend-header").hide();
 		$("#legend-back").show();
 		$("#legend-back").unbind('click')
 		$("#legend-back").bind('click', function(){
@@ -1964,7 +2291,7 @@ function listenToLineLegend(){
 			$(".legend-media").css({'opacity': 1})
 			$(".legend-media").removeClass('active');
 			$("#level1Label").hide();
-			$(".legend-header").show()
+			$("#legend-header").show()
 			$("#legend-back").hide();
 			lineTypeSelected = undefined
 		})
@@ -2023,7 +2350,7 @@ function listenToPointLegend(){
 		var child = $($(this).children()[0])
 		child.addClass('active')
 		child.css({"opacity": 1})
-		$(".legend-header").hide();
+		$("#legend-header").hide();
 		$("#legend-back").show();
 		$("#legend-back").unbind('click')
 		$("#legend-back").bind('click', function(){
@@ -2031,7 +2358,7 @@ function listenToPointLegend(){
 			$(".legend-media").css({'opacity': 1})
 			$(".legend-media").removeClass('active');
 			$("#level1Label").hide();
-			$(".legend-header").show();
+			$("#legend-header").show();
 			$("#legend-back").hide();
 			pointTypeSelected = undefined
 		})
@@ -2066,7 +2393,7 @@ function showOnePoint(pointType){
 
 
 function makePointOrLineLegendItem(item){
-	var legendItem = "<div class='col-xs-12 col-sm-6 col-md-3 col-lg-2 legend-item'  data-type='" + item.type + "' data-name='" + item.name + "'>"
+	var legendItem = "<div class='col-xs-6 col-sm-3 col-md-3 col-lg-2 legend-item'  data-type='" + item.type + "' data-name='" + item.name + "'>"
 	legendItem += "<div class='media legend-media'>"
 	legendItem += "<div class='media-left'><img class='media-object' src='" + item.icon + "'/></div>"
 	legendItem += "<div class='media-body'>" + item.name + "</div>"
@@ -2080,8 +2407,13 @@ function displayLevel1Label(level1Selected){
 	$("#level1Label").html(titleCase(level1Selected.split("_").join(" ")))
 
 	//figure out positioning
-	var boxHeight = $("#legendHolder").height();
-	$("#level1Label").css({'bottom': (boxHeight + 13) + "px", 'left': 0+'px'})
+	if (desktopMode){
+		var boxHeight = $("#legendHolder").height();
+		$("#level1Label").css({'bottom': (boxHeight + 13) + "px", 'left': 0+'px'})
+	}else{
+		$("#level1Label").css({'bottom':"25px", 'left':'25px'})
+	}
+
 	$("#level1Label").show();
 }
 
