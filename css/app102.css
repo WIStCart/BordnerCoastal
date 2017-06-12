@@ -395,22 +395,33 @@ div.cartodb-tooltip-content-wrapper p{
 }
 
 .infobox-mobile{
-	padding: 0px!important;
-	max-width: 50%;
+	padding-top: 0px!important;
+	padding-left: 0px!important;
+	padding-bottom: 0px!important;
+	padding-right: 0px!important;
+	right: 10px;
+	border-radius: 10px!important;
 }
 
 #mobile-clickwindow{
 	background-color: white!important;
 	width: 100%!important;
+	max-width: 200px;
+	float: right;
+	margin: 0px!important;
+	border-radius: 10px;
 }
 
 #mobile-clickwindow td{
 	/*display: inline-block;*/
 	max-width: 75px;
+	padding-left: 0px;
 }
 
-th, td{
+.infobox-mobile th, td{
 	border-bottom: 1px solid #ddd;
+	padding-left: 10px!important;
+	padding-right: 10px!important;
 }
 
 .cartodb-popup-content .content h3{
@@ -498,6 +509,7 @@ td{
 #legendModalBody{
 	overflow-y: auto;
 }
+
 
 
 .axis path,

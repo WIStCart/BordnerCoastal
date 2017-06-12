@@ -791,7 +791,7 @@ function destroyInfoWindow(){
 
 function onMapClick(){
 	//close the info window on basemap click
-	if (desktopMode){
+	if (desktopMode && (typeof(undefined) != "undefined")){
 		setTimeout(function(){
 			if(!isInfowindowOpen){
 				infowindow.set('visibility', false);
@@ -853,10 +853,15 @@ function onPolyOver(e, latln, pxPos, data, layer){
 			$("#level1-set").html(level1)
 		}else{
 			var lev1 = getLevel1FromCode(data.cov1)
+			var lev2 = getLevel2FromCode(data.cov1)
+			if (levelEngaged == 1){
+				var theLabel = lev1
+			}else{
+				var theLabel = lev2
+			}
 			if (lev1.toLowerCase() == level1Selected.toLowerCase()){
 				$(".infobox").show()
-				level1 = getLevel1FromCode(data.cov1)
-				$("#level1-set").html(level1)
+				$("#level1-set").html(theLabel)
 			}
 		}
 	}
@@ -906,15 +911,29 @@ function getZoomLevelsFromCode(code, featureType){
 }
 
 
-function getLevel1Props(){
-	var level1names = _.pluck(tempClasses2.classes, "level1")
-	var level1colors = _.pluck(tempClasses2.classes, "color1")
-	var props = _.zip(level1names, level1colors).map(function(pair){
+function getLevelProps(level, level1Selected){
+	if (level == 1){
+		var set = tempClasses2.classes
+		var colorKey = "color1"
+		var nameKey = "level1"
+	}else if (level == 2){
+		var set = level1Membership[level1Selected.toLowerCase().split(" ").join("_")]
+		var colorKey = "color2"
+		var nameKey = "level2"
+	}
+	var names = _.pluck(set, nameKey)
+	var colors = _.pluck(set, colorKey)
+	var props = _.zip(names, colors).map(function(pair){
 		return _.object(["name", "color"], pair)
 	})
 	var props = _.sortBy(_.unique(props, function(d){return d.name}), "name");
 	return props
 }
+
+
+
+
+
 
 function onMapFeatureClick(e, latln, pxPos, data, layer){
 	//mark the infowindow as open
@@ -1736,14 +1755,22 @@ function generateSpecificLayerQuery(boundsIn, _level1Selected){
 }
 
 function drawPolyFilterDesktop(el, _levelEngaged, _level1Selected){
-	$(el).empty();
-	var level1Props = getLevel1Props();
-		// console.log(summary)
-		var width = $(el).width();
+		$(el).empty();
+		var props = getLevelProps(_levelEngaged, _level1Selected);
+		if (_levelEngaged == 1){
+			var width = $(el).width();
+		}else{
+			var barwidth = 75;
+			width = props.length * barwidth;
+		}
+
+
+
+
+
 		var height = $(el).height() - 15;
 
 		var margins = {top: 20, left: 30, right: 30, bottom: 100}
-		console.log(el)
 
 
 		if (height < 0){
@@ -1775,7 +1802,7 @@ function drawPolyFilterDesktop(el, _levelEngaged, _level1Selected){
 			.append('g')
 				.attr('transform', "translate(" + margins.left + "," + margins.top + ")")
 
-		xScale.domain(_.pluck(level1Props, "name"))
+		xScale.domain(_.pluck(props, "name"))
 
 
 		svg.append("g")
@@ -1787,7 +1814,7 @@ function drawPolyFilterDesktop(el, _levelEngaged, _level1Selected){
 
 				//these are the data-driven bars proportional to the area in the screen
 		svg.selectAll('filter-swatch')
-			.data(level1Props)
+			.data(props)
 			.enter().append('rect')
 			.style('fill', function(d){return d.color})
 			.attr('x', function(d){ return xScale(d.name)})
@@ -1800,16 +1827,16 @@ function drawPolyFilterDesktop(el, _levelEngaged, _level1Selected){
 			.style('fill', function(d){
 				return d.color
 		})
-		.style('opacity', function(d){
-			if (levelEngaged == 2){
-				level1Key = _level1Selected.toLowerCase().split(" ").join("_")
-				dKey = d.name.toLowerCase().split(" ").join("_")
-				if (level1Key == dKey){
-					return 1
-				}
-				return 0.25
-			}
-		})
+		// .style('opacity', function(d){
+		// 	if (levelEngaged == 2){
+		// 		level1Key = _level1Selected.toLowerCase().split(" ").join("_")
+		// 		dKey = d.name.toLowerCase().split(" ").join("_")
+		// 		if (level1Key == dKey){
+		// 			return 1
+		// 		}
+		// 		return 0.25
+		// 	}
+		// })
 		.on('click', function(d){
 			if (levelEngaged == 1){
 					dispatchLegendClick(d.name.toLowerCase())
@@ -1842,8 +1869,10 @@ function drawPolyFilterDesktop(el, _levelEngaged, _level1Selected){
 
 function drawPolyFilterTablet(el, _levelEngaged, _level1Selected){
 	//draw the filter swatches vertically instead of horizontally to improve readability of labels
+
+	var props = getLevelProps(_levelEngaged, _level1Selected)
+
 	$(el).empty();
-	var level1Props = getLevel1Props();
 		// console.log(summary)
 		var width = $(el).width();
 		var height = $(el).height() - 25;
@@ -1854,7 +1883,6 @@ function drawPolyFilterTablet(el, _levelEngaged, _level1Selected){
 		height = height - margins.top - margins.bottom;
 		width = width - margins.left - margins.right;
 
-		console.log(height)
 
 		var barWidth = width;
 
@@ -1873,7 +1901,7 @@ function drawPolyFilterTablet(el, _levelEngaged, _level1Selected){
 			.append('g')
 				.attr('transform', "translate(" + margins.left + "," + margins.top + ")")
 
-		yScale.domain(_.pluck(level1Props, "name"))
+		yScale.domain(_.pluck(props, "name"))
 
 
 		svg.append("g")
@@ -1884,7 +1912,7 @@ function drawPolyFilterTablet(el, _levelEngaged, _level1Selected){
 
 				//these are the data-driven bars proportional to the area in the screen
 		svg.selectAll('filter-swatch')
-			.data(level1Props)
+			.data(props)
 			.enter().append('rect')
 			.style('fill', function(d){return d.color})
 			.attr('y', function(d){ return yScale(d.name)})
@@ -1941,11 +1969,9 @@ function drawPolyFilterTablet(el, _levelEngaged, _level1Selected){
 
 function drawPolyFilter(el, _levelEngaged, _level1Selected){
 	if (desktopMode){
-		console.log("Drawing in desktop mode.")
 		drawPolyFilterDesktop(el, _levelEngaged, _level1Selected)
 	}else{
 		//tablet mode has different orientation
-		console.log("Drawing in tablet mode")
 		if (isLegendOpen){
 					drawPolyFilterTablet(el, _levelEngaged, _level1Selected)
 		}
@@ -1979,13 +2005,10 @@ function shadeRGBColor(color, percent) {
 function drawPolygonHistogram(data, _levelEngaged, el, histogramScale){
 	var summary = summarize(data, _levelEngaged)
 
-
-
 	if (_levelEngaged == 2){
 		summary.reverse();
 	}
 
-	// console.log(summary)
 	var margins = {top: 20, left: 75, right: 30, bottom: 30}
 
 	var height = $(el).height() - 100;
