@@ -29,7 +29,7 @@ var level1Colors;
 var level2Colors;
 var polygonLegendFactor = 0.000247105;
 var isInfowindowOpen = false;
-var isTOCOpen = true;
+var isLegendOpen = true;
 var isLayerListOpen = false;
 var infowindow;
 var semanticZoomLevel = 13;
@@ -757,7 +757,7 @@ function setupInteraction(layer, _levelEngaged, _visibility){
 
 	$("#map").click(onMapClick)
 
-
+	$('#legendModal').on('hidden.bs.modal', closeLegendTablet);
 
 } //end setup interaction
 
@@ -1075,7 +1075,7 @@ function setUpMap(){
 
 	// Fade-in the toc button and give it a click handler
 	$("#tocButton").addClass( "toc-button-unfade" );
-	$("#tocButton").click(function(evt) { toggleTOC(evt) });
+	$("#tocButton").click(function(evt) { toggleLegend(evt) });
 	// Engage Bootstrap-style tooltips
 	$('[data-toggle="tooltip"]').tooltip();
 
@@ -1109,6 +1109,11 @@ function setUpMap(){
 	});
 
 	$("#layerList").addClass("closed")
+	isLayerListOpen = false;
+
+	if (!desktopMode){
+		isLegendOpen = false;
+	}
 
 	if (labelsAreOn){
 		$("#labelsOverlay").trigger("click")
@@ -1293,11 +1298,11 @@ function reflectChangeLayerInQueryString(overlayCalled, didAdd){
 }
 
 // To dock/undock the table of contents from bottom
-function toggleTOC(evt){
+function toggleLegend(evt){
 	evt.preventDefault();
-	console.log(isTOCOpen)
-	if (isTOCOpen){
-		isTOCOpen = false;
+	console.log(isLegendOpen)
+	if (isLegendOpen){
+		isLegendOpen = false;
 		$("#toc").hide()
 		$("#tocButton").css({'bottom': '4px'})
 		$("#tocButton").html("<span class='glyphicon glyphicon-chevron-up'></span>")
@@ -1317,7 +1322,7 @@ function toggleTOC(evt){
 		}
 			setTimeout(function(){ map.invalidateSize()}, 450)
 	}else{ //is open
-		isTOCOpen = true;
+		isLegendOpen = true;
 		$("#toc").show();
 		$("#tocButton").css({'bottom': '20%'})
 		$("#tocButton").html("<span class='glyphicon glyphicon-chevron-down'></span>");
@@ -1373,6 +1378,10 @@ function transformToDesktop(){
 	$("#level1Label").css({'bottom': '200px'})
 
 	$("#toc").show();
+
+	drawThisView(map.getBounds(), map.getZoom(), levelEngaged, level1Selected);
+
+	$("#legend").appendTo("#toc")
 }
 
 // To configure tablet view (is called upon pageload)
@@ -1384,6 +1393,8 @@ function transformToTablet(){
 	$("#level1Label").css({'bottom': '10px'})
 
 	$("#toc").hide();
+
+	isLegendOpen = false;
 }
 
 // Handles all click events from the 4 main UI buttons
@@ -1474,7 +1485,8 @@ function openLegendTablet(){
 	$("#legendModal").modal('show');
 	$("#legend").appendTo("#legendModalBody")
 	$("legendHolder").addClass("legend-holder-modal")
-	drawTabletLegend()
+	isLegendOpen = true;
+	drawTabletLegend();
 }
 
 
@@ -1499,9 +1511,9 @@ function adjustTabletLegend(){
 	d3.selectAll(" text").style("fill", "black");
 }
 
-// function closeLegendTablet(){
-// 	$("#legendModalContent").empty();
-// }
+function closeLegendTablet(){
+	isLegendOpen = false;
+}
 
 // ...
 function modalAttachTOC(){
@@ -1681,8 +1693,7 @@ function generateSpecificLayerQuery(boundsIn, _level1Selected){
 		return cartoQuery
 }
 
-function drawPolyFilter(el, _levelEngaged, _level1Selected){
-	console.log("Drawing filter")
+function drawPolyFilterDesktop(el, _levelEngaged, _level1Selected){
 	$(el).empty();
 	var level1Props = getLevel1Props();
 		// console.log(summary)
@@ -1727,7 +1738,7 @@ function drawPolyFilter(el, _levelEngaged, _level1Selected){
 
 		svg.append("g")
 			.attr("class", " x axis selector-axis")
-			.attr("transform", "translate(0,50)")
+			.attr("transform", "translate(0,75)")
 			.call(xAxis)
 			.selectAll(".tick text")
 				.call(wrap, xScale.rangeBand())
@@ -1743,7 +1754,7 @@ function drawPolyFilter(el, _levelEngaged, _level1Selected){
 			.attr('width', xScale.rangeBand())
 			.attr('data-fill', function(d){return d.color})
 			.attr('y', 0)
-			.attr('height', 50)
+			.attr('height', 75)
 			.style('fill', function(d){
 				return d.color
 		})
@@ -1785,6 +1796,118 @@ function drawPolyFilter(el, _levelEngaged, _level1Selected){
 			 d3.selectAll("." + d.name.split(" ").join("_")).style('fill', oldColor)
 			}
 		})
+}
+
+function drawPolyFilterTablet(el, _levelEngaged, _level1Selected){
+	//draw the filter swatches vertically instead of horizontally to improve readability of labels
+	$(el).empty();
+	var level1Props = getLevel1Props();
+		// console.log(summary)
+		var width = $(el).width();
+		var height = $(el).height() - 25;
+
+		var margins = {top: 10, left: 200, right: 30, bottom: 10}
+
+		//dimension setup
+		height = height - margins.top - margins.bottom;
+		width = width - margins.left - margins.right;
+
+		console.log(height)
+
+		var barWidth = width;
+
+		//axes setup
+		var yScale = d3.scale.ordinal().rangeRoundBands([0, height], 0.05)
+
+
+		var yAxis = d3.svg.axis()
+			.scale(yScale)
+			.orient('left')
+
+		var svg = d3.select(el)
+			.append('svg')
+			.attr('width', width + margins.left + margins.right)
+			.attr('height', height + margins.top + margins.bottom)
+			.append('g')
+				.attr('transform', "translate(" + margins.left + "," + margins.top + ")")
+
+		yScale.domain(_.pluck(level1Props, "name"))
+
+
+		svg.append("g")
+			.attr("class", "yx axis selector-axis")
+			.call(yAxis)
+			// .selectAll(".tick text")
+			// 	.call(wrap, yScale.rangeBand())
+
+				//these are the data-driven bars proportional to the area in the screen
+		svg.selectAll('filter-swatch')
+			.data(level1Props)
+			.enter().append('rect')
+			.style('fill', function(d){return d.color})
+			.attr('y', function(d){ return yScale(d.name)})
+			.attr('data-name', function(d){return d.name})
+			.attr('class', function(d){ return d.name.split(" ").join("_") + " filter-swatch"})
+			.attr('height', yScale.rangeBand())
+			.attr('data-fill', function(d){return d.color})
+			.attr('x', 0)
+			.attr('width', barWidth)
+			.style('fill', function(d){
+				return d.color
+		})
+		.style('opacity', function(d){
+			if (levelEngaged == 2){
+				level1Key = _level1Selected.toLowerCase().split(" ").join("_")
+				dKey = d.name.toLowerCase().split(" ").join("_")
+				if (level1Key == dKey){
+					return 1
+				}
+				return 0.25
+			}
+		})
+		.on('click', function(d){
+			if (levelEngaged == 1){
+					dispatchLegendClick(d.name.toLowerCase())
+			}
+		})
+		//change colors on hover
+		.on('mouseover', function(d){
+			if (_levelEngaged == 1){
+				var self = d3.select(this)
+				//set old color so we can recover it
+				var oldColor = self.style('fill')
+				self.attr('data-fill', oldColor)
+				var newColor = shadeRGBColor(oldColor, -0.25)
+				self.style('fill', newColor)
+				d3.selectAll("." + d.name.split(" ").join("_")).style('fill', newColor)
+			}
+			//make taller
+			// self.attr('y', 0)
+			// self.attr('height', height)
+		})
+		.on('mouseout', function(d){
+			if (_levelEngaged == 1){
+				var self = d3.select(this)
+				var oldColor = self.attr('data-fill')
+				self.style('fill', oldColor)
+			 d3.selectAll("." + d.name.split(" ").join("_")).style('fill', oldColor)
+			}
+		})
+}
+
+
+
+function drawPolyFilter(el, _levelEngaged, _level1Selected){
+	if (desktopMode){
+		console.log("Drawing in desktop mode.")
+		drawPolyFilterDesktop(el, _levelEngaged, _level1Selected)
+	}else{
+		//tablet mode has different orientation
+		console.log("Drawing in tablet mode")
+		if (isLegendOpen){
+					drawPolyFilterTablet(el, _levelEngaged, _level1Selected)
+		}
+	}
 }
 
 
@@ -2241,8 +2364,13 @@ function displayLevel1Label(level1Selected){
 	$("#level1Label").html(titleCase(level1Selected.split("_").join(" ")))
 
 	//figure out positioning
-	var boxHeight = $("#legendHolder").height();
-	$("#level1Label").css({'bottom': (boxHeight + 13) + "px", 'left': 0+'px'})
+	if (desktopMode){
+		var boxHeight = $("#legendHolder").height();
+		$("#level1Label").css({'bottom': (boxHeight + 13) + "px", 'left': 0+'px'})
+	}else{
+		$("#level1Label").css({'bottom':"25px", 'left':'25px'})
+	}
+
 	$("#level1Label").show();
 }
 

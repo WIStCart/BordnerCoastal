@@ -120,6 +120,12 @@ body{
 		overflow-y: auto!important;
 	}
 
+	.legend-bar{
+		color: black!important;
+		text-shadow: none!important;
+	}
+
+
 
 }
 
