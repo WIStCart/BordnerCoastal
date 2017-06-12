@@ -51,6 +51,8 @@ var navIsOn = false;
 var theLocation;
 var canDoGeolocation;
 
+var isMobileClickWindowOpen = true;
+
 // Overlay definitions:
 var labelsOverlay = L.tileLayer('http://{s}.tile.stamen.com/toner-labels/{z}/{x}/{y}.png', {
 	attribution: 'stamen toner labels'
@@ -750,6 +752,22 @@ function setupInteraction(layer, _levelEngaged, _visibility){
 
 } //end setup interaction
 
+function dockMobileInfowindow(){
+	$("#mobile-clickwindow").hide();
+}
+
+function expandMobileInfowindow(){
+	$("#mobile-clickwindow").show();
+}
+
+function destroyMobileInfowindow(){
+	$("#mobile-clickwindow-holder").remove();
+}
+
+function enableDesktopMouseover(){
+	$(".infobox").append("<p id='level1-set'></p>")
+}
+
 
 function setupInfoWindow(layer){
 	//layer here should be bordner
@@ -930,9 +948,24 @@ function onMapFeatureClick(e, latln, pxPos, data, layer){
 		$("#infobox").show();
 		windowContent = formatCoverageForInfowindow(data)
 		$("#infobox").html(_.template($('#infowindow_template_mobile').html())(windowContent));
+		$("#dock-mobile-info").click(function(){
+			 toggleMobileClickWindow();
+		})
 	}
 }
 
+
+function toggleMobileClickWindow(){
+	if (isMobileClickWindowOpen){
+		dockMobileInfowindow();
+		$("#dock-mobile-info").html("<span class='glyphicon glyphicon-chevron-left'></span>")
+		isMobileClickWindowOpen = false;
+	}else{
+		isMobileClickWindowOpen = true;
+		$("#dock-mobile-info").html("<span class='glyphicon glyphicon-chevron-right'></span>")
+		expandMobileInfowindow();
+	}
+}
 
 
 
@@ -1384,6 +1417,9 @@ function transformToDesktop(){
 
 	$("#infobox").removeClass("infobox-mobile")
 
+	destroyMobileInfowindow();
+	enableDesktopMouseover();
+	console.log("Desktop transform")
 }
 
 // To configure tablet view (is called upon pageload)
