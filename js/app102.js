@@ -1062,10 +1062,12 @@ function setupGeocoderSearch(){
 	// map.on('moveend', function(){
 	// 	$(".cartodb-searchbox").replaceWith('<span id="geocodeButtonIcon" class="button-icon-class glyphicon glyphicon-globe"></span>');
 	// })
-	L.control.geocoder('mapzen-RsgxFds', {
-		bounds: bounds,
-		layers: ["street", "neighbourhood", "locality", "county", "region", "country"]
-	}).addTo(map);
+	// if (typeof(L.control.geocoder) != "undefined"){
+	// 	L.control.geocoder('mapzen-RsgxFds', {
+	// 		bounds: bounds,
+	// 		layers: ["street", "neighbourhood", "locality", "county", "region", "country"]
+	// 	}).addTo(map);
+	// }
 }
 
 // Sets everything up after pageload and map creation are complete
