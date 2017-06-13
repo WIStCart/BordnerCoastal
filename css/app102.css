@@ -798,3 +798,20 @@ rect{
 	border-left: 1px solid #CCCCCC;
 	border-radius: 10px;*/
 }
+
+
+#copyButton:hover{
+	cursor: pointer;
+	background-color: darkgray;
+}
+
+.copybox{
+	padding-top: 50px;
+	margin-bottom: 25px;
+}
+
+
+
+#infosharemodalBdoay{
+	height: 100% !important;
+}

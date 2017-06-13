@@ -771,7 +771,13 @@ function setupInteraction(layer, _levelEngaged, _visibility){
 		map.panInsideBounds(bounds, {animate: false})
 	})
 
+	setupCopyToClipboard();
+
 } //end setup interaction
+
+function setupCopyToClipboard(){
+	var cpbrd = new Clipboard("#copyButton");
+}
 
 function dockMobileInfowindow(){
 	$("#mobile-clickwindow").hide();
@@ -1637,6 +1643,7 @@ function configInfoShareModal(){
 		$("#theLink").text(window.location.href)
 		$("#theLink").val (window.location.href)
 		$("#infoModal").modal('show');
+
 }
 
 
