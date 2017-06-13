@@ -1295,6 +1295,7 @@ function turnOnFeatureType(featureTypeCalled){
 			console.log("unidentified feature type called")
 	} //end switch
 	if (legendType == "polygons"){
+		$("#legendHolder").removeClass("stylescroll").removeClass("autoscroll")
 		drawThisView(map.getBounds(), map.getZoom(), levelEngaged, level1Selected)
 		if ((typeof(lines) == "undefined") || (typeof(points) == "undefined")){
 			setTimeout(function(featureTypeCalled){turnOnFeatureType(featureTypeCalled)}, 50) //this prevents on init load issues with undefined values
@@ -1313,6 +1314,7 @@ function turnOnFeatureType(featureTypeCalled){
 		}
 
 	}else if (legendType == "points"){
+		console.log("Drawing points")
 		drawPointLegend();
 		if ((typeof(lines) == "undefined") || (typeof(bordner) == "undefined")){
 			setTimeout(function(featureTypeCalled){turnOnFeatureType(featureTypeCalled)}, 50) //this prevents on init load issues with undefined values
@@ -2439,12 +2441,12 @@ function dispatchLegendClick(level1Selected){
 
 
 function drawLineLegend(){
+	console.log("Drawing line legend")
 	$("#legendHolder").empty();
-	lineLegendSorted = _.chain(lineLegend).sortBy("frequency").sortBy("class").value()
-	console.log(lineLegendSorted)
+	$("#legendHolder").addClass("stylescroll").addClass('autoscroll')
+	lineLegendSorted =  _.chain(lineLegend).sortBy("frequency").sortBy("class").unique(function(d){return d.group}).value()
 	for (var i=0; i < lineLegendSorted.length; i++){
 		var symbol = lineLegendSorted[i];
-		console.log(symbol)
 		var legendEntry = makePointOrLineLegendItem(symbol);
 		$("#legendHolder").append(legendEntry)
 	}
@@ -2509,8 +2511,9 @@ function showOneLine(lineType){
 
 function drawPointLegend(){
 	$("#legendHolder").empty();
-
-	var pointlegendSorted = _.chain().sortBy("frequency").sortBy("class").value()
+	$("#legendHolder").addClass("stylescroll").addClass('autoscroll');
+	var pointlegendSorted = _.chain(pointLegend).sortBy("frequency").sortBy("class").unique(function(d){return d.group}).value()
+	console.log(pointlegendSorted)
 	for (var i=0; i < pointlegendSorted.length; i++){
 		var symbol = pointlegendSorted[i];
 		var legendEntry = makePointOrLineLegendItem(symbol);

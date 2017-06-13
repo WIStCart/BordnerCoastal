@@ -594,15 +594,20 @@ td{
 }
 
 .media-body{
-	color: white;
-	fill: white;
-	text-shadow: black 0.1em 0.1em 0.2em;
+	color: black;
+	/*fill: white;*/
+	/*text-shadow: black 0.1em 0.1em 0.2em;*/
 	padding-top: 2%;
 }
 
 .media-left img{
 	height:32px;
 	width: 32px;
+}
+
+
+.autoscroll{
+	overflow-y: auto!important;
 }
 
 
