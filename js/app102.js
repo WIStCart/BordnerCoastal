@@ -166,9 +166,9 @@ function getPointCSS(pointTypeSelected, zoomIn){
 			var thisMinZoom = pointLegend[i].minZoom;
 			var thisMaxZoom = pointLegend[i].maxZoom;
 			if ((zoomIn >= thisMinZoom) && (zoomIn <= thisMaxZoom)){
-						style +=  "[point_type='" + pointLegend[i].type + "']{marker-opacity: 1; marker-fill: " + pointLegend[i].color + "; marker-file: url(" + pointLegend[i].icon + "); marker-opacity: 1;}"
+						style +=  "[point_type='" + pointLegend[i].type + "']{marker-fill: " + pointLegend[i].color + "; marker-file: url(" + pointLegend[i].icon + "); marker-allow-overlap: false; marker-opacity: 1;"+ pointLegend[i].otherCSS +"}"
 			}else{
-						style +=  "[point_type='" + pointLegend[i].type + "']{marker-opacity: 0;}"
+						style +=  "marker-fill:#000000; marker-allow-overlap: false; marker-opacity: 1; [zoom <9]{ marker-width:.1;}[zoom >=9]{marker-width:.5;}[zoom >=11]{marker-width:3.5;}"
 			}
 		}
 		style += "}"
@@ -179,7 +179,7 @@ function getPointCSS(pointTypeSelected, zoomIn){
 		for (var i=0; i < pointLegend.length; i++){
 			var thisPointType = pointLegend[i].type
 			if (pointTypeSelected.toLowerCase() === thisPointType.toLowerCase()){
-				var thisStyle = "[point_type='" + thisPointType + "']{marker-opacity: 1; marker-fill: " + pointLegend[i].color + "; marker-file: url(" + pointLegend[i].icon + ");}"
+				var thisStyle = "[point_type='" + thisPointType + "']{marker-opacity: 1; marker-fill: " + pointLegend[i].color + "; marker-file: url(" + pointLegend[i].icon + "); marker-allow-overlap: false;"+ pointLegend[i].otherCSS +"}"
 				style += thisStyle
 			}//end if
 		} //end loop
