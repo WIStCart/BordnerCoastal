@@ -1043,25 +1043,29 @@ function enableMapInteractionEvents(){
 
 function setupGeocoderSearch(){
 	//render the template
-	var v = cdb.vis.Overlay.create("search", map.viz, {})
-	v.show();
-	// $("#geocodeButton").append(v.render().el)
-	var searcher = v.render().el
-	// jquery magic to make it look nicer
-	// $("geocodeButton").width('100%');
-	// $(".cartodb-searchbox").width('100%');
-	$(".text").hide();
-	$("#geocodeButton").on('mouseover', function(){
-		$(".text").show();
-		$("#geocodeButtonIcon").replaceWith(searcher);
-	})
-	//close the geocoder when the map's been clicked or moved
-	map.on('click', function(){
-		$(".cartodb-searchbox").replaceWith('<span id="geocodeButtonIcon" class="button-icon-class glyphicon glyphicon-globe"></span>');
-	})
-	map.on('moveend', function(){
-		$(".cartodb-searchbox").replaceWith('<span id="geocodeButtonIcon" class="button-icon-class glyphicon glyphicon-globe"></span>');
-	})
+	// var v = cdb.vis.Overlay.create("search", map.viz, {})
+	// v.show();
+	// // $("#geocodeButton").append(v.render().el)
+	// var searcher = v.render().el
+	// // jquery magic to make it look nicer
+	// // $("geocodeButton").width('100%');
+	// // $(".cartodb-searchbox").width('100%');
+	// $(".text").hide();
+	// $("#geocodeButton").on('mouseover', function(){
+	// 	$(".text").show();
+	// 	$("#geocodeButtonIcon").replaceWith(searcher);
+	// })
+	// //close the geocoder when the map's been clicked or moved
+	// map.on('click', function(){
+	// 	$(".cartodb-searchbox").replaceWith('<span id="geocodeButtonIcon" class="button-icon-class glyphicon glyphicon-globe"></span>');
+	// })
+	// map.on('moveend', function(){
+	// 	$(".cartodb-searchbox").replaceWith('<span id="geocodeButtonIcon" class="button-icon-class glyphicon glyphicon-globe"></span>');
+	// })
+	L.control.geocoder('mapzen-RsgxFds', {
+		bounds: bounds,
+		layers: ["street", "neighbourhood", "locality", "county", "region", "country"]
+	}).addTo(map);
 }
 
 // Sets everything up after pageload and map creation are complete
@@ -1081,10 +1085,10 @@ function setUpMap(){
 			'</div></br>' +
 			'<div data-toggle="tooltip" title="legend" class="leaflet-bar leaflet-control leaflet-control-custom" id="legendButton" onClick="dispatchButtonClick(event, this.id)">' +
 				'<span id="legendButtonIcon" class="button-icon-class glyphicon glyphicon-stats">' +
-			'</div></br>' +
-			'<div data-toggle="tooltip" title="Search" class="leaflet-bar leaflet-control leaflet-control-custom" id="geocodeButton" onClick="dispatchButtonClick(event, this.id)">' +
-				'<span id="geocodeButtonIcon" class="button-icon-class glyphicon glyphicon-globe"></span>' +
 			'</div></br>'
+			// '<div data-toggle="tooltip" title="Search" class="leaflet-bar leaflet-control leaflet-control-custom" id="geocodeButton" onClick="dispatchButtonClick(event, this.id)">' +
+			// 	'<span id="geocodeButtonIcon" class="button-icon-class glyphicon glyphicon-globe"></span>' +
+			// '</div></br>'
 		)
 
 	map.addControl(new geolocationControl({position: 'bottomright'}));
