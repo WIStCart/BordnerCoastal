@@ -412,6 +412,8 @@ var cartoCSSLines = getLineCSS('none')
 		layer.bind('featureOver', onPolyOver)
 		layer.bind('featureOut', onPolyOut)
 
+		//could add a render event if we updated the leaflet version
+
 		//dispatch the filter, if required in the url parameter
 		if ((typeof(level1Selected) != "undefined") && (legendType == "polygons")){
 			dispatchLegendClick(level1Selected)
@@ -1062,7 +1064,7 @@ function setUpMap(){
 	map.addControl(new tabletCustomControl({position: "topleft"})); //Could also be: 'topleft', 'topright', 'bottomleft', 'bottomright'
 	$(".tablet-custom-control")
 		.attr("id", "tabletCustomControl")
-		.html('<div data-toggle="tooltip" title="info" class="leaflet-bar leaflet-control leaflet-control-custom" id="infoButton" onClick="dispatchButtonClick(event, this, this.id)">' +
+		.html('<div data-toggle="tooltip" title="info" class="leaflet-bar leaflet-control leaflet-control-custom" id="infoButton" onClick="dispatchButtonClick(event, this.id)">' +
 				'<span id="infoButtonIcon" class="button-icon-class glyphicon glyphicon-info-sign"></span>' +
 			'</div></br>' +
 			'<div data-toggle="tooltip" title="share" class="leaflet-bar leaflet-control leaflet-control-custom" id="shareButton" onClick="dispatchButtonClick(event, this.id)">' +
@@ -1081,7 +1083,7 @@ function setUpMap(){
 
 	map.addControl(new geolocationControl({position: 'bottomright'}));
 	$(".geolocation-control").html(
-		'<div data-toggle="tooltip" title="Locate Me" class="leaflet-bar leaflet-control leaflet-control-custom" id="locateMeButton" onClick="dispatchButtonClick(this.id)">' +
+		'<div data-toggle="tooltip" title="Locate Me" class="leaflet-bar leaflet-control leaflet-control-custom" id="locateMeButton" onClick="dispatchButtonClick(event, this.id)">' +
 		'<span id="shareButtonIcon" class="button-icon-class glyphicon glyphicon-map-marker">' +
 		'</div></br>'
 	)
@@ -1413,18 +1415,20 @@ function toggleLegend(evt){
 	console.log(isLegendOpen)
 	if (isLegendOpen){
 		isLegendOpen = false;
-		$("#toc").hide()
-		$("#tocButton").css({'bottom': '4px'})
+		$("#toc").hide();
+		$("#tocButton").addClass('toc-button-closed').show();
 		$("#tocButton").html("<span class='glyphicon glyphicon-chevron-up'></span>")
 		$("#map").height("100%");
 		if (desktopMode){
+			console.log("desktopMode")
 			$("#neatline").show();
 		}
-			setTimeout(function(){ map.invalidateSize()}, 450)
+
+		setTimeout(function(){ map.invalidateSize()}, 500)
 	}else{ //is open
 		isLegendOpen = true;
 		$("#toc").show();
-		$("#tocButton").css({'bottom': '20%'})
+		$("#tocButton").removeClass("toc-button-closed")
 		$("#tocButton").html("<span class='glyphicon glyphicon-chevron-down'></span>");
 		$("#map").height("80%");
 
@@ -1433,7 +1437,7 @@ function toggleLegend(evt){
 				console.log(levelEngaged)
 				console.log(level1Selected)
 				drawThisView(map.getBounds(), map.getZoom(), levelEngaged, level1Selected)
-			}, 500)
+			}, 100)
 		}else if (legendType == "lines"){
 			drawLineLegend();
 		}else if (legendType == "points"){
@@ -1463,6 +1467,9 @@ function transformToDesktop(){
 
 	// destroyMobileInfowindow();
 	enableDesktopMouseover();
+	isLegendOpen = true;
+
+	$("#legend-back").removeClass("col-xs-8").addClass("col-sm-2")
 	// if (typeof(bordner) != "undefined"){
 	// 	//happens tablet --> desktop
 	// 	setupInfoWindow(bordner);
@@ -1484,6 +1491,9 @@ function transformToTablet(){
 	$("#infobox").addClass("infobox-mobile")
 
 	map.closePopup();
+	map.invalidateSize()
+
+	$("#legend-back").addClass("col-xs-8").removeClass("col-sm-2")
 }
 
 // Handles all click events from the 4 main UI buttons
@@ -1621,6 +1631,9 @@ function configInfoShareModal(){
 		if (isLayerListOpen){
 			toggleLayerListDesktop();
 		}
+
+		$("#theLink").text(window.location.href)
+		$("#theLink").val (window.location.href)
 		$("#infoModal").modal('show');
 }
 
@@ -1735,7 +1748,7 @@ function drawThisView(boundsIn, zoomIn, _levelEngaged, _level1Selected){
 			sql.execute(cartoQuery)
 				.done(function(data) {
 					$("#legendHolder").empty();
-					$("#legendHolder").append("<div class='btn-group pull-right' role='group'><a id='logHist'>Log</a> | <a id='linearHist'>Linear</a></div>")
+					$("#legendHolder").append("<div class='btn-group pull-right' role='group'><a id='logHist' class='btn btn-default histbtn btn-sm'>Log</a><a id='linearHist' class='btn btn-default histbtn btn-sm'>Linear</a></div>")
 					$("#logHist").click(function(){
 						histogramScale = "log";
 						$(this).addClass('active');
@@ -1755,7 +1768,11 @@ function drawThisView(boundsIn, zoomIn, _levelEngaged, _level1Selected){
 					}else{
 						$("#linearHist").addClass('active')
 					}
-					drawPolygonHistogram(data, _levelEngaged, "#legendHolder", histogramScale);
+					if (desktopMode){
+						drawPolygonHistogramDesktop(data, _levelEngaged, "#legendHolder", histogramScale);
+					}else{
+						drawPolygonHistogramTablet(data, _levelEngaged, "#legendHolder", histogramScale);
+					}
 					adjustTabletLegend()
 				})
 				.error(function(errors) {
@@ -1804,6 +1821,15 @@ function drawPolyFilterDesktop(el, _levelEngaged, _level1Selected){
 		//dimension setup
 		height = height - margins.top - margins.bottom;
 		width = width - margins.left - margins.right;
+
+		if (_levelEngaged == 2){
+			var barWidth = 100
+			var altWidth = props.length * barWidth;
+			if (altWidth < width){
+				width = altWidth
+			}
+		}
+
 
 		//axes setup
 		var xScale = d3.scale.ordinal().rangeRoundBands([0, width], 0.05)
@@ -1892,6 +1918,11 @@ function drawPolyFilterTablet(el, _levelEngaged, _level1Selected){
 		height = height - margins.top - margins.bottom;
 		width = width - margins.left - margins.right;
 
+		// if (_levelEngaged == 2){
+		// 	var barwidth = 125
+		// 	var altWidth = barwidth *
+		// }
+
 
 		var barWidth = width;
 
@@ -1934,16 +1965,7 @@ function drawPolyFilterTablet(el, _levelEngaged, _level1Selected){
 			.style('fill', function(d){
 				return d.color
 		})
-		.style('opacity', function(d){
-			if (levelEngaged == 2){
-				level1Key = _level1Selected.toLowerCase().split(" ").join("_")
-				dKey = d.name.toLowerCase().split(" ").join("_")
-				if (level1Key == dKey){
-					return 1
-				}
-				return 0.25
-			}
-		})
+		.style('opacity', 0.7)
 		.on('click', function(d){
 			if (levelEngaged == 1){
 					dispatchLegendClick(d.name.toLowerCase())
@@ -2011,7 +2033,7 @@ function shadeRGBColor(color, percent) {
 }
 
 
-function drawPolygonHistogram(data, _levelEngaged, el, histogramScale){
+function drawPolygonHistogramDesktop(data, _levelEngaged, el, histogramScale){
 	var summary = summarize(data, _levelEngaged)
 
 	if (_levelEngaged == 2){
@@ -2020,7 +2042,7 @@ function drawPolygonHistogram(data, _levelEngaged, el, histogramScale){
 
 	var margins = {top: 20, left: 75, right: 30, bottom: 30}
 
-	var height = $(el).height() - 100;
+	var height = $(el).height() - 125;
 	if (height < 0){
 		return;
 	}
@@ -2188,6 +2210,133 @@ function drawPolygonHistogram(data, _levelEngaged, el, histogramScale){
 		.attr('fill', 'white')
 		.attr('text-shadow', 'black 0.1em 0.1em 0.2em')
 		.text("Acres")
+} //end of the draw polygon legend function
+
+
+
+
+function drawPolygonHistogramTablet(data, _levelEngaged, el, histogramScale){
+	//draws the histogram on the y axis
+
+	var height = +$(el).height() - 75;
+	var width = +$(el).width();
+
+	var summary = summarize(data, _levelEngaged)
+
+	summary.reverse();
+
+	var margins = {top: 20, left: 150, right: 30, bottom: 30}
+
+
+	//dimension setup
+	height = height - margins.top - margins.bottom;
+	width = width - margins.left - margins.right;
+
+	if (_levelEngaged == 2){
+		var barHeight = 40;
+		var altHeight = summary.length * barHeight;
+		if (altHeight < height){
+			height = altHeight
+		}
+	}
+
+	if ((height < 0) || (width < 0)){
+		return; //modal is closes
+	}
+	//axes setup
+	var yScale = d3.scale.ordinal().rangeRoundBands([0, height], 0.05)
+	if (histogramScale == "linear"){
+		var xScale = d3.scale.linear().range([0, width])
+	}else if (histogramScale == "log"){
+		var xScale = d3.scale.log().range([0, width])
+	}
+
+	var yAxis = d3.svg.axis()
+		.scale(yScale)
+		.orient('left')
+
+	var xAxis = d3.svg.axis()
+		.scale(xScale)
+		.orient('bottom')
+		.ticks(5)
+
+	if (histogramScale == "log"){ //make the ticks natural numbers instead of exp
+				xAxis.tickFormat(function (d) {
+		        return xScale.tickFormat(4, d3.format(",d"))(d)
+		})
+	}
+
+	var svg = d3.select(el)
+		.append('svg')
+		.attr('width', width + margins.left + margins.right)
+		.attr('height', height + margins.top + margins.bottom)
+		.append('g')
+			.attr('transform', "translate(" + margins.left + "," + margins.top + ")")
+
+	yScale.domain(summary.map(function(d){return d.type }))
+	xScale.domain([0.1, d3.max(summary, function(d){return d.area * polygonLegendFactor})])
+
+	svg.append("g")
+		.attr("class", " x axis tablet-hist")
+		.attr("transform", "translate(0," + height + ")")
+		.call(xAxis)
+
+	svg.append("g")
+		.attr('class', 'y axis tablet-hist')
+		.call(yAxis)
+
+	//add a background rectange to listen for click events
+	svg.selectAll("background")
+		.data(summary)
+		.enter()
+			.append('rect')
+			.attr('class', function(d){ return "tablet-hist background " + d.type.split(" ").join("_")})
+			.style('fill', function(d){return d.color})
+			.style('fill-opacity', 0.15)
+			.attr('y', function(d){
+				return yScale(d.type)})
+			.attr('height', yScale.rangeBand())
+			.attr('x', 0)
+			.attr('width', width)
+			.on('click', function(d){
+				level1Selected = d.type.toLowerCase()
+				if (_levelEngaged == 1){
+						dispatchLegendClick(level1Selected)
+				}
+			})
+
+
+			//these are the data-driven bars proportional to the area in the screen
+	svg.selectAll('bar')
+		.data(summary)
+		.enter().append('rect')
+		.attr('class', function(d){ return "background " + d.type.split(" ").join("_")})
+		.style('fill', function(d){return d.color})
+		.attr('y', function(d){ return yScale(d.type)})
+		.attr('height', yScale.rangeBand())
+		.attr('x', 0)
+		.attr('width', function(d){
+			var scaledWidth = xScale(d.area * polygonLegendFactor)
+			return scaledWidth})
+			.on('click', function(d){
+				level1Selected = d.type.toLowerCase()
+				if (_levelEngaged == 1){
+						dispatchLegendClick(level1Selected)
+				}
+			})
+	svg.append('text')
+		// .attr('transform', 'rotate(-90)')
+		.attr('x', width - 10)
+		.attr('y', height + 15)
+		.attr('dy', "1em")
+		.attr('text-anchor', 'middle')
+		.attr('fill', 'white')
+		.attr('text-shadow', 'black 0.1em 0.1em 0.2em')
+		.text("Acres")
+
+
+		$("#linearHist").addClass("tablet-hist-btn").addClass('btn btn-default')
+		$("#logHist").addClass("tablet-hist-btn").addClass('btn btn-default')
 } //end of the draw polygon legend function
 
 function getColor1FromLevel1(level1){
@@ -2468,10 +2617,14 @@ function switchLevel(_levelEngaged, _level1Selected){
 		sublayer2.setCartoCSS(cartoCSSRules)
 		sublayer2.setInteraction(true)
 		displayLevel1Label(_level1Selected)
+		if (!desktopMode){
+			$("#legendModalHeader").text(titleCase(_level1Selected))
+		}
 	}else{
 		sublayer1.show();
 		sublayer2.hide();
 		hideLevel1Label();
+		$("#legendModalHeader").text("The Legend")
 	}
 }
 

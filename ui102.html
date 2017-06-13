@@ -27,7 +27,7 @@
       </div>
 			<div class="col-sm-12  transition-class" id="toc">
 				<div class="col-sm-12 transition-class clearfix" id="legend">
-          <div id='legend-back' class='legend-bar'><span class="glyphicon glyphicon-chevron-left pull-left"></span>Back to overview</div>
+          <div id='legend-back' class='btn btn-default btn-sm'><span class="glyphicon glyphicon-chevron-left pull-left"></span>Back to Overview</div>
           <div class='legend-bar' id='legend-header'>Legend</div>
           <div id="legendHolder" class="col-xs-12 stylescroll"</div>
 				</div>
@@ -52,7 +52,7 @@
   <div id="legendModal" class="modal fade" role="dialog">
     <div class="modal-dialog" role="document">
       <div class="modal-content">
-        <h3 class='page-header'>The Legend</h3>
+        <h3 class='page-header' id='legendModalHeader'>The Legend</h3>
         <div class="modal-body" id="legendModalBody">
           <div id='modal-layerListHolder'></div>
         </div>
@@ -76,14 +76,15 @@
           </button>
         </div>
         <div class="modal-body">
-          <p>Here is some info about the map</p>
-          <i>Share me!</i>
+          <div class='form-horizontal'>
+            <div class='form-group col-xs-12'>
+              <label class='control-label col-xs-2'>Permanent URL: </label>
+              <input class='form-control col-xs-12' id='theLink'/>
+            </div>
+          </div>
           <div class="btn-group">
-                <a href="https://twitter.com/share" class="twitter-share-button" data-show-count="true" data-size='large'>Tweet</a><script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script>
+              <a href="https://twitter.com/share" class="twitter-share-button" data-show-count="true" data-size='large'>Tweet</a><script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script>
             <iframe src="https://www.facebook.com/plugins/share_button.php?href=https%3A%2F%2Fmaps.sco.wisc.edu%2FBordnerCoastal%2FBordnerCoastal%2Fui102.html&layout=button_count&size=large&mobile_iframe=true&appId=512535975552482&width=83&height=28" width="83" height="28" style="border:none;overflow:hidden" scrolling="no" frameborder="0" allowTransparency="true"></iframe>
-            <button class="btn btn-lg"><span class="glyphicon glyphicon-plane"></span></button>
-            <button class="btn btn-lg"><span class="glyphicon glyphicon-thumbs-up"></span></button>
-            <button class="btn btn-lg"><span class="glyphicon glyphicon-send"></span></button>
           </div>
         </div>
 
