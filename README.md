@@ -6,7 +6,7 @@ Collaborative project between Forest Landscape and Ecology Lab (FLEL) and State 
 The application has a number of URL parameters that allow users to programmatically create map configurations. At the current time, the options include:
 
 **Basemap Configuration**
-- ```basemap```: Change the basemap on the map. Available options are ```streets```, ```satellite```. Defaults to ```streets```.
+- ```basemap```: Change the basemap on the map. Available options are ```streets```, ```satellite```, ```historic```. Defaults to ```streets```.
 
 **Overlay Configuration**
 - ```showLabels```: Show place name labels on the map. Accepts Boolean values. Default to ```False```.
