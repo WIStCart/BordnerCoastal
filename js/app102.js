@@ -84,10 +84,14 @@ var satelliteBasemap =  L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest
 });
 
 
-// var basemapC = 	L.tileLayer('http://maps.sco.wisc.edu/V1/bordner/03_WHAI_Tiles/00_Demo_Kewaunee/{z}/{x}/{y}.png', {
-// 	opacity: 0.4,
-// 	attribution: 'WHAI Finder'
-// });
+var kewaunee = 	L.tileLayer('http://maps.sco.wisc.edu/V1/bordner/03_WHAI_Tiles/00_Demo_Kewaunee/{z}/{x}/{y}.png', {
+ 	attribution: 'WHAI'
+});
+var racine = L.tileLayer('http://maps.sco.wisc.edu/BordnerCoastal/BordnerTile/Racine/{z}/{x}/{y}.png', {
+ 	attribution: 'WHAI'
+});
+
+var historicBasemap = L.layerGroup([kewaunee, racine])
 
 // Create CartoCSS
 function getPolyStyle(level, level1Selected){
@@ -1139,7 +1143,7 @@ function setUpMap(){
 				'<label><input type="radio" name="basemapType" id="satelliteBasemap">Satellite</label>' +
 			'</div>' +
 			'<div class="radio">' +
-				'<label><input type="radio" name="basemapType" id="basemapC" disabled>Historic Imagery</label>' +
+				'<label><input type="radio" name="basemapType" id="historicBasemap" >Historic Imagery</label>' +
 			'</div>' +
 			'<label class="legend-label">Overlay Opacity</label>' +
 			'<input type="text" value="50" id="rangeSlider" data-slider-min="0" data-slider-max="100" data-slider-step="1" data-slider-value="' +  layerOpacity*100 + '" data-slider-ticks="[0, 100]"  / >' +
@@ -1395,7 +1399,14 @@ function showAllPolygons(){
 function turnOnBasemap(basemapCalled){
 	map.removeLayer(currentBasemap)
 	map.addLayer(window[basemapCalled]);
-	window[basemapCalled].bringToBack();
+	if(basemapCalled == "historicBasemap"){
+		window[basemapCalled].eachLayer(function(layer){
+			console.log(layer)
+			layer.bringToBack();
+		});
+	}else{
+		window[basemapCalled].bringToBack();
+	}
 	currentBasemap = window[basemapCalled]
 	replaceQueryValue("basemap", basemapCalled.replace("Basemap", ""));
 }
