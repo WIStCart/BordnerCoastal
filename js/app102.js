@@ -557,7 +557,7 @@ function parseURL(){
 } // end parse URL
 
 function validateBasemapParam(param){
-	var basemapChoices = ["streets", "satellite"]
+	var basemapChoices = ["streets", "satellite", "historic"]
 	if (basemapChoices.indexOf(param) > -1){
 		return true
 	}else{
@@ -1184,18 +1184,26 @@ function setUpMap(){
 		// --> $("#featureLines").prop("checked", true);
 
 	// Explicitly set current basemap and click its radio button
-	if (basemapChoice == "streets" ){
-		currentBasemap = streetsBasemap;
-		$( "#streetsBasemap" ).trigger( "click" );
-	}else if (basemapChoice == "satellite"){
-		currentBasemap = satelliteBasemap;
-		$( "#satelliteBasemap" ).trigger( "click" );
-	}else{
-		currentBasemap = satelliteBasemap;
-		$( "#satelliteBasemap" ).trigger( "click" );
+	console.log("basemapChoice")
+	console.log(basemapChoice)
+	switch(basemapChoice) {
+		case "streets":
+			currentBasemap = streetsBasemap;
+			$( "#streetsBasemap" ).trigger( "click" );
+			break;
+		case "satellite":
+			currentBasemap = satelliteBasemap;
+			$( "#satelliteBasemap" ).trigger( "click" );
+			break;
+		case "historic":
+			currentBasemap = historicBasemap;
+			$( "#historicBasemap" ).trigger( "click" );
+			break;
+		default:
+			console.log("unidentified basemap called")
+			currentBasemap = streetsBasemap;
+			$( "#streetsBasemap" ).trigger( "click" );
 	}
-
-
 	// Fade-in the toc button and give it a click handler
 	$("#tocButton").addClass( "toc-button-unfade" );
 	$("#tocButton").click(function(evt) { toggleLegend(evt) });
