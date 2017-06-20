@@ -272,7 +272,6 @@ body{
 	z-index: 1000!important;
 }
 
-
 .histogram-div{
 	position: absolute;
 	bottom: 0px;
@@ -304,6 +303,10 @@ body{
     padding-top: 5px;
 }
 
+
+.page-header {
+    margin: 10px 10px 0px;
+}
 
 .legend-holder-modal{
 	height: 750px!important;
