@@ -62,7 +62,7 @@ var west = -93
 var bounds = new L.latLngBounds(L.latLng(north, east), L.latLng(south, west));
 
 // Overlay definitions:
-var labelsOverlay = L.tileLayer('http://{s}.basemaps.cartocdn.com/light_only_labels/{z}/{x}/{y}.png', {
+var labelsOverlay = L.tileLayer('https://cartodb-basemaps-{s}.global.ssl.fastly.net/light_only_labels/{z}/{x}/{y}.png', {
 	attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="http://cartodb.com/attributions">CartoDB</a>',
 	subdomains: 'abcd',
 	maxZoom: 23
@@ -75,7 +75,7 @@ var terrainOverlay = L.tileLayer('http://{s}.tiles.wmflabs.org/hillshading/{z}/{
 });
 
 // Basemap definitions:
-var streetsBasemap = L.tileLayer('http://{s}.basemaps.cartocdn.com/light_nolabels/{z}/{x}/{y}.png', {
+var streetsBasemap = L.tileLayer('https://cartodb-basemaps-{s}.global.ssl.fastly.net/light_nolabels/{z}/{x}/{y}.png', {
 	attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, &copy; <a href="http://cartodb.com/attributions">CartoDB</a>'
 });
 
@@ -84,10 +84,10 @@ var satelliteBasemap =  L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest
 });
 
 
-var kewaunee = 	L.tileLayer('http://maps.sco.wisc.edu/V1/bordner/03_WHAI_Tiles/00_Demo_Kewaunee/{z}/{x}/{y}.png', {
+var kewaunee = 	L.tileLayer('https://maps.sco.wisc.edu/V1/bordner/03_WHAI_Tiles/00_Demo_Kewaunee/{z}/{x}/{y}.png', {
  	attribution: 'WHAI'
 });
-var racine = L.tileLayer('http://maps.sco.wisc.edu/BordnerCoastal/BordnerTile/Racine/{z}/{x}/{y}.png', {
+var racine = L.tileLayer('https://maps.sco.wisc.edu/BordnerCoastal/BordnerTile/Racine/{z}/{x}/{y}.png', {
  	attribution: 'WHAI'
 });
 
@@ -1489,7 +1489,7 @@ function transformToDesktop(){
 	$("#infoboxHolder").show();
 	$("#infoboxHolder").show();
 
-	$("#level1Label").css({'bottom': '200px'})
+	//$("#level1Label").css({'bottom': '200px'})
 
 	$("#toc").show();
 
@@ -1515,9 +1515,7 @@ function transformToTablet(){
 
 	$("#infoboxHolder").hide();
 	$("#infobox").hide();
-
-	$("#level1Label").css({'bottom': '10px'})
-
+	$("#level1Label").hide();
 	$("#toc").hide();
 
 	isLegendOpen = false;
@@ -2630,12 +2628,10 @@ function displayLevel1Label(level1Selected){
 	//figure out positioning
 	if (desktopMode){
 		var boxHeight = $("#legendHolder").height();
-		$("#level1Label").css({'bottom': (boxHeight + 13) + "px", 'left': 0+'px'})
+		$("#level1Label").show();
 	}else{
-		$("#level1Label").css({'bottom':"25px", 'left':'25px'})
+		$("#level1Label").hide();
 	}
-
-	$("#level1Label").show();
 }
 
 function hideLevel1Label(){

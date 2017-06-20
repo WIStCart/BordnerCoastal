@@ -299,8 +299,9 @@ body{
 #legend{
 	overflow-y: hidden;
 	height: 100%;
-	padding-left: 0px;
-	padding-right: 0px;
+    padding-left: 5px;
+    padding-right: 5px;
+    padding-top: 5px;
 }
 
 
@@ -534,12 +535,12 @@ td{
 }
 
 #level1Label{
-	color: white;
-	text-shadow: black 0.1em 0.1em 0.2em;
+	color: #333;
+	/*text-shadow: black 0.1em 0.1em 0.2em;*/
 	z-index: 999;
 	position: absolute;
-	bottom: 25%;
-	left: 10px;
+    top: -19px;
+    left: 18%;
 	display: none;
 }
 
