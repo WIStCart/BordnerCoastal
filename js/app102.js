@@ -258,18 +258,43 @@ window.onload = function() {
 
 	// Add county layer
 	var cartoCSSCounty = "#layer { " +
-	  "polygon-fill: #374C70;" +
-	  "polygon-opacity: 0;" +
-	  //"polygon-gamma: 0.5;" +
-	  "line-color: #FFF;" +
-	  "line-width: 1;" +
-	  "line-opacity: 0.5;" +
-	  "line-comp-op: soft-light;" +
-	  "text-name: [county_nam];" +
-	  "text-face-name: 'Open Sans Regular';"+
-	  "text-size: 13;"+
-	  "text-fill: #fff;"+
-	  "text-halo-fill: #000000;"+
+		"text-name: [county_nam];" +
+	  	"text-face-name: 'Open Sans Regular';" +
+	  	"text-fill: #151515;" +
+	  	"text-halo-fill: #fff;" +
+	  	"text-halo-radius: 1;" +
+	  	"[zoom = 7]{text-size: 9;}" +
+	  	"[zoom = 8]{text-size: 12;}" +
+	  	"[zoom = 9]{text-size: 16;}" +
+	  	"[zoom = 10]{text-size: 19;}" +
+	  	"[zoom = 11]{text-size: 23;}" +
+	  	"[zoom = 12]{text-size: 26;}" +
+	  	"[zoom = 13]{text-size: 31;}" +
+	  	"[zoom = 14]{text-size: 36;}" +
+	  	"[zoom = 15]{text-size: 43;}" +
+	  	"[zoom = 16]{text-size: 50;}" +
+	  	"[zoom = 17]{text-size: 58;}" +
+	  	"[zoom = 18]{text-size: 67;}" +
+	  	"text-fill: #fff;"+
+	  	"text-halo-fill: #000000;"+
+	  	"polygon-opacity: 0;" +
+	  	"::case {" +
+	  		"[zoom < 12]{line-width: 3;}" +
+			"[zoom >= 12]{line-width: 5;}" +
+			"[zoom >= 14]{line-width: 7;}" +
+			"[zoom >= 16]{line-width: 9;}" +
+      		"line-color:#7e7e7e;" +
+      	"}" +
+      	"::fill {" +
+			"[zoom < 12]{line-width: 1;}" +
+			"[zoom >= 12]{line-width: 2;}" +
+			"[zoom >= 14]{line-width: 3;}" +
+			"[zoom >= 16]{line-width: 4;}" +
+      		"line-color:#FFF;" +
+      	"}" +
+	  	"line-opacity: 0.5;" +
+	  	"line-comp-op: soft-light;" +
+
 	"}"
 
 	cartodb.createLayer(map, {
@@ -291,21 +316,50 @@ window.onload = function() {
 
 	// Add township layer
 	var cartoCSSTown = "#layer { " +
-	  "polygon-fill: #374C70;" +
-	  "polygon-opacity: 0;" +
-	  //"polygon-gamma: 0.5;" +
-	  "line-color: #FFF;" +
-	  "line-width: 0.5;" +
-	  "line-opacity: 0.5;" +
-	  "line-comp-op: soft-light;" +
-	  "[zoom > 10]{" +
-		"text-name: 'T'+ [twp] + 'N R'+[rng]+[dirchar];" +
-		"text-face-name: 'Open Sans Regular';" +
-	    "text-size: 13;"+
-	    "text-fill: #fff;"+
-	    "text-halo-fill: #000000;"+
-	    "text-halo-radius: 1;"+
-	  "}"+
+		"polygon-opacity: 0;" +
+		"line-color: #939393;" +
+		"line-width: 0.5;" +
+		"line-opacity: .80;" +
+		"line-comp-op: soft-light;" +
+		"[zoom > 8]{" +
+	  		"line-width: 1;" +
+		"}" +
+	  	"[zoom > 10]{" +
+			"text-name: 'T'+ [twp] + 'N R'+[rng]+[dirchar];" +
+			"text-face-name: 'Open Sans Regular';" +
+	  		"text-fill: #151515;" +
+	  		"text-halo-fill: #fff;" +
+	    	"text-halo-radius: 1;" +
+	  		"text-size: 13;" +
+	  		"line-width: 1.5;" +
+	  	"}"+
+		"[zoom > 12]{" +
+			"text-name: 'T'+ [twp] + 'N R'+[rng]+[dirchar];" +
+			"text-face-name: 'Open Sans Regular';" +
+			"text-fill: #151515;" +
+	  		"text-halo-fill: #fff;" +
+	    	"text-halo-radius: 1;" +
+	  		"text-size: 17;" +
+	  		"line-width: 2.5;" +
+		"}"+
+		"[zoom > 14]{" +
+			"text-name: 'T'+ [twp] + 'N R'+[rng]+[dirchar];" +
+			"text-face-name: 'Open Sans Regular';" +
+			"text-fill: #151515;" +
+	  		"text-halo-fill: #fff;" +
+			"text-halo-radius: 1;" +
+	  		"text-size: 21;" +
+	  		"line-width: 3.5;" +		
+		"}"+
+		"[zoom > 16]{" +
+			"text-name: 'T'+ [twp] + 'N R'+[rng]+[dirchar];" +
+			"text-face-name: 'Open Sans Regular';" +
+			"text-fill: #151515;" +
+			"text-halo-fill: #fff;" +
+			"text-halo-radius: 1;" +
+	  		"text-size: 25;" +
+	  		"line-width: 5;" +
+		"}"+
 	"}"
 	cartodb.createLayer(map, {
       user_name: 'sco-admin',
