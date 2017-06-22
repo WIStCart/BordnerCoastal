@@ -111,11 +111,11 @@ function getPolyStyle(level, level1Selected){
 			style += thisStyle;
 		}
 	}else{
-		style = "#layer{polygon-fill: #DDDDDD;polygon-opacity: " + layerOpacity +";";
+		style = "#layer{polygon-fill: #DDDDDD;polygon-opacity: " + 0 +";";
 		for(var i = 0; i < classes.length; i++) {
 			level1key = level1Selected.toLowerCase().split(" ").join("_")
 			if (level1key == classes[i].level1var) {
-				var thisStyle = "[cov1='"+classes[i].code+"']{polygon-fill: "+classes[i].color2+";polygon-opacity:1;}";
+				var thisStyle = "[cov1='"+classes[i].code+"']{polygon-fill: "+classes[i].color2+";polygon-opacity:" + layerOpacity +";}";
 				style += thisStyle;
 			}
 		}
@@ -1392,7 +1392,6 @@ function turnOnFeatureType(featureTypeCalled){
 		if ((typeof(lines) == "undefined") || (typeof(points) == "undefined")){
 			setTimeout(function(featureTypeCalled){turnOnFeatureType(featureTypeCalled)}, 50) //this prevents on init load issues with undefined values
 		}else{
-			console.log("#######################################################")
 			showOnlyPolygons();
 			$("#rangeSlider").slider('setValue', layerOpacity*100);
 		}
@@ -2136,10 +2135,8 @@ function shadeRGBColor(color, percent) {
 
 function drawPolygonHistogramDesktop(data, _levelEngaged, el, histogramScale){
 	var summary = summarize(data, _levelEngaged)
-
-	if (_levelEngaged == 2){
-		summary.reverse();
-	}
+	// Reverse the summary to have bars draw descending from lef to right
+	summary.reverse(); 
 
 	var margins = {top: 20, left: 75, right: 30, bottom: 30}
 
@@ -2318,7 +2315,6 @@ function drawPolygonHistogramDesktop(data, _levelEngaged, el, histogramScale){
 
 function drawPolygonHistogramTablet(data, _levelEngaged, el, histogramScale){
 	//draws the histogram on the y axis
-
 	var height = +$(el).height() - 75;
 	var width = +$(el).width();
 
