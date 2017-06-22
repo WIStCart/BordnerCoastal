@@ -410,7 +410,7 @@ var cartoCSSLines = getLineCSS('none')
 			$('#rangeSlider').slider().on('change', function (ev) {
 					ev.preventDefault();
 					layerOpacity.points = this.value / 100;
-					lines.setOpacity(layerOpacity);
+					//lines.setOpacity(layerOpacity);
 					replaceQueryValue("layerOpacity", this.value)
 			});
 	})
@@ -518,7 +518,7 @@ var cartoCSSLines = getLineCSS('none')
 				$('#rangeSlider').slider().on('change', function (ev) {
 						ev.preventDefault();
 						layerOpacity = this.value / 100;
-						lines.setOpacity(layerOpacity);
+						//lines.setOpacity(layerOpacity);
 						replaceQueryValue("layerOpacity", this.value)
 				});
 		})
@@ -1388,9 +1388,9 @@ function turnOnFeatureType(featureTypeCalled){
 			if ((typeof(bordner) == "undefined") || (typeof(points) == "undefined")){
 				setTimeout(function(featureTypeCalled){turnOnFeatureType(featureTypeCalled)}, 50) //this prevents on init load issues with undefined values
 			}else{
+				resetPolygons();
 				showOnlyLines();
 				$("#rangeSlider").slider('setValue', layerOpacity*100);
-				resetPolygons();
 			}
 			break;
 		case "featurePoints":
@@ -1443,15 +1443,17 @@ function showOnlyPolygons(){
 }
 
 function showOnlyLines(){
-	showNoPolygons();
+	//showNoPolygons();
 	showNoPoints();
 	showAllLines();
+	lines.bringToFront();
 }
 
 function showOnlyPoints(){
-	showNoPolygons();
+	//showNoPolygons();
 	showNoLines();
 	showAllPoints();
+	points.bringToFront();
 }
 
 function showNoPolygons(){
