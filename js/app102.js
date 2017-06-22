@@ -90,8 +90,11 @@ var kewaunee = 	L.tileLayer('https://maps.sco.wisc.edu/V1/bordner/03_WHAI_Tiles/
 var racine = L.tileLayer('https://maps.sco.wisc.edu/BordnerCoastal/BordnerTile/Racine/{z}/{x}/{y}.png', {
  	attribution: 'WHAI'
 });
+var kenosha = L.tileLayer('https://maps.sco.wisc.edu/BordnerCoastal/BordnerTile/Kenosha/{z}/{x}/{y}.png', {
+ 	attribution: 'WHAI'
+});
 
-var historicBasemap = L.layerGroup([kewaunee, racine])
+var historicBasemap = L.layerGroup([kewaunee, racine, kenosha])
 
 // Create CartoCSS
 function getPolyStyle(level, level1Selected){

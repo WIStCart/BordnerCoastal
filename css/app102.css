@@ -587,14 +587,14 @@ td{
 }
 
 .legend-item{
-	height: 70px;
-	min-height: 70px;
+	height: 30px;
+	min-height: 30px;
 	margin-top:5px;
 	margin-bottom:5px!important;
 }
 
 .media{
-	height: 60px;
+	height: 30px;
 	cursor: pointer;
 }
 
@@ -606,8 +606,8 @@ td{
 }
 
 .media-left img{
-	height:32px;
-	width: 32px;
+	height:25px;
+	width: 25px;
 }
 
 
@@ -629,7 +629,7 @@ button.active{
 }
 
 .legend-media{
-	border-radius: 10px;
+	border-radius: 4px;
 }
 
 .active{
