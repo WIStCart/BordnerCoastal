@@ -104,14 +104,14 @@ function getPolyStyle(level, level1Selected){
 	classes = tempClasses2.classes;
 
 	//Beginning part of the cartocss style
-	style = "#layer{polygon-fill: #DDDDDD;polygon-opacity:1;";
+	style = "#layer{polygon-fill: #DDDDDD;polygon-opacity:" + layerOpacity +";";
 	if (level =="level1"){
 		for(var i = 0; i < classes.length; i++) {
 			var thisStyle = "[cov1='"+classes[i].code+"']{polygon-fill: "+classes[i].color1+";}";
 			style += thisStyle;
 		}
 	}else{
-		style = "#layer{polygon-fill: #DDDDDD;polygon-opacity: 0;";
+		style = "#layer{polygon-fill: #DDDDDD;polygon-opacity: " + layerOpacity +";";
 		for(var i = 0; i < classes.length; i++) {
 			level1key = level1Selected.toLowerCase().split(" ").join("_")
 			if (level1key == classes[i].level1var) {
@@ -480,6 +480,7 @@ var cartoCSSLines = getLineCSS('none')
 			layer.setOpacity(layerOpacity);
 			replaceQueryValue("layerOpacity", this.value)
 		});
+		layer.setOpacity(layerOpacity);
 		layer.bind('featureOver', onPolyOver)
 		layer.bind('featureOut', onPolyOut)
 
@@ -1391,6 +1392,7 @@ function turnOnFeatureType(featureTypeCalled){
 		if ((typeof(lines) == "undefined") || (typeof(points) == "undefined")){
 			setTimeout(function(featureTypeCalled){turnOnFeatureType(featureTypeCalled)}, 50) //this prevents on init load issues with undefined values
 		}else{
+			console.log("#######################################################")
 			showOnlyPolygons();
 			$("#rangeSlider").slider('setValue', layerOpacity*100);
 		}
