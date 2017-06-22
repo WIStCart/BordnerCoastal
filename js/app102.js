@@ -104,7 +104,7 @@ function getPolyStyle(level, level1Selected){
 	classes = tempClasses2.classes;
 
 	//Beginning part of the cartocss style
-	style = "#layer{polygon-fill: #DDDDDD;polygon-opacity:" + layerOpacity +";";
+	style = "#layer{polygon-fill: #DDDDDD;polygon-opacity:" + 1 +";";
 	if (level =="level1"){
 		for(var i = 0; i < classes.length; i++) {
 			var thisStyle = "[cov1='"+classes[i].code+"']{polygon-fill: "+classes[i].color1+";}";
@@ -115,7 +115,7 @@ function getPolyStyle(level, level1Selected){
 		for(var i = 0; i < classes.length; i++) {
 			level1key = level1Selected.toLowerCase().split(" ").join("_")
 			if (level1key == classes[i].level1var) {
-				var thisStyle = "[cov1='"+classes[i].code+"']{polygon-fill: "+classes[i].color2+";polygon-opacity:" + layerOpacity +";}";
+				var thisStyle = "[cov1='"+classes[i].code+"']{polygon-fill: "+classes[i].color2+";polygon-opacity:" + 1 +";}";
 				style += thisStyle;
 			}
 		}
@@ -470,7 +470,7 @@ var cartoCSSLines = getLineCSS('none')
 	.addTo(map) // add cartodb layer and basemap to map object
 	.done(function(layer) {
 		bordner = layer;
-		layer.setOpacity(layerOpacity);
+		//layer.setOpacity(layerOpacity);
 		layer.setInteraction(true);
 		setupSublayer(layer, 1, "visible");
 		setupSublayer(layer, 2, "hidden");
@@ -1371,51 +1371,45 @@ function turnOnFeatureType(featureTypeCalled){
 			legendType = "polygons";
 			$("#legend-header").text("Area Features")
 			manageURLToPolygons();
+			$("#legendHolder").removeClass("stylescroll").removeClass("autoscroll")
+			drawThisView(map.getBounds(), map.getZoom(), levelEngaged, level1Selected)
+			if ((typeof(lines) == "undefined") || (typeof(points) == "undefined")){
+				setTimeout(function(featureTypeCalled){turnOnFeatureType(featureTypeCalled)}, 50) //this prevents on init load issues with undefined values
+			}else{
+				showOnlyPolygons();
+				$("#rangeSlider").slider('setValue', layerOpacity*100);
+			}
 			break;
 		case "featureLines":
 			legendType = "lines"
 			$("#legend-header").text("Line Features")
 			manageURLToLines();
+			drawLineLegend();
+			if ((typeof(bordner) == "undefined") || (typeof(points) == "undefined")){
+				setTimeout(function(featureTypeCalled){turnOnFeatureType(featureTypeCalled)}, 50) //this prevents on init load issues with undefined values
+			}else{
+				showOnlyLines();
+				$("#rangeSlider").slider('setValue', layerOpacity*100);
+				resetPolygons();
+			}
 			break;
 		case "featurePoints":
 			replaceQueryValue("featureType", "points");
 			legendType = "points"
 			$("#legend-header").text("Point Features")
 			manageURLToPoints();
+			drawPointLegend();
+			if ((typeof(lines) == "undefined") || (typeof(bordner) == "undefined")){
+				setTimeout(function(featureTypeCalled){turnOnFeatureType(featureTypeCalled)}, 50) //this prevents on init load issues with undefined values
+			}else{
+				resetPolygons();
+				showOnlyPoints();
+				$("#rangeSlider").slider('setValue', layerOpacity*100);
+			}
 			break;
 		default:
 			console.log("unidentified feature type called")
-	} //end switch
-	if (legendType == "polygons"){
-		$("#legendHolder").removeClass("stylescroll").removeClass("autoscroll")
-		drawThisView(map.getBounds(), map.getZoom(), levelEngaged, level1Selected)
-		if ((typeof(lines) == "undefined") || (typeof(points) == "undefined")){
-			setTimeout(function(featureTypeCalled){turnOnFeatureType(featureTypeCalled)}, 50) //this prevents on init load issues with undefined values
-		}else{
-			showOnlyPolygons();
-			$("#rangeSlider").slider('setValue', layerOpacity*100);
-		}
-	}else if (legendType == "lines"){
-		drawLineLegend();
-		if ((typeof(bordner) == "undefined") || (typeof(points) == "undefined")){
-			setTimeout(function(featureTypeCalled){turnOnFeatureType(featureTypeCalled)}, 50) //this prevents on init load issues with undefined values
-		}else{
-			showOnlyLines();
-			$("#rangeSlider").slider('setValue', layerOpacity*100);
-			resetPolygons();
-		}
-
-	}else if (legendType == "points"){
-		console.log("Drawing points")
-		drawPointLegend();
-		if ((typeof(lines) == "undefined") || (typeof(bordner) == "undefined")){
-			setTimeout(function(featureTypeCalled){turnOnFeatureType(featureTypeCalled)}, 50) //this prevents on init load issues with undefined values
-		}else{
-			resetPolygons();
-			showOnlyPoints();
-			$("#rangeSlider").slider('setValue', layerOpacity*100);
-		}
-	}
+	} 
 }
 
 function resetPolygons(){
