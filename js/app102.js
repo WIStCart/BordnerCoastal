@@ -416,21 +416,39 @@ var cartoCSSLines = getLineCSS('none')
 	})
 
 	// add bordner density1 layer
+	// var cartoCSSDensity = "#layer { "+
+	// 	"[den1=1] {"+
+	// 		"polygon-pattern-file: url('https://www.amcharts.com/lib/3/patterns/black/pattern2.png');"+
+	// 		"polygon-pattern-alignment: global;"+
+	// 	"}"+
+	// 	"[den1=2] {"+
+	// 		"polygon-pattern-file: url('https://www.amcharts.com/lib/3/patterns/black/pattern2.png');"+
+	// 		"polygon-pattern-alignment: global;"+
+	// 	"}"+
+	// 	"[den1=3] {"+
+	// 		"polygon-pattern-file: url('https://www.amcharts.com/lib/3/patterns/black/pattern3.png');"+
+	// 		"polygon-pattern-alignment: global;"+
+	// 	"}"+
+	// 	"[den1=4] {"+
+	// 		"polygon-pattern-file: url('https://www.amcharts.com/lib/3/patterns/black/pattern4.png');"+
+	// 		"polygon-pattern-alignment: global;"+
+	// 	"}"+
+	// "}"
 	var cartoCSSDensity = "#layer { "+
 		"[den1=1] {"+
-			"polygon-pattern-file: url('https://www.amcharts.com/lib/3/patterns/black/pattern2.png');"+
+			"polygon-pattern-file: url('http://maps.sco.wisc.edu/BordnerCoastal/BordnerIcon/pattern1.png');"+
 			"polygon-pattern-alignment: global;"+
 		"}"+
 		"[den1=2] {"+
-			"polygon-pattern-file: url('https://www.amcharts.com/lib/3/patterns/black/pattern2.png');"+
+			"polygon-pattern-file: url('http://maps.sco.wisc.edu/BordnerCoastal/BordnerIcon/pattern1.png');"+
 			"polygon-pattern-alignment: global;"+
 		"}"+
 		"[den1=3] {"+
-			"polygon-pattern-file: url('https://www.amcharts.com/lib/3/patterns/black/pattern3.png');"+
+			"polygon-pattern-file: url('http://maps.sco.wisc.edu/BordnerCoastal/BordnerIcon/pattern2.png');"+
 			"polygon-pattern-alignment: global;"+
 		"}"+
 		"[den1=4] {"+
-			"polygon-pattern-file: url('https://www.amcharts.com/lib/3/patterns/black/pattern4.png');"+
+			"polygon-pattern-file: url('http://maps.sco.wisc.edu/BordnerCoastal/BordnerIcon/pattern2.png');"+
 			"polygon-pattern-alignment: global;"+
 		"}"+
 	"}"
