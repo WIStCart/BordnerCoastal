@@ -437,19 +437,19 @@ var cartoCSSLines = getLineCSS('none')
 	var cartoCSSDensity = "#layer { "+
 		"[den1=1] {"+
 			"polygon-pattern-file: url('http://maps.sco.wisc.edu/BordnerCoastal/BordnerIcon/pattern3.png');"+
-			"polygon-pattern-alignment: global;"+
+			"polygon-pattern-alignment: local; polygon-pattern-simplify: 5; polygon-pattern-opacity: 0.55;"+
 		"}"+
 		"[den1=2] {"+
-			"polygon-pattern-file: url('http://maps.sco.wisc.edu/BordnerCoastal/BordnerIcon/pattern3.png');"+
-			"polygon-pattern-alignment: global;"+
+			"polygon-pattern-file: url('http://maps.sco.wisc.edu/BordnerCoastal/BordnerIcon/pattern6.png');"+
+			"polygon-pattern-alignment: local; polygon-pattern-simplify: 5; polygon-pattern-opacity: 0.55;"+
 		"}"+
 		"[den1=3] {"+
-			"polygon-pattern-file: url('http://maps.sco.wisc.edu/BordnerCoastal/BordnerIcon/pattern4.png');"+
-			"polygon-pattern-alignment: global;"+
+			"polygon-pattern-file: url('http://maps.sco.wisc.edu/BordnerCoastal/BordnerIcon/pattern7.png');"+
+			"polygon-pattern-alignment: local; polygon-pattern-simplify: 5; polygon-pattern-opacity: 0.55;"+
 		"}"+
 		"[den1=4] {"+
-			"polygon-pattern-file: url('http://maps.sco.wisc.edu/BordnerCoastal/BordnerIcon/pattern4.png');"+
-			"polygon-pattern-alignment: global;"+
+			"polygon-pattern-file: url('http://maps.sco.wisc.edu/BordnerCoastal/BordnerIcon/pattern8.png');"+
+			"polygon-pattern-alignment: local; polygon-pattern-simplify: 5; polygon-pattern-opacity: 0.55;"+
 		"}"+
 	"}"
 	cartodb.createLayer(map, {
