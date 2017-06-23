@@ -1,0 +1,12 @@
+@font-face {
+    font-family: myFirstFont;
+    src: url(../MHE/MHEelemsans-Regular.woff);
+}
+body {
+    font-family: myFirstFont;
+	padding-top: 70px; /* Required padding for .navbar-fixed-top. Remove if using .navbar-static-top. Change if height of navigation changes. */
+}
+
+footer {
+    margin: 50px 0;
+}

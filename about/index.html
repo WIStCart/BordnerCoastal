@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title>Coastal Bordner Project Page</title>
+
+    <!-- Bootstrap Core CSS #ccddbb; -->
+    <link href="css/bootstrap.css" rel="stylesheet">
+
+    <!-- Custom CSS -->
+    <link href="css/1-col-portfolio.css" rel="stylesheet">
+	<script src="http://code.jquery.com/jquery-1.8.2.min.js"></script>
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+        <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+<script type="text/javascript">
+
+  /* NEW CODE NEEDED
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-129066-10', 'auto');
+  ga('send', 'pageview');
+  */
+
+</script>
+	<style>
+		#map {
+			height: 700px;
+			margin-top: 20px;
+			position: relative;
+		}
+		.leaflet-top-pane {
+			pointer-events: none;
+		}
+		.info {
+			padding: 6px 8px;
+			font: 14px/16px Arial, Helvetica, sans-serif;
+			background: white;
+			background: rgba(255,255,255,0.8);
+			box-shadow: 0 0 15px rgba(0,0,0,0.2);
+			border-radius: 5px;
+		}
+		.info h4 {
+			margin: 0 0 5px;
+			color: #777;
+		}
+
+		.legend {
+			text-align: left;
+			line-height: 18px;
+			color: #555;
+		}
+		.legend i {
+			width: 18px;
+			height: 18px;
+			float: left;
+			margin-right: 8px;
+			opacity: 0.7;
+		}
+	</style>
+</head>
+
+<body>
+
+    <!-- Navigation -->
+    <nav class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+        <div class="container">
+            <!-- Brand and toggle get grouped for better mobile display -->
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <!--<a class="navbar-brand" href="#">Blah... SCO</a>-->
+            </div>
+             <!--Collect the nav links, forms, and other content for toggling -->
+            <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                <ul class="nav navbar-nav">
+					<li><a href="#About">About the Grant</a></li>
+					<li><a href="#Resources">Resources</a></li>
+					<li><a href="#Legend">Bordner Legend</a></li>
+					<li><a href="#Download">Data Download</a></li>
+					<li><a href="#Funding">Funding</a></li>
+                </ul>
+            </div>
+            <!-- /.navbar-collapse -->
+        </div>
+        <!-- /.container -->
+    </nav>
+
+    <!-- Page Content -->
+    <div class="container">
+		<!-- <a name="Top" style="position: absolute; top:-60px;"></a> -->
+        <!-- Page Heading -->
+        <div class="row">
+            <div class="col-lg-12">
+				<h1 class="page-header">
+					<div style="float:left;">Project Page</div>		
+				</h1>
+            </div>
+        </div>
+		<div class="row">
+            <div class="col-md-12">
+                <li><a href="#About" style="color:gray;">About the Grant</a></li>
+                <li><a href="#Resources" style="color:gray;">Resources</a></li>
+				<li><a href="#Legend" style="color:gray;">Bordner Legend</a></li>
+                <li><a href="#Download" style="color:gray;">Data Download</a></li>
+                <li><a href="#Funding" style="color:gray;">Funding</a></li>
+             </div>
+        </div>
+		 <hr>
+		<!-- Questions -->
+        <div class="row">
+            <div class="col-md-3">
+                <h3>About the Grant:</h3>
+            </div>
+        </div>
+        <!-- Question NegativeTwo -->
+        <div class="row">
+            <div class="col-md-3">
+                <a name="NegativeTwo" style="position: absolute; top:-100px;"></a>
+				<p>Should <a href="../V3_Submission_Documentation.pdf#page=16" target="_blank">NETPRPTA (Net Property Tax)</a> include special charges such as delinquent payments?</p>
+            </div>
+            <div class="col-md-9">
+                <p>NETPRPTA (Net Property Tax) should reflect:
+				<li>Net property-taxes for the <i>single tax year</i> only. Delinquent property taxes from prior years should not be included within this sum.</li>
+				<li>Only net <i>property</i> tax amounts. Any other non-tax related charges, such as <i>delinquent utilities</i>, should not be included.</li>
+				</p>
+			</div>
+        </div>
+        <hr>
+		
+        <!-- Question NegativeOne -->
+        <div class="row">
+            <div class="col-md-3">
+                <a name="NegativeOne" style="position: absolute; top:-100px;"></a>
+				<p>Why are my non-parcel features being flagged as "<b><i>Appears to be a duplicate value in PARCELID</i></b>" when they are actually labeled properly according to the <a href="../V3_Submission_Documentation.pdf#page=8" target="_blank">PARCELID schema definition</a> (i.e. "HWY ROW"  or "LONG LAKE") as non-tax parcels?</p>
+            </div>
+            <div class="col-md-9">
+                <p>The logic within the duplicate value function of the validation tool checks against a <a href="../tools/Validation/V2_PinSkips.txt" target="_blank">list of non-tax parcels</a> that were derived from the V2 Statewide Parcel Layer. Any PARCELID strings found within this list will not be flagged as duplicates. However, if the string is not found within this list, then it will be flagged. <b>Values not included in the list are still valid as long as they meet the <a href="../V3_Submission_Documentation.pdf#page=8" target="_blank">PARCELID schema definition</a>.</b></p>
+			</div>
+        </div>
+        <hr>
+
+        <!-- Question Zero -->
+        <div class="row">
+            <div class="col-md-3">
+                <a name="Zero" style="position: absolute; top:-100px;"></a>
+				<p>Is there an easy way to field map my native fields to that of the Parcel Initiative's Schema?</p>
+            </div>
+            <div class="col-md-9">
+                <p>The steps for achieving this are outlined in the following workflow documentation:</br>
+				<a href="../tools/FieldMapping/Parcel_Schema_Field_Mapping_Guide.pdf" target="_blank" onClick="ga('send','event','V3','Tools','Field Mapping Guide for V3');">Parcel Schema Field Mapping Guide(.pdf) <span class="glyphicon glyphicon-book">
+				</p>
+			</div>
+        </div>
+        <hr>
+		
+        <!-- Question One -->
+        <div class="row">
+            <div class="col-md-3">
+                <a name="One" style="position: absolute; top:-100px;"></a>
+				<p>How should Union High School (UHS) districts be populated in SCHOOLDIST and SCHOOLDISTNO?</p>
+            </div>
+            <div class="col-md-9">
+                <p>According to Wisconsin Department of Public Instruction (DPI), a school district may be categorized in many ways and one of the ways of categorization is by grades operated. The three possible categories for operable grades are:</br>
+				<li>pre - kindergarten to Grade 12 <b>(PK - 12)</b>;</li>
+				<li>elementary <b>(PK - 8)</b>; and</li>
+				<li>union high school or UHS <b>(9 - 12)</b>.</li></p>
+				<p><b>*</b>The the elementary (PK - 8) and UHS (9 - 12) categories share the same territory, and multiple elementary districts are geographically nested within for each Union High School District. DPI cites ten total Union High School Districts across the state of Wisconsin (see the list <a target="_blank" href="http://dpi.wi.gov/sfs/statistical/basic-facts/uhs-system">here</a>).</p>
+				<p>A tax parcel should not contain multiple school districts. For any areas that apply a Union High School District (UHS), <b>the UHS district should be the only district populating this field,</b>. Elementary districts within a UHS are known as ‘children’ of the ‘parent’ UHS district and should not be included in the data submission.</p>
+            </div>
+        </div>
+        <hr>
+        <!-- Footer -->
+        <footer>
+            <div class="row">
+                <div class="col-lg-12" style="text-align: center;">
+                    <p>A joint effort of the <a href="http://www.sco.wisc.edu/" target="_blank">State Cartographer's Office</a> and the <a href="http://labs.russell.wisc.edu/landscape/" target="_blank">Forest Ecosystem and Landscape Ecology Lab</a></p>
+                    <a href="#Top" style="color: gray;"> Back to top </a>
+                </div>
+            </div>
+        </footer>
+    </div>
+    <!-- /.container -->
+
+    <!-- jQuery -->
+    <script src="js/jquery.js"></script>
+	<script>
+	var embedded = true;
+	$(document).ready(function(){
+		$('[data-toggle="tooltip"]').tooltip();   
+	});
+	</script>
+    <!-- Bootstrap Core JavaScript -->
+    <script src="js/bootstrap.min.js"></script>
+</body>
+
+</html>
