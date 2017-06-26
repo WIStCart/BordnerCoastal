@@ -327,30 +327,11 @@
 		<!-- Bordner Legend; #Legend -->
         <div class="row">
             <div class="col-md-3">
+				<a name="Legend" style="position: absolute; top:-100px;"></a>
                 <h3>Bordner Legend:</h3>
             </div>
         </div>
-		<div id="legendDiv">
-			<div class="row">
-				<div class="col-md-1">
-					<a name="Legend" style="position: absolute; top:-100px;"></a>
-					<div style="background-color:red; width:50px; height:30px; float:right;"></div>
-				</div>
-				<div class="col-md-11">
-					Class definition goes here.
-				</div>
-			</div>
-			<div style="height:3px;"></div>
-			<div class="row">
-				<div class="col-md-1">
-					<a name="Legend" style="position: absolute; top:-100px;"></a>
-					<div style="background-color:red; width:50px; height:30px; float:right;"></div>
-				</div>
-				<div class="col-md-11">
-					Class definition goes here.
-				</div>
-			</div>
-        </div>
+		<div id="legendDiv"></div>
         <hr>
 		
 		<!-- Data Download; #Download -->
@@ -433,14 +414,26 @@
 		$(document).ready(function(){
 			$('[data-toggle="tooltip"]').tooltip(); 
 			console.log(tempClasses2)
+			console.log(yellowDocClassDefinitions)
+			
 			for(var i = 0; i < tempClasses2.classes.length; i++) {
 				var item = tempClasses2.classes[i];
+				var augmentedDef = ""
+				if(yellowDocClassDefinitions[item.code]){
+					var augItem = yellowDocClassDefinitions[item.code]
+					augmentedDef =  '<li><b>YELLOW DEF. GENERAL: </b>' + augItem.General_Group + ": " + augItem.General_Group_Definition  + '</li>' +		
+									'<li><b>YELLOW DEF. CLASS: </b>' + augItem.Class_Name + ": " + augItem.Class_Definition  + '</li>' 					
+				}
 				var htmlInjection = '<div class="row">' +
 										'<div class="col-md-1">' +
 											'<a name="' + item.code + '" style="position: absolute; top:-100px;"></a>' +
 											'<div style="background-color:' + item.color2 + '; width:50px; height:30px; float:right;"></div>' +
 										'</div>' +
-										'<div class="col-md-11">' + item.level1  + " - " + item.level2 +
+										'<div class="col-md-11">' +
+											'<ul>' + 
+												'<li><b>MAP DEFINITION: </b>' + item.code + ": " + item.level1  + " - " + item.level2 + '</li>' + 
+												 augmentedDef +
+											'</ul>' +
 										'</div>' +
 									'</div>' +
 									'<div style="height:3px;"></div>'
