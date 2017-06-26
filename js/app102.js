@@ -1566,6 +1566,7 @@ function transformToDesktop(){
 	console.log("Transforming to desktop")
 	$("#tocModal").modal('hide');
 	$("#infoModal").modal('hide');
+	$("#aboutModal").modal('hide');
 
 	$("#infoboxHolder").show();
 	$("#infoboxHolder").show();
@@ -1611,6 +1612,7 @@ function transformToTablet(){
 
 // Handles all click events from the 4 main UI buttons
 function dispatchButtonClick(e, buttonClicked){
+	
 	e.preventDefault()
 	e.stopPropagation()
 	if (desktopMode == true){
@@ -1621,7 +1623,7 @@ function dispatchButtonClick(e, buttonClicked){
 			toggleLayerListDesktop();
 			return
 		} else if (buttonClicked == "infoButton"){
-			 configInfoShareModal();
+			 $("#aboutModal").modal('show');
 			 return
 		}else if (buttonClicked == "shareButton"){
 			 configInfoShareModal();
@@ -1748,6 +1750,7 @@ function configInfoShareModal(){
 		$("#theLink").text(window.location.href)
 		$("#theLink").val (window.location.href)
 		$("#infoModal").modal('show');
+		$("#aboutModal").modal('hide');
 
 }
 
