@@ -41,7 +41,7 @@ body{
 	overflow-y: auto;
 	overflow-x: hidden;
 	border-radius: 10px;
-	height: 45%;
+	//height: 45%;
 	width: 30%;
 	position: absolute;
 	top: 10px;
@@ -56,7 +56,7 @@ body{
 }
 
 #toc{
-	height: 20%!important;
+	height: 20%;
 	position: absolute;
 	bottom: 0px;
 	left:0px;
@@ -756,7 +756,7 @@ button.active{
 }
 
 .slider{
-	margin-top: 25px;
+	margin-top: 15px;
 	display: block;
 }
 
