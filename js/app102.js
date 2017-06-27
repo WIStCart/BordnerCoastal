@@ -19,11 +19,11 @@ var counties;
 var townships;
 var density1;
 var lines;
-var infowindowVars = ['cov1','cov2', 'cov3', 'cov4', 'cov5',
-					'den1', 'den2', 'den3', 'den4', 'den5',
-					'pctcov1', 'pctcov2', 'pctcov3', 'pctcov4', 'pctcov5',
-					'mindiam1','mindiam2','mindiam3','mindiam4','mindiam5',
-					 'maxdiam1','maxdiam2','maxdiam3','maxdiam4','maxdiam5' ]
+var infowindowVars = ['cov1','cov2', 'cov3', 'cov4', /*'cov5',*/
+					'den1', 'den2', 'den3', 'den4', /*'den5',*/
+					'pctcov1', 'pctcov2', 'pctcov3', 'pctcov4', /*'pctcov5',*/
+					'mindiam1','mindiam2','mindiam3','mindiam4',/*'mindiam5',*/
+					 'maxdiam1','maxdiam2','maxdiam3','maxdiam4'/*,'maxdiam5'*/ ]
 var polygonLegend; //svg polygon legend
 var level1Colors;
 var level2Colors;
@@ -813,7 +813,7 @@ function formatCoverageForInfowindow(data){
 			 maxDiameter: data.maxdiam4,
 			 percentCover: data.pctcov4,
 			 densityTranslate: translateDensity(data.den4)
-		 },
+		 }/*,
 		 coverage5: {
 			 code: data.cov5,
 			 name: getNameFromCode(data.cov5),
@@ -822,7 +822,7 @@ function formatCoverageForInfowindow(data){
 			 maxDiameter: data.maxdiam5,
 			 percentCover: data.pctcov5,
 			 densityTranslate : translateDensity(data.den5)
-		 }
+		 }*/
 	}
 	if (levelEngaged == 1){
 		infowindowContent.levelname = getLevel1FromCode(data.cov1)
@@ -972,6 +972,7 @@ function onPointOut(e, latln, pxPos, data, layer){
 }
 
 function onPolyOver(e, latln, pxPos, data, layer){
+	console.log("OVER")
 	if ((legendType == "polygons") && showInfoboxOnHover && desktopMode){
 		if (typeof(level1Selected) == 'undefined'){
 			$(".infobox").show()
@@ -994,6 +995,7 @@ function onPolyOver(e, latln, pxPos, data, layer){
 }
 
 function onPolyOut(e, latln, pxPos, data, layer){
+	console.log("OVER")
 	if (legendType == "polygons" &&(!showInfoboxOnHover)){
 		$(".infobox").hide()
 	}
