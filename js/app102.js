@@ -176,7 +176,7 @@ function getPointCSS(pointTypeSelected, zoomIn){
 			var thisMinZoom = pointLegend[i].minZoom;
 			var thisMaxZoom = pointLegend[i].maxZoom;
 			if ((zoomIn >= thisMinZoom) && (zoomIn <= thisMaxZoom)){
-				style +=  "[point_type='" + pointLegend[i].type + "']{marker-fill: " + pointLegend[i].color + "; marker-file: url(" + pointLegend[i].icon + "); marker-allow-overlap: false; marker-opacity: 1; [zoom >=13]{marker-width: 17;}[zoom >=15]{marker-width: 19;}[zoom >=16]{marker-width: 21;}[zoom >=17]{marker-width: 23;}[zoom >=18]{marker-width: 25;} "+ pointLegend[i].otherCSS 
+				style +=  "[point_type='" + pointLegend[i].type + "']{marker-fill: " + pointLegend[i].color + "; marker-file: url(" + pointLegend[i].icon + "); marker-allow-overlap: false; marker-opacity: 1;[zoom >=12]{marker-width: 10;}[zoom >=15]{marker-width: 15;}[zoom >=16]{marker-width: 19;}[zoom >=17]{marker-width: 21;}[zoom >=18]{marker-width: 23;} "+ pointLegend[i].otherCSS 
 				if (window[basemapParam] == 'satellite'){
 					style += "marker-line-color:#ffffff; marker-line-width:.25; "	
 				}
@@ -194,7 +194,7 @@ function getPointCSS(pointTypeSelected, zoomIn){
 			var thisPointType = pointLegend[i].type
 			if (pointTypeSelected.toLowerCase() === thisPointType.toLowerCase()){
 
-				var thisStyle = "[point_type='" + thisPointType + "']{marker-opacity: 1; marker-fill: " + pointLegend[i].color + "; marker-file: url(" + pointLegend[i].icon + "); marker-allow-overlap: false; [zoom >=13]{marker-width: 17;}[zoom >=15]{marker-width: 19;}[zoom >=16]{marker-width: 21;}[zoom >=17]{marker-width: 23;}[zoom >=18]{marker-width: 25;} "+ pointLegend[i].otherCSS
+				var thisStyle = "[point_type='" + thisPointType + "']{marker-opacity: 1; marker-fill: " + pointLegend[i].color + "; marker-file: url(" + pointLegend[i].icon + "); marker-allow-overlap: false; [zoom < 12]{marker-width: 15;}[zoom >=12]{marker-width: 10;}[zoom >=15]{marker-width: 15;}[zoom >=16]{marker-width: 19;}[zoom >=17]{marker-width: 21;}[zoom >=18]{marker-width: 23;} "+ pointLegend[i].otherCSS
 				if (window[basemapParam] == 'satellite'){
 					thisStyle += "marker-line-color:#2f2fd1; marker-line-width:.5; "	
 				}
@@ -419,40 +419,22 @@ var cartoCSSLines = getLineCSS('none')
 	})
 
 	// add bordner density1 layer
-	// var cartoCSSDensity = "#layer { "+
-	// 	"[den1=1] {"+
-	// 		"polygon-pattern-file: url('https://www.amcharts.com/lib/3/patterns/black/pattern2.png');"+
-	// 		"polygon-pattern-alignment: global;"+
-	// 	"}"+
-	// 	"[den1=2] {"+
-	// 		"polygon-pattern-file: url('https://www.amcharts.com/lib/3/patterns/black/pattern2.png');"+
-	// 		"polygon-pattern-alignment: global;"+
-	// 	"}"+
-	// 	"[den1=3] {"+
-	// 		"polygon-pattern-file: url('https://www.amcharts.com/lib/3/patterns/black/pattern3.png');"+
-	// 		"polygon-pattern-alignment: global;"+
-	// 	"}"+
-	// 	"[den1=4] {"+
-	// 		"polygon-pattern-file: url('https://www.amcharts.com/lib/3/patterns/black/pattern4.png');"+
-	// 		"polygon-pattern-alignment: global;"+
-	// 	"}"+
-	// "}"
 	var cartoCSSDensity = "#layer { "+
 		"[den1=1] {"+
-			"polygon-pattern-file: url('http://maps.sco.wisc.edu/BordnerCoastal/BordnerIcon/pattern3.png');"+
-			"polygon-pattern-alignment: local; polygon-pattern-simplify: 5; polygon-pattern-opacity: 0.55;"+
+			"polygon-pattern-file: url('http://maps.sco.wisc.edu/BordnerCoastal/BordnerIcon/pattern8.png');"+
+			"polygon-pattern-alignment: local; polygon-pattern-gamma:1; polygon-pattern-simplify: 5; polygon-pattern-opacity: 0.45;"+
 		"}"+
 		"[den1=2] {"+
-			"polygon-pattern-file: url('http://maps.sco.wisc.edu/BordnerCoastal/BordnerIcon/pattern6.png');"+
-			"polygon-pattern-alignment: local; polygon-pattern-simplify: 5; polygon-pattern-opacity: 0.55;"+
+			"polygon-pattern-file: url('http://maps.sco.wisc.edu/BordnerCoastal/BordnerIcon/pattern7.png');"+
+			"polygon-pattern-alignment: local; polygon-pattern-gamma:1; polygon-pattern-simplify: 5; polygon-pattern-opacity: 0.45;"+
 		"}"+
 		"[den1=3] {"+
-			"polygon-pattern-file: url('http://maps.sco.wisc.edu/BordnerCoastal/BordnerIcon/pattern7.png');"+
-			"polygon-pattern-alignment: local; polygon-pattern-simplify: 5; polygon-pattern-opacity: 0.55;"+
+			"polygon-pattern-file: url('http://maps.sco.wisc.edu/BordnerCoastal/BordnerIcon/pattern2.png');"+
+			"polygon-pattern-alignment: local; polygon-pattern-gamma:1; polygon-pattern-simplify: 5; polygon-pattern-opacity: 0.45;"+
 		"}"+
 		"[den1=4] {"+
-			"polygon-pattern-file: url('http://maps.sco.wisc.edu/BordnerCoastal/BordnerIcon/pattern8.png');"+
-			"polygon-pattern-alignment: local; polygon-pattern-simplify: 5; polygon-pattern-opacity: 0.55;"+
+			"polygon-pattern-file: url('http://maps.sco.wisc.edu/BordnerCoastal/BordnerIcon/pattern5.png');"+
+			"polygon-pattern-alignment: local; polygon-pattern-gamma:1; polygon-pattern-simplify: 5; polygon-pattern-opacity: 0.45;"+
 		"}"+
 	"}"
 	cartodb.createLayer(map, {
@@ -1135,14 +1117,14 @@ function enableMapInteractionEvents(){
 }
 
 function setupGeocoderSearch(){
-	//render the template
+	// //render the template
 	// var v = cdb.vis.Overlay.create("search", map.viz, {})
 	// v.show();
-	// // $("#geocodeButton").append(v.render().el)
+	// $("#geocodeButton").append(v.render().el)
 	// var searcher = v.render().el
 	// // jquery magic to make it look nicer
-	// // $("geocodeButton").width('100%');
-	// // $(".cartodb-searchbox").width('100%');
+	// $("geocodeButton").width('100%');
+	// $(".cartodb-searchbox").width('100%');
 	// $(".text").hide();
 	// $("#geocodeButton").on('mouseover', function(){
 	// 	$(".text").show();
@@ -1230,6 +1212,9 @@ function setUpMap(){
 			'</div>' +
 			'<div class="checkbox">' +
 				'<label><input type="checkbox" name="overlayType" id="density1">Class 1 Density</label>' +
+			'</div>' +
+			'<div class="checkbox">' +
+				'<label><img src="http://maps.sco.wisc.edu/BordnerCoastal/BordnerIcon/pattern4.png" class="densityLegend"> Good</label><label><img src="http://maps.sco.wisc.edu/BordnerCoastal/BordnerIcon/pattern3.png" class="densityLegend"> Medium</label><label><img src="http://maps.sco.wisc.edu/BordnerCoastal/BordnerIcon/pattern2.png" class="densityLegend"> Poor</label><label><img src="http://maps.sco.wisc.edu/BordnerCoastal/BordnerIcon/pattern1.png" class="densityLegend"> Scattered</label>' +
 			'</div>' +
 			'<label class="legend-label">Basemap</label>' +
 			'<div class="radio">' +
