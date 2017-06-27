@@ -954,7 +954,6 @@ function onPointOut(e, latln, pxPos, data, layer){
 }
 
 function onPolyOver(e, latln, pxPos, data, layer){
-	console.log("OVER")
 	if ((legendType == "polygons") && showInfoboxOnHover && desktopMode){
 		if (typeof(level1Selected) == 'undefined'){
 			$(".infobox").show()
@@ -977,7 +976,6 @@ function onPolyOver(e, latln, pxPos, data, layer){
 }
 
 function onPolyOut(e, latln, pxPos, data, layer){
-	console.log("OVER")
 	if (legendType == "polygons" &&(!showInfoboxOnHover)){
 		$(".infobox").hide()
 	}
@@ -1606,6 +1604,12 @@ function transformToTablet(){
 	map.invalidateSize()
 
 	$("#legend-back").addClass("col-xs-8").removeClass("col-sm-2")
+}
+
+function mailTheView(e,clickID){
+	console.log(e)
+	console.log(clickID)
+	document.location.href = "mailto:csee@wisc.edu?Subject=Coastal%20Bordner%20Feedback";
 }
 
 // Handles all click events from the 4 main UI buttons
