@@ -23,19 +23,16 @@
         <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
         <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
     <![endif]-->
-<script type="text/javascript">
+	<script type="text/javascript">
+	  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+	  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+	  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+	  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
 
-  /* NEW CODE NEEDED
-  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+	  ga('create', 'UA-129066-10', 'auto');
+	  ga('send', 'pageview');
 
-  ga('create', 'UA-129066-10', 'auto');
-  ga('send', 'pageview');
-  */
-
-</script>
+	</script>
 	<style>
 		#map {
 			height: 700px;
@@ -91,12 +88,12 @@
              <!--Collect the nav links, forms, and other content for toggling -->
             <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
                 <ul class="nav navbar-nav">
-					<li><a href="../">Back to the App</a></li>
-					<li><a href="#About">About the Grant</a></li>
-					<li><a href="#Resources">Resources</a></li>
-					<li><a href="#Legend">Bordner Legend</a></li>
-					<li><a href="#Download">Data Download</a></li>
-					<li><a href="#Funding">Funding</a></li>
+					<li><a href="../" style="color:#333;">App</a></li>
+					<li><a href="#About" style="color:#333;">About Bordner</a></li>
+					<li><a href="#Legend" style="color:#333;">Bordner Legend</a></li>
+					<li><a href="#Download" style="color:#333;">Data Download</a></li>
+					<li><a href="#Resources" style="color:#333;">Resources</a></li>
+					<li><a href="#Funding" style="color:#333;">Funding</a></li>
                 </ul>
             </div>
             <!-- /.navbar-collapse -->
@@ -117,10 +114,10 @@
         </div>
 		<div class="row">
             <div class="col-md-12">
-                <li><a href="#About" style="color:gray;">About the Grant</a></li>
-                <li><a href="#Resources" style="color:gray;">Resources</a></li>
+                <li><a href="#About" style="color:gray;">About Bordner</a></li>
 				<li><a href="#Legend" style="color:gray;">Bordner Legend</a></li>
                 <li><a href="#Download" style="color:gray;">Data Download</a></li>
+				<li><a href="#Resources" style="color:gray;">Resources</a></li>
                 <li><a href="#Funding" style="color:gray;">Funding</a></li>
              </div>
         </div>
@@ -129,7 +126,7 @@
         <div class="row">
             <div class="col-md-3">
                 <a name="About" style="position: absolute; top:-100px;"></a>
-				<h3>About the Grant:</h3>
+				<h3>About the Bordner Survey:</h3>
             </div>
         </div>
         <div class="row">
@@ -311,9 +308,9 @@
         <div class="row">
 			<div class="col-md-4">Download the Digitized point, line, and polygon Bordner data:</div> 
 			<div class="col-md-8">
-				<li><a href="../../03_GIS_Data/polys/final_coastal_polygons.zip" target="_blank">Bordner Polygons - Version 1.0.0 (82 MB)</a></li>
-				<li><a href="../../03_GIS_Data/points-lines/final_coastal_points.zip" target="_blank">Bordner Points - Version 1.0.0 (1.1 MB)</a></li>
-				<li><a href="../../03_GIS_Data/points-lines/final_coastal_lines.zip" target="_blank">Bordner Lines - Version 1.0.0 (8.8 MB)</a></li>
+				<li><a href="../../03_GIS_Data/polys/final_coastal_polygons.zip" target="_blank" onClick="ga('send','event','BordnerCoastal','BordnerDataDownload','BordnerPolygons');">Bordner Polygons - Version 1.0.0 (82 MB)</a></li>
+				<li><a href="../../03_GIS_Data/points_lines/final_coastal_points.zip" target="_blank" onClick="ga('send','event','BordnerCoastal','BordnerDataDownload','BordnerPoints');">Bordner Points - Version 1.0.0 (1.1 MB)</a></li>
+				<li><a href="../../03_GIS_Data/points_lines/final_coastal_lines.zip" target="_blank" onClick="ga('send','event','BordnerCoastal','BordnerDataDownload','BordnerLines');">Bordner Lines - Version 1.0.0 (8.8 MB)</a></li>
 			</div>
         </div>
         <hr>
@@ -367,7 +364,7 @@
 						<img src="../img/branding/WCMP.png" alt="WCMP" style="width:100%; max-width:476px; max-height:72px;">
 					</a></br>
 					<a href="http://www.noaa.gov/" target="_blank">
-						<img src="../img/branding/NOAA.gif" alt="NOAA" style="width:100%; max-width:384px; max-height:384px;">
+						<img src="../img/branding/NOAA.gif" alt="NOAA" style="width:25%; max-width:384px; max-height:384px;">
 					</a>
 				</div>
 			</div>
@@ -389,7 +386,7 @@
 						<img src="../img/branding/FLEL.gif" alt="FLEL" style="width:100%; max-width:400px; max-height:145px;">
 					</a></br>
 					<a href="http://www.sco.wisc.edu/" target="_blank">
-						<img src="../img/branding/SCO.png" alt="SCO" style="width:100%; max-width:300px; max-height:170px;">
+						<img src="../img/branding/SCO.png" alt="SCO" style="width:95%; max-width:300px; max-height:170px; border-radius: 6px;">
 					</a>
 				</div>
 			</div>
