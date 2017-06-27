@@ -1189,9 +1189,17 @@ function setUpMap(){
 	map.addControl(new geolocationControl({position: 'bottomright'}));
 	$(".geolocation-control").html(
 		'<div data-toggle="tooltip" title="Locate Me" class="leaflet-bar leaflet-control leaflet-control-custom" id="locateMeButton" onClick="dispatchButtonClick(event, this.id)">' +
-		'<span id="shareButtonIcon" class="button-icon-class glyphicon glyphicon-map-marker">' +
+			'<span id="shareButtonIcon" class="button-icon-class glyphicon glyphicon-map-marker">' +
+		'</div></br>' +
+		'<div data-toggle="tooltip" title="Reset Map" class="leaflet-bar leaflet-control leaflet-control-custom" id="goHomeButton" onClick="dispatchButtonClick(event, this.id)">' +
+			'<span id="goHomeButtonIcon" class="button-icon-class glyphicon glyphicon-home">' +
 		'</div></br>'
 	)
+
+	//map.addControl(new geolocationControl({position: 'bottomright'}));
+	//$(".go-home-control").html(
+
+	//)
 
 	$("#layerList")
 		.html(
@@ -1631,8 +1639,11 @@ function dispatchButtonClick(e, buttonClicked){
 		}else if (buttonClicked == "shareButton"){
 			 configInfoShareModal();
 			 return
-		}else if (buttonClicked == geocodeButton){
+		}else if (buttonClicked == 'geocodeButton'){
 			//auto dispatches to the geocoderr
+			return
+		}else if (buttonClicked == "goHomeButton"){
+			window.location = "./";
 			return
 		}else{
 			console.log("Unknown button, returning...")
@@ -1641,7 +1652,7 @@ function dispatchButtonClick(e, buttonClicked){
 	}else{
 		console.log("Dispatching button click in TABLET MODE")
 		//tablet mode
-		if (buttonClicked == 'locateMeButton'){
+		if (buttonClicked == 'locateMeButton'){	
 			geoLocate();
 			return
 		}else if (buttonClicked == "legendButton"){
@@ -1658,6 +1669,9 @@ function dispatchButtonClick(e, buttonClicked){
 			 return
 		}else if (buttonClicked == 'geocodeButton'){
 			//auto dispatches to the geocoder
+			return
+		}else if (buttonClicked == "goHomeButton"){
+			window.location = "./";
 			return
 		}else{
 			console.log("Unknown button, returning...")
@@ -1803,6 +1817,16 @@ var geolocationControl = L.Control.extend({
 	},
 	onAdd: function(map){
 		var container = L.DomUtil.create("div", "geolocation-control")
+		return container;
+	}
+})
+
+var goHomeControl = L.Control.extend({
+	options: {
+		position: "bottomleft"
+	},
+	onAdd: function(map){
+		var container = L.DomUtil.create("div", "go-home-control")
 		return container;
 	}
 })

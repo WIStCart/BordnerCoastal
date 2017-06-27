@@ -352,7 +352,14 @@ body{
 .leaflet-control-attribution, .cartodb-legend-stack {
 	visibility:hidden;
 }
-
+#locateMeButton {
+	bottom: -13px !important;
+	margin-bottom: 0px !important;
+}
+#goHomeButton {
+    bottom: -13px !important;
+    margin-bottom: 0px !important;
+}
 .cartodb-logo {
 	visibility:hidden !important;
 }
