@@ -79,7 +79,7 @@
   <div id='layerList' class='transiton transition-class row clearfix stylescroll'>
   </div>
 
-  <div class="modal fade" id=infoModal>
+  <div class="modal fade" style="z-index: 999999;" id=infoModal>
     <div class="modal-dialog modal-lg" role="document">
       <div class="modal-content">
         <div class="modal-header">
@@ -121,7 +121,7 @@
     </div>
   </div>
 
-  <div style="z-index: 99999;" class="modal fade" id=aboutModal>
+  <div class="modal fade" style="z-index: 999999;" id=aboutModal>
     <div class="modal-dialog modal-lg" role="document">
       <div class="modal-content">
         <div class="modal-header">
@@ -250,15 +250,6 @@
               <% } %>
               </tr>
           <% } %>
-          <% if ((typeof(coverage5.name) !== "undefined") && (coverage5.name != "Other")) { %>
-              <tr><td><%= coverage5.name %></td>
-              <% if (coverage5.density == 0) { %>
-                <td>--</td><td>--</td><td>--</td>
-              <% } else { %>
-                  <td><%= coverage5.densityTranslate %></td><td><%= coverage5.minDiameter %></td><td><%= coverage5.maxDiameter %></td>
-              <% } %>
-              </tr>
-          <% } %>
           </table>
   				<div>
 			<div>
@@ -303,15 +294,6 @@
               <td>--</td><td>--</td><td>--</td>
             <% } else { %>
                 <td><%= coverage4.densityTranslate %></td><td><%= coverage4.minDiameter %></td><td><%= coverage4.maxDiameter %></td>
-            <% } %>
-            </tr>
-        <% } %>
-        <% if ((typeof(coverage5.name) !== "undefined") && (coverage5.name != "Other")) { %>
-            <tr><td><%= coverage5.name %></td>
-            <% if (coverage5.density == 0) { %>
-              <td>--</td><td>--</td><td>--</td>
-            <% } else { %>
-                <td><%= coverage5.densityTranslate %></td><td><%= coverage5.minDiameter %></td><td><%= coverage5.maxDiameter %></td>
             <% } %>
             </tr>
         <% } %>

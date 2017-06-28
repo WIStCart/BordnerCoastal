@@ -1544,7 +1544,7 @@ function toggleLegend(evt){
 		$("#toc").show();
 		$("#tocButton").removeClass("toc-button-closed")
 		$("#tocButton").html("<span class='glyphicon glyphicon-chevron-down'></span>");
-		$("#map").height("80%");
+		$("#map").height("70%");
 
 		if (legendType == "polygons"){
 			setTimeout(function(){
