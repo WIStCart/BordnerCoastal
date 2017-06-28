@@ -96,8 +96,11 @@ var kenosha = L.tileLayer('https://maps.sco.wisc.edu/BordnerCoastal/BordnerTile/
 var ozaukee = L.tileLayer('https://maps.sco.wisc.edu/BordnerCoastal/BordnerTile/Ozaukee/{z}/{x}/{y}.png', {
  	attribution: 'WHAI'
 });
+var douglas = L.tileLayer('https://maps.sco.wisc.edu/BordnerCoastal/BordnerTile/Douglas/{z}/{x}/{y}.png', {
+ 	attribution: 'WHAI'
+});
 
-var historicBasemap = L.layerGroup([kewaunee, racine, kenosha, ozaukee])
+var historicBasemap = L.layerGroup([kewaunee, racine, kenosha, ozaukee, douglas])
 
 // Create CartoCSS
 function getPolyStyle(level, level1Selected){
@@ -1214,7 +1217,7 @@ function setUpMap(){
 				'<label><input type="checkbox" name="overlayType" id="density1">Class 1 Density</label>' +
 			'</div>' +
 			'<div class="checkbox">' +
-				'<label><img src="http://maps.sco.wisc.edu/BordnerCoastal/BordnerIcon/pattern4.png" class="densityLegend"> Good</label><label><img src="http://maps.sco.wisc.edu/BordnerCoastal/BordnerIcon/pattern3.png" class="densityLegend"> Medium</label><label><img src="http://maps.sco.wisc.edu/BordnerCoastal/BordnerIcon/pattern2.png" class="densityLegend"> Poor</label><label><img src="http://maps.sco.wisc.edu/BordnerCoastal/BordnerIcon/pattern1.png" class="densityLegend"> Scattered</label>' +
+				'<label><img src="https://maps.sco.wisc.edu/BordnerCoastal/BordnerIcon/pattern4.png" class="densityLegend"> Good</label><label><img src="https://maps.sco.wisc.edu/BordnerCoastal/BordnerIcon/pattern3.png" class="densityLegend"> Medium</label><label><img src="https://maps.sco.wisc.edu/BordnerCoastal/BordnerIcon/pattern2.png" class="densityLegend"> Poor</label><label><img src="https://maps.sco.wisc.edu/BordnerCoastal/BordnerIcon/pattern1.png" class="densityLegend"> Scattered</label>' +
 			'</div>' +
 			'<label class="legend-label">Basemap</label>' +
 			'<div class="radio">' +
