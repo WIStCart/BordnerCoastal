@@ -2019,6 +2019,8 @@ function drawPolyFilterDesktop(el, _levelEngaged, _level1Selected){
 		.on('click', function(d){
 			if (levelEngaged == 1){
 					dispatchLegendClick(d.name.toLowerCase())
+			}else {
+				window.open('/about#'+d.name.replace(" ","_"))
 			}
 		})
 		//change colors on hover
