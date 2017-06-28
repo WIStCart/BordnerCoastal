@@ -42,7 +42,7 @@ body{
 	overflow-x: hidden;
 	border-radius: 10px;
 	//height: 45%;
-	width: 30%;
+	/*width: 30%;*/
 	position: absolute;
 	top: 10px;
 	left: 20px;
@@ -50,9 +50,10 @@ body{
 	border-radius: 10px;
 	min-height: 150px;
 	min-width: 250px;
-	background-color: #2c5875;
+	background-color: #fff;
 	display: none;
 	padding: 10px;
+	color:black;
 }
 
 #toc{
@@ -407,7 +408,7 @@ body{
 
 /* leaflet customized css */
 .radio, .checkbox{
-	color: #ffffff;
+	color: #000000;
 	font-size: 8pt;
 	height: 10px;
 	line-height: 2;
@@ -665,8 +666,8 @@ td{
 
 
 .layer-list-header{
-	color: white;
-	text-shadow: black 0.1em 0.1em 0.2em;
+	color: #000000;
+	/*text-shadow: black 0.1em 0.1em 0.2em;*/
 }
 
 #legend-header{
