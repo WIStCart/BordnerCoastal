@@ -71,6 +71,7 @@ body{
 	color: white;
 }
 
+/* next 3 media queries to resolve issues on narriw height screens */
 @media (max-height: 650px){
 	.toc-button{
 		bottom: 35% !important;
@@ -111,9 +112,6 @@ body{
 	#map{
 		height: 60%;
 	}
-	/*#toc{
-		height: 40% !important;
-	}*/
 	.map-view-full{
 		height: 100% !important;
 	}
@@ -138,9 +136,6 @@ body{
 	#map{
 		height: 55%;
 	}
-	/*#toc{
-		height: 45% !important;
-	}*/
 	.map-view-full{
 		height: 100% !important;
 	}
@@ -205,9 +200,9 @@ body{
 		color: black!important;
 		text-shadow: none!important;
 	}
-
-
-
+	.legend-item {
+		line-height: 0.9;
+	}
 }
 
 /* for css when *PHONE* mode is engaged */
@@ -801,7 +796,7 @@ button.active{
 	right: 10px;
 	/*width:  75px;*/
 	height: 25px;
-	z-index: 200000;
+	z-index: 20;
 	color: 		black;
 	/*text-shadow: black 0.1em 0.1em 0.2em;*/
 	/*padding-left: 5px;*/

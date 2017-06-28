@@ -1532,7 +1532,6 @@ function toggleLegend(evt){
 	console.log(isLegendOpen)
 	if (isLegendOpen){
 		isLegendOpen = false;
-		//$("#toc").hide();
 		$("#tocButton").addClass('toc-button-closed').show();
 		$("#tocButton").html("<span class='glyphicon glyphicon-chevron-up'></span>")
 		$("#map").addClass('map-view-full')
@@ -1546,7 +1545,6 @@ function toggleLegend(evt){
 		setTimeout(function(){ map.invalidateSize()}, 500)
 	}else{ //is open
 		isLegendOpen = true;
-		//$("#toc").show();
 		$("#tocButton").removeClass("toc-button-closed")
 		$("#tocButton").html("<span class='glyphicon glyphicon-chevron-down'></span>");
 		$("#map").removeClass('map-view-full')
@@ -2584,6 +2582,7 @@ function dispatchLegendClick(level1Selected){
 function drawLineLegend(){
 	console.log("Drawing line legend")
 	$("#legendHolder").empty();
+	$("#legendLogLinear").empty();
 	$("#legendHolder").addClass("stylescroll").addClass('autoscroll')
 	lineLegendSorted =  _.chain(lineLegend).sortBy("frequency").sortBy("class").unique(function(d){return d.group}).value()
 	for (var i=0; i < lineLegendSorted.length; i++){
@@ -2652,6 +2651,7 @@ function showOneLine(lineType){
 
 function drawPointLegend(){
 	$("#legendHolder").empty();
+	$("#legendLogLinear").empty();
 	$("#legendHolder").addClass("stylescroll").addClass('autoscroll');
 	var pointlegendSorted = _.chain(pointLegend).sortBy("frequency").sortBy("class").unique(function(d){return d.group}).value()
 	console.log(pointlegendSorted)
