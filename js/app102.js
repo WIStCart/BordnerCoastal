@@ -185,14 +185,14 @@ function getPointCSS(pointTypeSelected, zoomIn){
 				}
 				style += "}"
 			}else{
-				style +=  "marker-fill:#000000; marker-allow-overlap: false; marker-opacity: 1; [zoom <9]{ marker-width:.1;}[zoom >=9]{marker-width:.5;}[zoom >=11]{marker-width:3.5;}"
+				style +=  "marker-fill:#000000; marker-allow-overlap: false; marker-opacity: 1; [zoom =7]{ marker-width:.05;}[zoom <9]{ marker-width:.15;}[zoom >=9]{marker-width:1;}[zoom >=11]{marker-width:3.5;}"
 			}
 		}
 		style += "}"
 	}else if (pointTypeSelected == "none"){
 		style = "#layer{marker-opacity:0;}"
 	}else{
-		style = "#layer{marker-opacity: 0; "
+		style = "#layer{marker-opacity: 0; marker-width: 0;"
 		for (var i=0; i < pointLegend.length; i++){
 			var thisPointType = pointLegend[i].type
 			if (pointTypeSelected.toLowerCase() === thisPointType.toLowerCase()){
@@ -1214,9 +1214,9 @@ function setUpMap(){
 				'<label><input type="checkbox" name="overlayType" id="townships" >PLSS</label>' +
 			'</div>' +
 			'<div class="checkbox">' +
-				'<label><input type="checkbox" name="overlayType" id="density1">Class 1 Density</label>' +
+				'<label><input type="checkbox" name="overlayType" id="density1">Coverage 1 Density</label>' +
 			'</div>' +
-			'<div class="checkbox">' +
+			'<div id="densityLegend" class="checkbox" style="display:none">' +
 				'<label><img src="https://maps.sco.wisc.edu/BordnerCoastal/BordnerIcon/pattern4.png" class="densityLegend"> Good</label><label><img src="https://maps.sco.wisc.edu/BordnerCoastal/BordnerIcon/pattern3.png" class="densityLegend"> Medium</label><label><img src="https://maps.sco.wisc.edu/BordnerCoastal/BordnerIcon/pattern2.png" class="densityLegend"> Poor</label><label><img src="https://maps.sco.wisc.edu/BordnerCoastal/BordnerIcon/pattern1.png" class="densityLegend"> Scattered</label>' +
 			'</div>' +
 			'<label class="legend-label">Basemap</label>' +
@@ -1233,6 +1233,9 @@ function setUpMap(){
 			'<input type="text" value="50" id="rangeSlider" data-slider-min="0" data-slider-max="100" data-slider-step="1" data-slider-value="' +  layerOpacity*100 + '" data-slider-ticks="[0, 100]"  / >' +
 		'</div>')
 
+
+	//Dynamic density legend
+	$('#density1').click(function() {($(this).is(":checked")) ? $("#densityLegend").show() : $("#densityLegend").hide();});
 	$('input[name=featureType]').click(function(){ turnOnFeatureType(this.id) });
 	$('input[name=basemapType]').click(function(){ turnOnBasemap(this.id) });
 	$('input[name=overlayType]').click(function(){ turnOnOverlay(this.id) });
