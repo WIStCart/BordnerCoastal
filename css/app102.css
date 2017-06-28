@@ -71,6 +71,86 @@ body{
 	color: white;
 }
 
+@media (max-height: 650px){
+	.toc-button{
+		bottom: 35% !important;
+	}
+	.toc-view-open{
+		height: 35% !important;
+	}
+	.map-view-toc{
+		height: 65% !important;
+	}
+	#map{
+		height: 65%;
+	}
+	#toc{
+		height: 35%;
+	}
+	.map-view-full{
+		height: 100% !important;
+	}
+	.toc-view-open{
+		height: 35% !important;
+	}
+	.toc-view-closed{
+		height: 0% !important;
+	}
+}
+
+@media (max-height: 550px){
+	.toc-button{
+		bottom: 40% !important;
+	}
+	.toc-view-open{
+		height: 40% !important;
+	}
+	.map-view-toc{
+		height: 60% !important;
+	}
+	#map{
+		height: 60%;
+	}
+	/*#toc{
+		height: 40% !important;
+	}*/
+	.map-view-full{
+		height: 100% !important;
+	}
+	.toc-view-open{
+		height: 40% !important;
+	}
+	.toc-view-closed{
+		height: 0% !important;
+	}
+}
+
+@media (max-height: 480px){
+	.toc-button{
+		bottom: 45% !important;
+	}
+	.toc-view-open{
+		height: 45% !important;
+	}
+	.map-view-toc{
+		height: 55% !important;
+	}
+	#map{
+		height: 55%;
+	}
+	/*#toc{
+		height: 45% !important;
+	}*/
+	.map-view-full{
+		height: 100% !important;
+	}
+	.toc-view-open{
+		height: 45% !important;
+	}
+	.toc-view-closed{
+		height: 0% !important;
+	}
+}
 
 /* for css when *TABLET* mode is engaged */
 @media (max-width: 767px){
@@ -190,6 +270,7 @@ body{
 	bottom: 30%;
 	color: black;
 }
+
 .toc-button-unfade{
  	opacity: 100;
 }
@@ -210,7 +291,7 @@ body{
 	padding-left:5px;
 }
 .map-view-full{
-	height: 100%!important;
+	height: 100% !important;
 	position: absolute;
 	top: 0px;
 	left: 0px;
@@ -221,6 +302,7 @@ body{
 	left:0px;
 	height: 70%;
 }
+
 .toc-view{
 	padding:4px;
 }
@@ -228,13 +310,18 @@ body{
 	position: absolute;
 	bottom: 0px;
 	left: 0px;
-	height: 30%!important;
+	height: 30%;
+	padding: 4px;
+    border: solid 4px;
 }
+
 .toc-view-closed{
-	height: 1%;
+	height: 0% !important;
 	position: absolute;
 	bottom:0px;
 	left:0px;
+	padding: 0px !important;
+    border: solid 0px !important;
 }
 
 /* toc elements  */
@@ -649,6 +736,11 @@ button.active{
 }
 #showNone:hover{
 	background: rgba(0, 0, 0, 0.25)
+}
+
+.legend-log-linear{
+	float:right;
+	text-align:right;
 }
 
 /*#logHist{

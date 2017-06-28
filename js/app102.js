@@ -1529,10 +1529,12 @@ function toggleLegend(evt){
 	console.log(isLegendOpen)
 	if (isLegendOpen){
 		isLegendOpen = false;
-		$("#toc").hide();
+		//$("#toc").hide();
 		$("#tocButton").addClass('toc-button-closed').show();
 		$("#tocButton").html("<span class='glyphicon glyphicon-chevron-up'></span>")
-		$("#map").height("100%");
+		$("#map").addClass('map-view-full')
+		$("#toc").removeClass('toc-view-open')
+		$("#toc").addClass('toc-view-closed')
 		if (desktopMode){
 			console.log("desktopMode")
 			$("#neatline").show();
@@ -1541,10 +1543,12 @@ function toggleLegend(evt){
 		setTimeout(function(){ map.invalidateSize()}, 500)
 	}else{ //is open
 		isLegendOpen = true;
-		$("#toc").show();
+		//$("#toc").show();
 		$("#tocButton").removeClass("toc-button-closed")
 		$("#tocButton").html("<span class='glyphicon glyphicon-chevron-down'></span>");
-		$("#map").height("70%");
+		$("#map").removeClass('map-view-full')
+		$("#toc").addClass('toc-view-open')
+		$("#toc").removeClass('toc-view-closed')
 
 		if (legendType == "polygons"){
 			setTimeout(function(){
@@ -1886,7 +1890,8 @@ function drawThisView(boundsIn, zoomIn, _levelEngaged, _level1Selected){
 			sql.execute(cartoQuery)
 				.done(function(data) {
 					$("#legendHolder").empty();
-					$("#legendHolder").append("<div class='btn-group pull-right' role='group'><a id='logHist' class='btn btn-default histbtn btn-sm'>Log</a><a id='linearHist' class='btn btn-default histbtn btn-sm'>Linear</a></div>")
+					$("#legendLogLinear").empty();
+					$("#legendLogLinear").append("<div class='btn-group pull-right' role='group'><a id='logHist' class='btn btn-default histbtn btn-sm'>Log</a><a id='linearHist' class='btn btn-default histbtn btn-sm'>Linear</a></div>")
 					$("#logHist").click(function(){
 						histogramScale = "log";
 						$(this).addClass('active');
