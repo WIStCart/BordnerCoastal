@@ -11,6 +11,7 @@ var classConfigs = {};
 var level1Membership = {};
 var levelEngaged = "1";
 var level1Selected = undefined;
+var cachedLevel1Selection = undefined;
 var sublayer1;
 var sublayer2;
 var layerOpacity = 0.65;
@@ -39,7 +40,6 @@ var pointTypeSelected;
 var histogramScale = "linear";
 var showInfoboxOnHover = true;
 var basemapChoice = "streets";
-var cachedLevel1Selection = undefined
 
 //overlays on the map
 var labelsAreOn = false;
@@ -105,6 +105,8 @@ var historicBasemap = L.layerGroup([kewaunee, racine, kenosha, ozaukee, douglas]
 
 // Create CartoCSS
 function getPolyStyle(level, level1Selected){
+	console.log(level)
+	console.log(level1Selected)
 	if (level == "none"){
 		return "#layer{polygon-opacity: 0;}"
 	}
@@ -1428,15 +1430,6 @@ var jsMediaQuery = function() {
 
 // To turn on the appropriate feature type (line, point, poly) in the TOC legend
 function turnOnFeatureType(featureTypeCalled){
-	/*console.log('bordner')
-	console.log(bordner)
-	console.log(typeof(bordner))
-	console.log('points')
-	console.log(points)
-	console.log(typeof(points))
-	console.log('lines')
-	console.log(lines)
-	console.log(typeof(lines))*/
 	switch(featureTypeCalled) {
 		case "featurePolygons":
 			listenToPolyLegend()
@@ -2662,16 +2655,12 @@ function wrap(text, width) {
 
 
 function dispatchLegendClick(level1Selected){
-	console.log("level1Selected")
-	console.log(level1Selected)
-	if (+levelEngaged == 1){
+	if ((+levelEngaged == 1)&&(level1Selected != undefined)){
 		//go from level one to level 2
 		levelEngaged = 2;
 		$("#legend-back").show();
 		$("#legend-header").hide();
-		if (level1Selected != undefined){
-			replaceQueryValue("polygonFilter", level1Selected.split(" ").join("_"))
-		}
+		replaceQueryValue("polygonFilter", level1Selected.split(" ").join("_"))
 	}else{
 		//go from level 2 to level 1
 		levelEngaged = 1;
