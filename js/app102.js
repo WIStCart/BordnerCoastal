@@ -180,13 +180,24 @@ function getPointCSS(pointTypeSelected, zoomIn){
 			var thisMinZoom = pointLegend[i].minZoom;
 			var thisMaxZoom = pointLegend[i].maxZoom;
 			if ((zoomIn >= thisMinZoom) && (zoomIn <= thisMaxZoom)){
-				style +=  "[point_type='" + pointLegend[i].type + "']{marker-fill: " + pointLegend[i].color + "; marker-file: url(" + pointLegend[i].icon + "); marker-allow-overlap: false; marker-opacity: 1;[zoom >=12]{marker-width: 10;}[zoom >=15]{marker-width: 15;}[zoom >=16]{marker-width: 19;}[zoom >=17]{marker-width: 21;}[zoom >=18]{marker-width: 23;} "+ pointLegend[i].otherCSS 
-				if (window[basemapParam] == 'satellite'){
-					style += "marker-line-color:#ffffff; marker-line-width:.25; "	
+				style +=  "[point_type='" + pointLegend[i].type + "']{marker-file: url(" + pointLegend[i].icon + "); marker-allow-overlap: false; marker-opacity: 1;[zoom >=12]{marker-width: 10;}[zoom >=13]{marker-width: 12;}[zoom >=14]{marker-width: 14;}[zoom >=15]{marker-width: 16;}[zoom >=16]{marker-width: 19;}[zoom >=17]{marker-width: 21;}[zoom >=18]{marker-width: 23;} "+ pointLegend[i].otherCSS 
+				if (window["basemapParam"] == 'satellite'){
+					style += "marker-fill: " + pointLegend[i].color + ";[zoom > 10]{marker-line-color:#ffffff; marker-line-width:1;}"	
+				}else if(window["basemapParam"] == 'historic'){
+					style += "marker-fill:#ffffed;marker-line-color:#000000; marker-line-width:1;"
+				}else {
+					style += "marker-fill: " + pointLegend[i].color + ";"
 				}
 				style += "}"
 			}else{
-				style +=  "marker-fill:#000000; marker-allow-overlap: false; marker-opacity: 1; [zoom =7]{ marker-width:.05;}[zoom <9]{ marker-width:.15;}[zoom >=9]{marker-width:1;}[zoom >=11]{marker-width:3.5;}"
+				style +=  "marker-allow-overlap: false; marker-opacity: 1; [zoom =7]{marker-width:.1;}[zoom <9]{ marker-width:.15;}[zoom >=9]{marker-width:1.25;}[zoom >=10]{marker-width:2;}[zoom >=11]{marker-width:3.5;}"
+				if (window["basemapParam"] == 'satellite'){
+					style += "marker-fill:#000000; [zoom > 10]{marker-line-color:#ffffff; marker-line-width:.5;}"	
+				}else if(window["basemapParam"] == 'historic'){
+					style += "marker-fill:#ffffed; marker-fill-opacity: 1; [zoom < 11]{marker-line-width:0;}"
+				}else {
+					style += "marker-fill:#000000;"
+				}
 			}
 		}
 		style += "}"
@@ -195,12 +206,18 @@ function getPointCSS(pointTypeSelected, zoomIn){
 	}else{
 		style = "#layer{marker-opacity: 0; marker-width: 0;"
 		for (var i=0; i < pointLegend.length; i++){
-			var thisPointType = pointLegend[i].type
+			var thisPointType = pointLegend[i].type;
+			var thisMinZoom = pointLegend[i].minZoom;
+			var thisMaxZoom = pointLegend[i].maxZoom;
 			if (pointTypeSelected.toLowerCase() === thisPointType.toLowerCase()){
 
-				var thisStyle = "[point_type='" + thisPointType + "']{marker-opacity: 1; marker-fill: " + pointLegend[i].color + "; marker-file: url(" + pointLegend[i].icon + "); marker-allow-overlap: false; [zoom < 12]{marker-width: 15;}[zoom >=12]{marker-width: 10;}[zoom >=15]{marker-width: 15;}[zoom >=16]{marker-width: 19;}[zoom >=17]{marker-width: 21;}[zoom >=18]{marker-width: 23;} "+ pointLegend[i].otherCSS
-				if (window[basemapParam] == 'satellite'){
-					thisStyle += "marker-line-color:#2f2fd1; marker-line-width:.5; "	
+				var thisStyle = "[point_type='" + thisPointType + "']{marker-opacity: 1; marker-file: url(" + pointLegend[i].icon + "); marker-allow-overlap: false; marker-opacity: 1;[zoom >=12]{marker-width: 10;}[zoom >=13]{marker-width: 12;}[zoom >=14]{marker-width: 14;}[zoom >=15]{marker-width: 16;}[zoom >=16]{marker-width: 19;}[zoom >=17]{marker-width: 21;}[zoom >=18]{marker-width: 23;} "+ pointLegend[i].otherCSS 
+				if (window["basemapParam"] == 'satellite'){
+					thisStyle += "marker-fill: " + pointLegend[i].color + "; marker-line-color:#ffffff; marker-line-width:0.5; "	
+				}else if(window["basemapParam"] == 'historic'){
+					style += "marker-fill:#ffffed; marker-fill-opacity: 1; marker-line-width:1;"
+				}else {
+					style += "marker-fill: " + pointLegend[i].color + ";"
 				}
 				thisStyle += "}"
 				style += thisStyle
