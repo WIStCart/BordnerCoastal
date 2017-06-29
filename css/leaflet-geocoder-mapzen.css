@@ -53,7 +53,15 @@
 .leaflet-pelias-expanded {
   width: 280px;
   height: 44px;
+  max-width:280px;
 }
+
+@media (max-width: 499px){
+	.leaflet-pelias-expanded {
+	  max-width: 200px;
+	}
+}
+
 
 .leaflet-pelias-expanded .leaflet-pelias-input {
   padding-right: 30px; /* Space for close button */
