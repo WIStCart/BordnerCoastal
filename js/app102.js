@@ -211,7 +211,7 @@ function getPointCSS(pointTypeSelected, zoomIn){
 			var thisMaxZoom = pointLegend[i].maxZoom;
 			if (pointTypeSelected.toLowerCase() === thisPointType.toLowerCase()){
 
-				var thisStyle = "[point_type='" + thisPointType + "']{marker-opacity: 1; marker-file: url(" + pointLegend[i].icon + "); marker-allow-overlap: false; marker-opacity: 1;[zoom >=12]{marker-width: 10;}[zoom >=13]{marker-width: 12;}[zoom >=14]{marker-width: 14;}[zoom >=15]{marker-width: 16;}[zoom >=16]{marker-width: 19;}[zoom >=17]{marker-width: 21;}[zoom >=18]{marker-width: 23;} "+ pointLegend[i].otherCSS 
+				var thisStyle = "[point_type='" + thisPointType + "']{marker-opacity: 1; marker-file: url(" + pointLegend[i].icon + "); marker-allow-overlap: true; marker-opacity: 1;[zoom =7]{marker-width:4;}[zoom <9]{ marker-width:4;}[zoom >=9]{marker-width:8;}[zoom >=10]{marker-width:8;}[zoom >=11]{marker-width:8;}[zoom >=12]{marker-width: 10; marker-allow-overlap: false;}[zoom >=13]{marker-width: 12;}[zoom >=14]{marker-width: 14;}[zoom >=15]{marker-width: 16;}[zoom >=16]{marker-width: 19;}[zoom >=17]{marker-width: 21;}[zoom >=18]{marker-width: 23;} "+ pointLegend[i].otherCSS 
 				if (window["basemapParam"] == 'satellite'){
 					thisStyle += "marker-fill: " + pointLegend[i].color + "; marker-line-color:#ffffff; marker-line-width:0.5; "	
 				}else if(window["basemapParam"] == 'historic'){
