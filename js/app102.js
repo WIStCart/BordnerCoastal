@@ -39,6 +39,7 @@ var pointTypeSelected;
 var histogramScale = "linear";
 var showInfoboxOnHover = true;
 var basemapChoice = "streets";
+var cachedLevel1Selection = undefined
 
 //overlays on the map
 var labelsAreOn = false;
@@ -838,7 +839,8 @@ function setupInteraction(layer, _levelEngaged, _visibility){
 
 	//setup legend navigation
 	$("#legend-back").click(function(d){
-		dispatchLegendClick(undefined)
+		// listenToPolyLegend() function now takes the place of this logic  
+		//dispatchLegendClick(undefined)
 	})
 
 	$("#map").click(onMapClick)
@@ -1409,8 +1411,18 @@ var jsMediaQuery = function() {
 
 // To turn on the appropriate feature type (line, point, poly) in the TOC legend
 function turnOnFeatureType(featureTypeCalled){
+	/*console.log('bordner')
+	console.log(bordner)
+	console.log(typeof(bordner))
+	console.log('points')
+	console.log(points)
+	console.log(typeof(points))
+	console.log('lines')
+	console.log(lines)
+	console.log(typeof(lines))*/
 	switch(featureTypeCalled) {
 		case "featurePolygons":
+			listenToPolyLegend()
 			legendType = "polygons";
 			$("#legend-header").text("Area Features")
 			manageURLToPolygons();
@@ -1421,6 +1433,7 @@ function turnOnFeatureType(featureTypeCalled){
 			}else{
 				showOnlyPolygons();
 				$("#rangeSlider").slider('setValue', layerOpacity*100);
+				dispatchLegendClick(cachedLevel1Selection)
 			}
 			break;
 		case "featureLines":
@@ -1434,6 +1447,8 @@ function turnOnFeatureType(featureTypeCalled){
 				resetPolygons();
 				showOnlyLines();
 				$("#rangeSlider").slider('setValue', layerOpacity*100);
+				hideLevel1Label();
+				$("#legend-back").hide();
 			}
 			break;
 		case "featurePoints":
@@ -1448,11 +1463,13 @@ function turnOnFeatureType(featureTypeCalled){
 				resetPolygons();
 				showOnlyPoints();
 				$("#rangeSlider").slider('setValue', layerOpacity*100);
+				hideLevel1Label();
+				$("#legend-back").hide();
 			}
 			break;
 		default:
 			console.log("unidentified feature type called")
-	} 
+	}
 }
 
 function resetPolygons(){
@@ -2628,12 +2645,16 @@ function wrap(text, width) {
 
 
 function dispatchLegendClick(level1Selected){
+	console.log("level1Selected")
+	console.log(level1Selected)
 	if (+levelEngaged == 1){
 		//go from level one to level 2
 		levelEngaged = 2;
 		$("#legend-back").show();
 		$("#legend-header").hide();
-		replaceQueryValue("polygonFilter", level1Selected.split(" ").join("_"))
+		if (level1Selected != undefined){
+			replaceQueryValue("polygonFilter", level1Selected.split(" ").join("_"))
+		}
 	}else{
 		//go from level 2 to level 1
 		levelEngaged = 1;
@@ -2642,6 +2663,7 @@ function dispatchLegendClick(level1Selected){
 		replaceQueryValue("polygonFilter", undefined)
 	}
 	// level1Selected = level1Selected;
+	cachedLevel1Selection = level1Selected
 	switchLevel(levelEngaged, level1Selected);
 	drawThisView(map.getBounds(), map.getZoom(), levelEngaged, level1Selected);
 }
@@ -2770,6 +2792,13 @@ function listenToPointLegend(){
 	$(".legend-media").on('mouseout', function(e){
 			var bkgrd = 'rgba(0, 0, 0, 0)'
 			$(this).css({'background': bkgrd})
+	})
+}
+
+function listenToPolyLegend(){
+	$("#legend-back").unbind('click')
+	$("#legend-back").bind('click', function(){
+		dispatchLegendClick(undefined)
 	})
 }
 
