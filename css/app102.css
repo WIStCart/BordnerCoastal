@@ -592,6 +592,11 @@ td{
 	float: none!important;
 }
 
+.geocode-search-button {    
+	top: 23px;
+    position: relative;
+}
+	
 .legend-label{
 	padding-top: 10px;
 	margin-bottom: 0px;

@@ -1173,6 +1173,8 @@ function setUpMap(){
 
 	map.addControl(new geolocationControl({position: 'bottomright'}));
 	$(".geolocation-control").html(
+		'<div id="geocodeSearchButton" class="geocode-search-button">' +
+		'</div></br>' +
 		'<div data-toggle="tooltip" title="Locate Me" class="leaflet-bar leaflet-control leaflet-control-custom" id="locateMeButton" onClick="dispatchButtonClick(event, this.id)">' +
 			'<span id="shareButtonIcon" class="button-icon-class glyphicon glyphicon-map-marker">' +
 		'</div></br>' +
@@ -1198,14 +1200,15 @@ function setUpMap(){
 		  bounds: bounds, // note that bounds is only respected in the search functionality (what happens after you press return), not the autocomplete. See: https://github.com/mapzen/leaflet-geocoder/issues/108 for more.
 		  placeholder: "Search",
 		  attribution: null,
-		  pointIcon: false,
-		polygonIcon: false,
-		//position: 'topright',
+		  pointIcon: true,
+		  polygonIcon: true,
+		  //position: 'topright',
 		  autocomplete: false, // Turn off autocomplete in order to get "bounds" option to work (also see line 769 and 772 in leaflet-geocoder-mapzen.js for the slight hack to make this work).
 		  layers: ['venue','address','county','locality','region','localadmin','neighbourhood'] // Other options include: ['venue', 'address', 'country', 'region', 'county', 'locality', 'localadmin','neighbourhood'] 
 		}
 	  var geocoder = L.control.geocoder('search-te2euuB', options).addTo(map); // Note, Mapzen api is engaged through CS's github account
-
+	  $('.leaflet-pelias-control').appendTo('#geocodeSearchButton')
+	  $('.leaflet-pelias-search-icon').attr("data-toggle", "tooltip").attr("title","Search")
 	$("#layerList")
 		.html(
 		'<button class="btn btn-primary btn-sm btn-close layer-list-close-btn pull-right"><span class="glyphicon glyphicon-remove"></span></button>' +

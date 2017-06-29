@@ -7,7 +7,7 @@
   width: 100%;
   border: none;
   border-radius: 4px;
-  padding-left: 26px;
+  padding-left: 28px;
   text-indent: 6px;
   font-size: 14px;
   background-color: transparent; /* Should inherit color from control */
@@ -15,8 +15,8 @@
 }
 
 .leaflet-pelias-control {
-  width: 26px;
-  height: 26px;
+  width: 28px;
+  height: 28px;
   background-color: white;
   -webkit-transition: width .1s, height .1s;
   -moz-transition: width .1s, height .1s;
@@ -123,7 +123,7 @@ only screen and (min-device-pixel-ratio: 2) {
   display: table-cell;
   position: absolute;
   right: 0;
-  width: 26px;
+  width: 28px;
   height: 100%;
   padding-right: 2px;
   text-align: center;
@@ -135,6 +135,23 @@ only screen and (min-device-pixel-ratio: 2) {
   -moz-user-select: none;
   -ms-user-select: none;
   user-select: none;
+}
+
+.leaflet-pelias-search-icon-closed {
+	top:0%;
+}
+
+.leaflet-pelias-search-icon {
+    border-bottom: 0px solid #ccc !important;
+    width: 28px !important;
+    height: 28px !important;
+    line-height: 28px;
+	background-color: transparent !important;
+	//top:23%;
+	opacity: 0.5;
+}
+.leaflet-pelias-expanded .leaflet-pelias-search-icon{
+	top:17%;
 }
 
 .leaflet-pelias-expanded .leaflet-pelias-close {
@@ -178,7 +195,7 @@ only screen and (min-device-pixel-ratio: 2) {
 
 /* Overrides to .leaflet-bar a */
 .leaflet-bar a.leaflet-pelias-search-icon {
-  border-radius: 4px;
+  border-radius: 0px;
   border-bottom: 0;
   height: 100%;
 }
@@ -186,8 +203,8 @@ only screen and (min-device-pixel-ratio: 2) {
 /* Overrides to .leaflet-bar a, which provides a white background
    By making it transparent (unless hovered) it prevents situations
    where the background color overlaps a parent element unexpectedly */
-.leaflet-bar a.leaflet-pelias-search-icon:not(:hover) {
-  background-color: transparent;
+.leaflet-bar a.leaflet-pelias-search-icon {
+  background-color: transparent
 }
 
 /* When expanded, search icon doesn't need right-side radii */
@@ -272,14 +289,14 @@ only screen and (min-device-pixel-ratio: 2) {
 }
 
 .leaflet-pelias-results .leaflet-pelias-result:hover {
-  background-color: #d5f1f3;
-  border-color: #d5f1f3;
+  background-color: #e89c7b;
+  border-color: #e89c7b;
 }
 
 .leaflet-pelias-results .leaflet-pelias-result.leaflet-pelias-selected,
 .leaflet-pelias-results .leaflet-pelias-result.leaflet-pelias-selected:hover {
-  background-color: #b2e3e7;
-  border-color: #b2e3e7;
+  background-color: #f95108;
+  border-color: #f95108;
 }
 
 .leaflet-pelias-message {
