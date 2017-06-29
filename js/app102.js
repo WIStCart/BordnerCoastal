@@ -1181,10 +1181,30 @@ function setUpMap(){
 		'</div></br>'
 	)
 
-	//map.addControl(new geolocationControl({position: 'bottomright'}));
-	//$(".go-home-control").html(
-
-	//)
+	// Add leaflet geocoding plugin 
+  var southWest = L.latLng(40.379312, -94.010668); // South west part of the Wisconsin region (somewhere in Iowa)  
+  var northEast = L.latLng(48.958198, -86.273782); // Norht east part of the Wisconsin region (somewhere in UP Michigan) 	
+		var bounds = L.latLngBounds(southWest, northEast);
+		var geocodeIcon = L.icon({
+			iconUrl: 'img/icons/marker.gif',
+			iconSize:     [36.5, 36], 
+			iconAnchor:   [18.25, 18], 
+			popupAnchor:  [0.5, -9] 
+		});
+		var options = {
+		//markers: false, // Will turn markers off altogether
+		  markers: {icon: geocodeIcon},
+		  //latlng: [map.getCenter().lat, map.getCenter().lng], // to search within a radius of the current map center
+		  bounds: bounds, // note that bounds is only respected in the search functionality (what happens after you press return), not the autocomplete. See: https://github.com/mapzen/leaflet-geocoder/issues/108 for more.
+		  placeholder: "Search",
+		  attribution: null,
+		  pointIcon: false,
+		polygonIcon: false,
+		//position: 'topright',
+		  autocomplete: false, // Turn off autocomplete in order to get "bounds" option to work (also see line 769 and 772 in leaflet-geocoder-mapzen.js for the slight hack to make this work).
+		  layers: ['venue','address','county','locality','region','localadmin','neighbourhood'] // Other options include: ['venue', 'address', 'country', 'region', 'county', 'locality', 'localadmin','neighbourhood'] 
+		}
+	  var geocoder = L.control.geocoder('search-te2euuB', options).addTo(map); // Note, Mapzen api is engaged through CS's github account
 
 	$("#layerList")
 		.html(
