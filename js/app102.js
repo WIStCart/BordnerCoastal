@@ -1993,7 +1993,7 @@ function drawPolyFilterDesktop(el, _levelEngaged, _level1Selected){
 				width = altWidth
 			}
 		}
-
+		
 
 		//axes setup
 		var xScale = d3.scale.ordinal().rangeRoundBands([0, width], 0.05)
@@ -2013,7 +2013,6 @@ function drawPolyFilterDesktop(el, _levelEngaged, _level1Selected){
 
 		xScale.domain(_.pluck(props, "name"))
 
-
 		svg.append("g")
 			.attr("class", " x axis selector-axis")
 			.attr("transform", "translate(0,75)")
@@ -2021,7 +2020,11 @@ function drawPolyFilterDesktop(el, _levelEngaged, _level1Selected){
 			.selectAll(".tick text")
 				.call(wrap, xScale.rangeBand())
 
-				//these are the data-driven bars proportional to the area in the screen
+		// Define the div for the tooltip
+		var tt = d3.select("#legendHolder").append("div")	
+		    .attr("class", "legendTooltip");
+
+		//these are the data-driven bars proportional to the area in the screen
 		svg.selectAll('filter-swatch')
 			.data(props)
 			.enter().append('rect')
@@ -2053,6 +2056,18 @@ function drawPolyFilterDesktop(el, _levelEngaged, _level1Selected){
 				var newColor = shadeRGBColor(oldColor, -0.25)
 				self.style('fill', newColor)
 				d3.selectAll("." + d.name.split(" ").join("_")).style('fill', newColor)
+			}else {		
+				var self = d3.select(this)
+				//set old color so we can recover it
+				var oldColor = self.style('fill')
+				self.attr('data-fill', oldColor)
+				var newColor = shadeRGBColor(oldColor, -0.25)
+				self.style('fill', newColor)
+				d3.selectAll("." + d.name.split(" ").join("_")).style('fill', newColor)	
+                tt.style("left",d3.select(this).attr("x")+"px");
+                tt.style("top", d3.select(this).attr("y")+"px");
+                tt.style("display", "inline-block");
+                tt.html("Class definition");
 			}
 			//make taller
 			// self.attr('y', 0)
@@ -2064,6 +2079,12 @@ function drawPolyFilterDesktop(el, _levelEngaged, _level1Selected){
 				var oldColor = self.attr('data-fill')
 				self.style('fill', oldColor)
 			 d3.selectAll("." + d.name.split(" ").join("_")).style('fill', oldColor)
+			}else {
+				var self = d3.select(this)
+				var oldColor = self.attr('data-fill')
+				self.style('fill', oldColor)
+			 d3.selectAll("." + d.name.split(" ").join("_")).style('fill', oldColor)
+				tt.style("display", "none");
 			}
 		})
 }
@@ -2109,6 +2130,8 @@ function drawPolyFilterTablet(el, _levelEngaged, _level1Selected){
 
 		yScale.domain(_.pluck(props, "name"))
 
+		var tt = d3.select("#legendHolder").append("div")	
+		    .attr("class", "legendTooltip");
 
 		svg.append("g")
 			.attr("class", "yx axis selector-axis")
@@ -2135,6 +2158,8 @@ function drawPolyFilterTablet(el, _levelEngaged, _level1Selected){
 		.on('click', function(d){
 			if (levelEngaged == 1){
 					dispatchLegendClick(d.name.toLowerCase())
+			}else {
+				window.open(window.location.origin+window.location.pathname+'about#'+d.name.replace(" ","_"))
 			}
 		})
 		//change colors on hover
@@ -2147,6 +2172,18 @@ function drawPolyFilterTablet(el, _levelEngaged, _level1Selected){
 				var newColor = shadeRGBColor(oldColor, -0.25)
 				self.style('fill', newColor)
 				d3.selectAll("." + d.name.split(" ").join("_")).style('fill', newColor)
+			}else {		
+				var self = d3.select(this)
+				//set old color so we can recover it
+				var oldColor = self.style('fill')
+				self.attr('data-fill', oldColor)
+				var newColor = shadeRGBColor(oldColor, -0.25)
+				self.style('fill', newColor)
+				d3.selectAll("." + d.name.split(" ").join("_")).style('fill', newColor)	
+                tt.style("left",d3.select(this).attr("x")+"px");
+                tt.style("top", d3.select(this).attr("y")+"px");
+                tt.style("display", "inline-block");
+                tt.html("Class definition");
 			}
 			//make taller
 			// self.attr('y', 0)
@@ -2158,6 +2195,12 @@ function drawPolyFilterTablet(el, _levelEngaged, _level1Selected){
 				var oldColor = self.attr('data-fill')
 				self.style('fill', oldColor)
 			 d3.selectAll("." + d.name.split(" ").join("_")).style('fill', oldColor)
+			}else {
+				var self = d3.select(this)
+				var oldColor = self.attr('data-fill')
+				self.style('fill', oldColor)
+			 d3.selectAll("." + d.name.split(" ").join("_")).style('fill', oldColor)
+				tt.style("display", "none");
 			}
 		})
 }
