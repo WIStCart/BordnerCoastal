@@ -2122,7 +2122,7 @@ function drawPolyFilterDesktop(el, _levelEngaged, _level1Selected){
 			if (levelEngaged == 1){
 					dispatchLegendClick(d.name.toLowerCase())
 			}else {
-				window.open(window.location.origin+window.location.pathname+'about#'+d.name.replace(" ","_"))
+				window.open(window.location.origin+window.location.pathname+'about#'+d.name.replace(/ /g, "_"))
 			}
 		})
 		//change colors on hover
@@ -2238,7 +2238,7 @@ function drawPolyFilterTablet(el, _levelEngaged, _level1Selected){
 			if (levelEngaged == 1){
 					dispatchLegendClick(d.name.toLowerCase())
 			}else {
-				window.open(window.location.origin+window.location.pathname+'about#'+d.name.replace(" ","_"))
+				window.open(window.location.origin+window.location.pathname+'about#'+d.name.replace(/ /g, "_"))
 			}
 		})
 		//change colors on hover

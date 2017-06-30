@@ -67,6 +67,20 @@
 			margin-right: 8px;
 			opacity: 0.7;
 		}
+		.selected-legend-element{
+			border: 5px solid #f7ff00;
+		}
+		.normal-legend-element{
+			border: 0px solid gray;
+			border-color: rgba(255, 255, 255, .15);
+			-webkit-transition: all 2s ease;
+			-moz-transition: all 2s ease;
+			-o-transition: all 2s ease;
+			transition: all 2s ease;
+		}
+		.transition-class{
+
+		}
 	</style>
 </head>
 
@@ -341,12 +355,15 @@
 		
 		<!-- Bordner Legend; #Legend -->
         <div class="row">
-			<div id="accordion" role="tablist" aria-multiselectable="true">
-            </div>
+			<div class="col-md-3">
+                <h3>Bordner Legend:</h3>
+            </div></br>
+			<a name="Legend"></a></br></br>
+			<div id="accordion" role="tablist" aria-multiselectable="true"></div>
         </div>
         <hr>
 
-		<!-- Bordner Legend; #Legend -->
+		<!-- Bordner Legend; #Legend 
         <div class="row">
 			<div id="accordion2" role="tablist" aria-multiselectable="true">
 				<div class="card" style="padding-left:10px; padding-right:10px;">
@@ -377,7 +394,7 @@
 				</div>
 			</div>
         </div>
-        <hr>
+        <hr>-->
 		
 		<!-- Funding; #Funding -->
         <div class="row">
@@ -455,59 +472,51 @@
 					augmentedDef =  '<li><b>YELLOW DEF. GENERAL: </b>' + augItem.General_Group + ": " + augItem.General_Group_Definition  + '</li>' +		
 									'<li><b>YELLOW DEF. CLASS: </b>' + augItem.Class_Name + ": " + augItem.Class_Definition  + '</li>' 					
 				}
-				var htmlInjection = '<div class="row">' +
-										'<div class="col-md-1">' +
-											'<a name="' + item.level2.replace(" ","_") + '" style="position: absolute; top:-100px;"></a>' +
-											'<div style="background-color:' + item.color2 + '; width:50px; height:30px; float:right;"></div>' +
-										'</div>' +
-										'<div class="col-md-11">' +
-											'<ul>' + 
-												'<li><b>MAP DEFINITION: </b>' + item.code + ": " + item.level1  + " - " + item.level2 + '</li>' + 
-												 augmentedDef +
-											'</ul>' +
-										'</div>' +
-									'</div>' +
-									'<div style="height:3px;"></div>'
-				//$( "#accordion" ).append( htmlInjection );
-
 				if (i+1 < tempClasses2.classes.length){
+					var level1Item = (item.level1).replace(/ /g, "_");
+					var level2Item = (item.level2).replace(/ /g, "_");
 					if (tempClasses2.classes[i]["level1"] == tempClasses2.classes[i+1]["level1"]){
 						// not last class in group
 						if (tempClasses2.classes[i]["level2"] == tempClasses2.classes[i+1]["level2"]){
 							// Multiple codes in group, list out the codes for use in definition
 						}else{
 							// Create level 2 definition
-							console.log(item.level2)
-							level2HTMl = level2HTMl + '<div style="background-color:' + item.color2 + '; width:50px; height:30px; float:left; padding-bottom:5px;"></div>' +
-							'<div style="width:10px; height:30px; float:left;"></div>' +
-							'<div style="color:gray; text-align:left;">' +
-								item.level2 + 
+							//console.log(item.level2)
+							level2HTMl = level2HTMl + 
+							'<div>' +
+								'<div id="' + level2Item + '" class="normal-legend-element transition-class" style="background-color:' + item.color2 + '; width:50px; height:30px; float:left; padding-bottom:5px;"></div>' +
+								'<div style="width:10px; height:30px; float:left;"></div>' +
+								'<div style="text-align:left;">' +
+									item.level2 + augmentedDef +
+								'</div>' + 
 							'</div><br/>'
 						}
 					}else{
 						// last class in group
-						console.log(item.level1 + " --- " + item.level2)
-						var level1Item = (item.level1).replace(/ /g, "_");
+						//console.log(item.level1 + " --- " + item.level2)
 						level1HTMl = level1HTMl + 
-						'<div class="card" style="padding-left:10px; padding-right:10px;">' +
+						'<div class="card" name="' + level1Item +'Scroll"style="padding-left:10px; padding-right:10px;">' +
 							'<div class="card-header" role="tab" id="headingOne">' +
 								'<a data-toggle="collapse" data-parent="#accordion2" href="#collapse' + level1Item + '" aria-expanded="false" aria-controls="collapse' + level1Item + '" style="text-decoration: none;">' +
 									'<div style="background-color:' + item.color1 + '; width:50px; height:30px; float:left; padding-bottom:5px;"></div>' +
 									'<div style="width:10px; height:30px; float:left;"></div>' +
-									'<div style="color:gray; text-align:left;">' +
-										item.level1 + //" --- " + item.level2 +
+									'<div style="text-align:left;">' +
+										item.level1 +
 									'</div>' +
 								'</a>' +
 							'</div>' +
+							'<a name="' + level1Item + '" style="position: absolute; top:-100px;"></a>' +
 							'</br>' +
 							'<div id="collapse' + level1Item + '" class="collapse" style="padding-left:70px;" name="' + level1Item + '" role="tabpanel" aria-labelledby="heading' + level1Item + '">' +
 								 '<div class="card-block">' +
 									level2HTMl +
-									'<div style="background-color:' + item.color2 + '; width:50px; height:30px; float:left; padding-bottom:5px;"></div>' +
-									'<div style="width:10px; height:30px; float:left;"></div>' +
-									'<div style="color:gray; text-align:left;">' +
-										item.level2 +
-									'</div><br/>' + 
+									'<div>' +
+										'<div id="' + level2Item + '" class="normal-legend-element transition-class" style="background-color:' + item.color2 + '; width:50px; height:30px; float:left; padding-bottom:5px;"></div>' +
+										'<div style="width:10px; height:30px; float:left;"></div>' +
+										'<div style="text-align:left;">' +
+											item.level2 + augmentedDef +
+										'</div>' + 
+									'</div><br/>' +
 								'</div>' +
 							'</div>' + 
 						'</div>'
@@ -517,33 +526,26 @@
 			}
 			$( "#accordion" ).append( level1HTMl );
 		});
-				/*<div class="card" style="padding-left:10px; padding-right:10px;">
-					<div class="card-header" role="tab" id="headingOne">
-						<a data-toggle="collapse" data-parent="#accordion2" href="#collapseOne" aria-expanded="false" aria-controls="collapseOne" style="text-decoration: none;">
-							<div style="background-color:#aac459; width:50px; height:30px; float:left; padding-bottom:5px;"></div>
-							<div style="width:10px; height:30px; float:left;"></div>
-							<div style="color:gray; text-align:left;">
-								Level 1 Class Definition: Anim pariatur cliche reprehenderit, enim eiusmod high life accusamus terry richardson ad squid. 3 wolf moon officia aute, non cupidatat skateboard dolor brunch. Food truck quinoa nesciunt laborum eiusmod.
-							</div>
-						</a>
-					</div>
-					</br>
-					<div id="collapseOne" class="collapse" style="padding-left:70px;" name="XXXX" role="tabpanel" aria-labelledby="headingOne">
-						 <div class="card-block">
-							<div style="background-color:#aac459; width:50px; height:30px; float:left; padding-bottom:5px;"></div>
-							<div style="width:10px; height:30px; float:left;"></div>
-							<div style="color:gray; text-align:left;">
-								Level 2 Class Definition: Anim pariatur cliche reprehenderit, enim eiusmod high life accusamus terry richardson ad squid. 3 wolf moon officia aute, non cupidatat skateboard dolor brunch. Food truck quinoa nesciunt laborum eiusmod.
-							</div>
-						</div>
-					</div>
-				</div>*/
-		var url = document.location.toString();
-		console.log(location.hash)
-		if (url.match('#') ) {
-			console.log('[name="'+ url.split('#')[1] +'"]')
-			$('[name="'+ url.split('#')[1] +'"]').addClass('in');
-		}
+		$(document).ready(function() {
+			var url = document.location.toString();
+			if (url.match('#') ) {
+				for(var i = 0; i < tempClasses2.classes.length; i++) {
+					if ((tempClasses2.classes[i]["level2"]).replace(/ /g, "_") == url.split('#')[1]){
+						$('[name="'+ (tempClasses2.classes[i]["level1"]).replace(/ /g, "_") +'"]').addClass('in');	
+						$('html, body').animate({
+						   'scrollTop':   $('[name="' + (tempClasses2.classes[i]["level1"]).replace(/ /g, "_") + 'Scroll"]').offset().top - 100
+						}, 1000);
+						$('#' + url.split('#')[1]).addClass('selected-legend-element')
+						$('#' + url.split('#')[1]).removeClass('normal-legend-element')
+						setTimeout(function(){ 
+							$('#' + url.split('#')[1]).removeClass('selected-legend-element')
+							$('#' + url.split('#')[1]).addClass('normal-legend-element')						
+						}, 3000);
+						break;
+					}
+				}
+			}
+		});
 	</script>
 </body>
 
