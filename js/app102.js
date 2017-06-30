@@ -1447,6 +1447,7 @@ function turnOnFeatureType(featureTypeCalled){
 			}else{
 				showOnlyPolygons();
 				$("#rangeSlider").slider('setValue', layerOpacity*100);
+				bordner.setOpacity(layerOpacity);
 				dispatchLegendClick(cachedLevel1Selection)
 			}
 			break;
