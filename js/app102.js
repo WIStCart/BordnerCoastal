@@ -208,14 +208,14 @@ function getPointCSS(pointTypeSelected, zoomIn){
 	}else{
 		style = "#layer{marker-opacity: 0; marker-width: 0;"
 		for (var i=0; i < pointLegend.length; i++){
-			var thisPointType = pointLegend[i].type;
+			var thisPointType = pointLegend[i].group;
 			var thisMinZoom = pointLegend[i].minZoom;
 			var thisMaxZoom = pointLegend[i].maxZoom;
 			if (pointTypeSelected.toLowerCase() === thisPointType.toLowerCase()){
-				if (thisPointType == "VH" || thisPointType == "OH" || thisPointType == "SH" || thisPointType == "O"){
-					var thisStyle = "[point_type='" + thisPointType + "']{marker-opacity: 1; marker-file: url(" + pointLegend[i].icon + "); marker-allow-overlap: true; marker-opacity: 1;[zoom =7]{marker-width:1;}[zoom >=8]{ marker-width:1.5;}[zoom >=9]{marker-width:2;}[zoom >=10]{marker-width:3;}[zoom >=11]{marker-width:3.5;marker-allow-overlap: false;}[zoom >=12]{marker-width: 10;}[zoom >=13]{marker-width: 12;  marker-allow-overlap: false;}[zoom >=14]{marker-width: 14;}[zoom >=15]{marker-width: 16;}[zoom >=16]{marker-width: 19;}[zoom >=17]{marker-width: 21;}[zoom >=18]{marker-width: 23;} "+ pointLegend[i].otherCSS; 
+				if (thisPointType == "Vacant House" || thisPointType == "Occupied House" || thisPointType == "Summer Home" || thisPointType == "Orchard"){
+					var thisStyle = "[point_type='" + pointLegend[i].type + "']{marker-opacity: 1; marker-file: url(" + pointLegend[i].icon + "); marker-allow-overlap: true; marker-opacity: 1;[zoom =7]{marker-width:1;}[zoom >=8]{ marker-width:1.5;}[zoom >=9]{marker-width:2;}[zoom >=10]{marker-width:3;}[zoom >=11]{marker-width:3.5;marker-allow-overlap: false;}[zoom >=12]{marker-width: 10;}[zoom >=13]{marker-width: 12;  marker-allow-overlap: false;}[zoom >=14]{marker-width: 14;}[zoom >=15]{marker-width: 16;}[zoom >=16]{marker-width: 19;}[zoom >=17]{marker-width: 21;}[zoom >=18]{marker-width: 23;} "+ pointLegend[i].otherCSS; 
 				}else {
-					var thisStyle = "[point_type='" + thisPointType + "']{marker-opacity: 1; marker-file: url(" + pointLegend[i].icon + "); marker-allow-overlap: true; marker-opacity: 1;[zoom =7]{marker-width:4;}[zoom <9]{ marker-width:4;}[zoom >=9]{marker-width:8;}[zoom >=10]{marker-width:8;}[zoom >=11]{marker-width:8;}[zoom >=12]{marker-width: 10;}[zoom >=13]{marker-width: 12;}[zoom >=14]{marker-width: 14;}[zoom >=15]{marker-width: 16;}[zoom >=16]{marker-width: 19;}[zoom >=17]{marker-width: 21;}[zoom >=18]{marker-width: 23;} "+ pointLegend[i].otherCSS; 
+					var thisStyle = "[point_type='" + pointLegend[i].type + "']{marker-opacity: 1; marker-file: url(" + pointLegend[i].icon + "); marker-allow-overlap: true; marker-opacity: 1;[zoom =7]{marker-width:4;}[zoom <9]{ marker-width:4;}[zoom >=9]{marker-width:8;}[zoom >=10]{marker-width:8;}[zoom >=11]{marker-width:8;}[zoom >=12]{marker-width: 10;}[zoom >=13]{marker-width: 12;}[zoom >=14]{marker-width: 14;}[zoom >=15]{marker-width: 16;}[zoom >=16]{marker-width: 19;}[zoom >=17]{marker-width: 21;}[zoom >=18]{marker-width: 23;} "+ pointLegend[i].otherCSS; 
 				}
 				
 				if (window["basemapParam"] == 'satellite'){
@@ -2781,18 +2781,19 @@ function listenToLineLegend(){
 
 function showNoLines(){
 	var lineStyle = getLineCSS("none");
-	lines.setCartoCSS(lineStyle)
+	lines.setCartoCSS(lineStyle);
 }
 
 function showAllLines(){
 	var lineStyle = getLineCSS("all", map.getZoom());
-	lines.setCartoCSS(lineStyle)
-	lines.bringToFront()
+	lines.setCartoCSS(lineStyle);
+	lines.bringToFront();
 }
 
 function showOneLine(lineType){
 	var lineStyle = getLineCSS(lineType);
 	lines.setCartoCSS(lineStyle);
+	lines.bringToFront();
 }
 
 function drawPointLegend(){
@@ -2812,7 +2813,7 @@ function drawPointLegend(){
 
 function listenToPointLegend(){
 	$(".legend-item").click(function(){
-		var clickedType = $(this).data('type')
+		var clickedType = $(this).data('group')
 		var clickedName = $(this).data('name')
 		pointTypeSelected = clickedType;
 		$(".legend-media").removeClass('active');
@@ -2860,24 +2861,25 @@ function listenToPolyLegend(){
 
 function showNoPoints(){
 	var pointStyle = getPointCSS("none");
-	points.setCartoCSS(pointStyle)
+	points.setCartoCSS(pointStyle);
 }
 function showAllPoints(){
 	var pointStyle = getPointCSS("all", map.getZoom());
-	points.setCartoCSS(pointStyle)
-	points.bringToFront()
+	points.setCartoCSS(pointStyle);
+	points.bringToFront();
 	console.log(basemapChoice);
 }
 
 function showOnePoint(pointType){
 	var pointStyle = getPointCSS(pointType);
-	points.setCartoCSS(pointStyle)
+	points.setCartoCSS(pointStyle);
+	points.bringToFront();
 }
 
 
 
 function makePointOrLineLegendItem(item){
-	var legendItem = "<div class='col-xs-6 col-sm-3 col-md-3 col-lg-2 legend-item'  data-type='" + item.type + "' data-name='" + item.name + "'>"
+	var legendItem = "<div class='col-xs-6 col-sm-3 col-md-3 col-lg-2 legend-item'  data-type='" + item.type + "' data-name='" + item.name + "' data-group='" + item.group + "'>"
 	legendItem += "<div class='media legend-media'>"
 	legendItem += "<div class='media-left'><img class='media-object' src='" + item.icon + "'/></div>"
 	legendItem += "<div class='media-body'>" + item.name + "</div>"
