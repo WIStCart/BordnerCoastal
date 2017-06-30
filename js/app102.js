@@ -1452,7 +1452,6 @@ function turnOnFeatureType(featureTypeCalled){
 			break;
 		case "featureLines":
 			legendType = "lines"
-			$("#legend-header").text("Line Features")
 			manageURLToLines();
 			drawLineLegend();
 			if ((typeof(bordner) == "undefined") || (typeof(points) == "undefined")){
@@ -1464,11 +1463,11 @@ function turnOnFeatureType(featureTypeCalled){
 				hideLevel1Label();
 				$("#legend-back").hide();
 			}
+			$("#legend-header").text("Line Features").show();
 			break;
 		case "featurePoints":
 			replaceQueryValue("featureType", "points");
 			legendType = "points"
-			$("#legend-header").text("Point Features")
 			manageURLToPoints();
 			drawPointLegend();
 			if ((typeof(lines) == "undefined") || (typeof(bordner) == "undefined")){
@@ -1480,6 +1479,7 @@ function turnOnFeatureType(featureTypeCalled){
 				hideLevel1Label();
 				$("#legend-back").hide();
 			}
+			$("#legend-header").text("Point Features").show();
 			break;
 		default:
 			console.log("unidentified feature type called")
