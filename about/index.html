@@ -469,8 +469,8 @@
 				var augmentedDef = ""
 				if(yellowDocClassDefinitions[item.code]){
 					var augItem = yellowDocClassDefinitions[item.code]
-					augmentedDef =  '<li><b>YELLOW DEF. GENERAL: </b>' + augItem.General_Group + ": " + augItem.General_Group_Definition  + '</li>' +		
-									'<li><b>YELLOW DEF. CLASS: </b>' + augItem.Class_Name + ": " + augItem.Class_Definition  + '</li>' 					
+					augmentedDef =  '<p><b>' + augItem.Class_Name + "</b>: " + augItem.Class_Definition  + '</p>'  //'<li><b>YELLOW DEF. GENERAL: </b>' + augItem.General_Group + ": " + augItem.General_Group_Definition  + '</li>' +		
+														
 				}
 				if (i+1 < tempClasses2.classes.length){
 					var level1Item = (item.level1).replace(/ /g, "_");
@@ -486,7 +486,7 @@
 							'<div>' +
 								'<div id="' + level2Item + '" class="normal-legend-element transition-class" style="background-color:' + item.color2 + '; width:50px; height:30px; float:left; padding-bottom:5px;"></div>' +
 								'<div style="width:10px; height:30px; float:left;"></div>' +
-								'<div style="text-align:left;">' +
+								'<div style="text-align:left; color:gray;">' +
 									item.level2 + augmentedDef +
 								'</div>' + 
 							'</div><br/>'
@@ -500,7 +500,7 @@
 								'<a data-toggle="collapse" data-parent="#accordion2" href="#collapse' + level1Item + '" aria-expanded="false" aria-controls="collapse' + level1Item + '" style="text-decoration: none;">' +
 									'<div style="background-color:' + item.color1 + '; width:50px; height:30px; float:left; padding-bottom:5px;"></div>' +
 									'<div style="width:10px; height:30px; float:left;"></div>' +
-									'<div style="text-align:left;">' +
+									'<div style="text-align:left; color:gray;">' +
 										item.level1 +
 									'</div>' +
 								'</a>' +
@@ -513,7 +513,7 @@
 									'<div>' +
 										'<div id="' + level2Item + '" class="normal-legend-element transition-class" style="background-color:' + item.color2 + '; width:50px; height:30px; float:left; padding-bottom:5px;"></div>' +
 										'<div style="width:10px; height:30px; float:left;"></div>' +
-										'<div style="text-align:left;">' +
+										'<div style="text-align:left; color:gray;">' +
 											item.level2 + augmentedDef +
 										'</div>' + 
 									'</div><br/>' +
