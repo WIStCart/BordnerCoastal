@@ -478,6 +478,56 @@ var cartoCSSLines = getLineCSS('none')
 
 	});
 
+
+	//add state boundary
+	var cartoCSSState = "#layer {"+
+  	"::case {"+
+    "line-color:#d9d9d9;"+
+    "[zoom < 7]{line-width:5;}"+
+    "[zoom >= 7]{line-width:6;}"+
+    "[zoom >= 9]{line-width:7;}"+
+    "[zoom >= 10]{line-width:9;}"+
+    "[zoom >= 11]{line-width:11;}"+
+    "[zoom >= 12]{line-width:13;}"+
+    "[zoom >= 13]{line-width:15;}"+
+    "[zoom >= 14]{line-width:17;}"+
+    "[zoom >= 15]{line-width:19;}"+
+    "[zoom >= 16]{line-width:21;}"+
+    "[zoom >= 17]{line-width:23;}"+
+    "[zoom >= 18]{line-width:25;}"+
+  	"}"+
+  	"::fill {"+
+    "line-color:#ff9595;"+
+    "[zoom < 7]{line-width:2;}"+
+    "[zoom >= 7]{line-width:2.5;}"+
+	"[zoom >= 9]{line-width:3;}"+
+    "[zoom >= 10]{line-width:3.5;}"+
+    "[zoom >= 11]{line-width:4;}"+
+    "[zoom >= 12]{line-width:4.5;}"+
+    "[zoom >= 13]{line-width:5;}"+
+    "[zoom >= 14]{line-width:5.5;}"+
+    "[zoom >= 15]{line-width:6;}"+
+    "[zoom >= 16]{line-width:6.5;}"+
+    "[zoom >= 17]{line-width:7;}"+
+    "[zoom >= 18]{line-width:7.5;}"+
+  	"}"+
+	"}"+
+
+	cartodb.createLayer(map, {
+      user_name: 'sco-admin',
+      type: 'cartodb',
+      sublayers: [{type: "cartodb",
+			sql: 'SELECT * FROM final_coastal_state_boundary',
+			cartocss: cartoCSSState,
+			layerIndex:8
+	}]
+	}, { https: true })
+	.addTo(map)
+	.done(function(layer){
+		console.log(layer);
+
+	});
+
 	// add bordner layer
 	createStyles()
 	cartoCSSRules = getPolyStyle("level1");
