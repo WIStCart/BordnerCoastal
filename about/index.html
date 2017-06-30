@@ -341,60 +341,40 @@
 		
 		<!-- Bordner Legend; #Legend -->
         <div class="row">
-            <div class="col-md-3">
-				<a name="Legend" style="position: absolute; top:-100px;"></a>
-                <h3>Bordner Legend:</h3>
+			<div id="accordion" role="tablist" aria-multiselectable="true">
             </div>
         </div>
-		<div id="legendDiv"></div>
         <hr>
 
 		<!-- Bordner Legend; #Legend -->
         <div class="row">
-			<div id="accordion" role="tablist" aria-multiselectable="true">
-			  <div class="card">
-				<div class="card-header" role="tab" id="headingOne">
-				  <h5 class="mb-0">
-					<a data-toggle="collapse" name="XXXX" data-parent="#accordion" href="#collapseOne" aria-expanded="false" aria-controls="collapseOne">
-					  Collapsible Group Item #1
-					</a>
-				  </h5>
+			<div id="accordion2" role="tablist" aria-multiselectable="true">
+				<div class="card" style="padding-left:10px; padding-right:10px;">
+					<div class="card-header" role="tab" id="headingOne">
+						<a data-toggle="collapse" data-parent="#accordion2" href="#collapseOne" aria-expanded="false" aria-controls="collapseOne" style="text-decoration: none;">
+							<div style="background-color:#aac459; width:50px; height:30px; float:left; padding-bottom:5px;"></div>
+							<div style="width:10px; height:30px; float:left;"></div>
+							<div style="color:gray; text-align:left;">
+								Level 1 Class Definition: Anim pariatur cliche reprehenderit, enim eiusmod high life accusamus terry richardson ad squid. 3 wolf moon officia aute, non cupidatat skateboard dolor brunch. Food truck quinoa nesciunt laborum eiusmod.
+							</div>
+						</a>
+					</div>
+					</br>
+					<div id="collapseOne" class="collapse" style="padding-left:70px;" name="XXXX" role="tabpanel" aria-labelledby="headingOne">
+						 <div class="card-block">
+							<div style="background-color:#aac459; width:50px; height:30px; float:left; padding-bottom:5px;"></div>
+							<div style="width:10px; height:30px; float:left;"></div>
+							<div style="color:gray; text-align:left;">
+								Level 2 Class Definition: Anim pariatur cliche reprehenderit, enim eiusmod high life accusamus terry richardson ad squid. 3 wolf moon officia aute, non cupidatat skateboard dolor brunch. Food truck quinoa nesciunt laborum eiusmod.
+							</div>
+							<div style="background-color:#aac459; width:50px; height:30px; float:left; padding-bottom:5px;"></div>
+							<div style="width:10px; height:30px; float:left;"></div>
+							<div style="color:gray; text-align:left;">
+								Level 2 Class Definition: Anim pariatur cliche reprehenderit, enim eiusmod high life accusamus terry richardson ad squid. 3 wolf moon officia aute, non cupidatat skateboard dolor brunch. Food truck quinoa nesciunt laborum eiusmod.
+							</div>
+						</div>
+					</div>
 				</div>
-
-				<div id="collapseOne" class="collapse" role="tabpanel" aria-labelledby="headingOne">
-				  <div class="card-block">
-					Anim pariatur cliche reprehenderit, enim eiusmod high life accusamus terry richardson ad squid. 3 wolf moon officia aute, non cupidatat skateboard dolor brunch. Food truck quinoa nesciunt laborum eiusmod. Brunch 3 wolf moon tempor, sunt aliqua put a bird on it squid single-origin coffee nulla assumenda shoreditch et. Nihil anim keffiyeh helvetica, craft beer labore wes anderson cred nesciunt sapiente ea proident. Ad vegan excepteur butcher vice lomo. Leggings occaecat craft beer farm-to-table, raw denim aesthetic synth nesciunt you probably haven't heard of them accusamus labore sustainable VHS.
-				  </div>
-				</div>
-			  </div>
-			  <div class="card">
-				<div class="card-header" role="tab" id="headingTwo">
-				  <h5 class="mb-0">
-					<a class="collapsed" data-toggle="collapse" data-parent="#accordion" href="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
-					  Collapsible Group Item #2
-					</a>
-				  </h5>
-				</div>
-				<div id="collapseTwo" class="collapse" role="tabpanel" aria-labelledby="headingTwo">
-				  <div class="card-block">
-					Anim pariatur cliche reprehenderit, enim eiusmod high life accusamus terry richardson ad squid. 3 wolf moon officia aute, non cupidatat skateboard dolor brunch. Food truck quinoa nesciunt laborum eiusmod. Brunch 3 wolf moon tempor, sunt aliqua put a bird on it squid single-origin coffee nulla assumenda shoreditch et. Nihil anim keffiyeh helvetica, craft beer labore wes anderson cred nesciunt sapiente ea proident. Ad vegan excepteur butcher vice lomo. Leggings occaecat craft beer farm-to-table, raw denim aesthetic synth nesciunt you probably haven't heard of them accusamus labore sustainable VHS.
-				  </div>
-				</div>
-			  </div>
-			  <div class="card">
-				<div class="card-header" role="tab" id="headingThree">
-				  <h5 class="mb-0">
-					<a class="collapsed" data-toggle="collapse" data-parent="#accordion" href="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
-					  Collapsible Group Item #3
-					</a>
-				  </h5>
-				</div>
-				<div id="collapseThree" class="collapse" role="tabpanel" aria-labelledby="headingThree">
-				  <div class="card-block">
-					Anim pariatur cliche reprehenderit, enim eiusmod high life accusamus terry richardson ad squid. 3 wolf moon officia aute, non cupidatat skateboard dolor brunch. Food truck quinoa nesciunt laborum eiusmod. Brunch 3 wolf moon tempor, sunt aliqua put a bird on it squid single-origin coffee nulla assumenda shoreditch et. Nihil anim keffiyeh helvetica, craft beer labore wes anderson cred nesciunt sapiente ea proident. Ad vegan excepteur butcher vice lomo. Leggings occaecat craft beer farm-to-table, raw denim aesthetic synth nesciunt you probably haven't heard of them accusamus labore sustainable VHS.
-				  </div>
-				</div>
-			  </div>
 			</div>
         </div>
         <hr>
@@ -465,7 +445,8 @@
 			$('[data-toggle="tooltip"]').tooltip(); 
 			console.log(tempClasses2)
 			console.log(yellowDocClassDefinitions)
-			
+			var level2HTMl = ""
+			var level1HTMl = ""
 			for(var i = 0; i < tempClasses2.classes.length; i++) {
 				var item = tempClasses2.classes[i];
 				var augmentedDef = ""
@@ -487,9 +468,82 @@
 										'</div>' +
 									'</div>' +
 									'<div style="height:3px;"></div>'
-				$( "#legendDiv" ).append( htmlInjection );
+				//$( "#accordion" ).append( htmlInjection );
+
+				if (i+1 < tempClasses2.classes.length){
+					if (tempClasses2.classes[i]["level1"] == tempClasses2.classes[i+1]["level1"]){
+						// not last class in group
+						if (tempClasses2.classes[i]["level2"] == tempClasses2.classes[i+1]["level2"]){
+							// Multiple codes in group, list out the codes for use in definition
+						}else{
+							// Create level 2 definition
+							console.log(item.level2)
+							level2HTMl = level2HTMl + '<div style="background-color:' + item.color2 + '; width:50px; height:30px; float:left; padding-bottom:5px;"></div>' +
+							'<div style="width:10px; height:30px; float:left;"></div>' +
+							'<div style="color:gray; text-align:left;">' +
+								item.level2 + 
+							'</div><br/>'
+						}
+					}else{
+						// last class in group
+						console.log(item.level1 + " --- " + item.level2)
+						var level1Item = (item.level1).replace(/ /g, "_");
+						level1HTMl = level1HTMl + 
+						'<div class="card" style="padding-left:10px; padding-right:10px;">' +
+							'<div class="card-header" role="tab" id="headingOne">' +
+								'<a data-toggle="collapse" data-parent="#accordion2" href="#collapse' + level1Item + '" aria-expanded="false" aria-controls="collapse' + level1Item + '" style="text-decoration: none;">' +
+									'<div style="background-color:' + item.color1 + '; width:50px; height:30px; float:left; padding-bottom:5px;"></div>' +
+									'<div style="width:10px; height:30px; float:left;"></div>' +
+									'<div style="color:gray; text-align:left;">' +
+										item.level1 + //" --- " + item.level2 +
+									'</div>' +
+								'</a>' +
+							'</div>' +
+							'</br>' +
+							'<div id="collapse' + level1Item + '" class="collapse" style="padding-left:70px;" name="' + level1Item + '" role="tabpanel" aria-labelledby="heading' + level1Item + '">' +
+								 '<div class="card-block">' +
+									level2HTMl +
+									'<div style="background-color:' + item.color2 + '; width:50px; height:30px; float:left; padding-bottom:5px;"></div>' +
+									'<div style="width:10px; height:30px; float:left;"></div>' +
+									'<div style="color:gray; text-align:left;">' +
+										item.level2 +
+									'</div><br/>' + 
+								'</div>' +
+							'</div>' + 
+						'</div>'
+						level2HTMl = ""
+					}
+				}
 			}
+			$( "#accordion" ).append( level1HTMl );
 		});
+				/*<div class="card" style="padding-left:10px; padding-right:10px;">
+					<div class="card-header" role="tab" id="headingOne">
+						<a data-toggle="collapse" data-parent="#accordion2" href="#collapseOne" aria-expanded="false" aria-controls="collapseOne" style="text-decoration: none;">
+							<div style="background-color:#aac459; width:50px; height:30px; float:left; padding-bottom:5px;"></div>
+							<div style="width:10px; height:30px; float:left;"></div>
+							<div style="color:gray; text-align:left;">
+								Level 1 Class Definition: Anim pariatur cliche reprehenderit, enim eiusmod high life accusamus terry richardson ad squid. 3 wolf moon officia aute, non cupidatat skateboard dolor brunch. Food truck quinoa nesciunt laborum eiusmod.
+							</div>
+						</a>
+					</div>
+					</br>
+					<div id="collapseOne" class="collapse" style="padding-left:70px;" name="XXXX" role="tabpanel" aria-labelledby="headingOne">
+						 <div class="card-block">
+							<div style="background-color:#aac459; width:50px; height:30px; float:left; padding-bottom:5px;"></div>
+							<div style="width:10px; height:30px; float:left;"></div>
+							<div style="color:gray; text-align:left;">
+								Level 2 Class Definition: Anim pariatur cliche reprehenderit, enim eiusmod high life accusamus terry richardson ad squid. 3 wolf moon officia aute, non cupidatat skateboard dolor brunch. Food truck quinoa nesciunt laborum eiusmod.
+							</div>
+						</div>
+					</div>
+				</div>*/
+		var url = document.location.toString();
+		console.log(location.hash)
+		if (url.match('#') ) {
+			console.log('[name="'+ url.split('#')[1] +'"]')
+			$('[name="'+ url.split('#')[1] +'"]').addClass('in');
+		}
 	</script>
 </body>
 
