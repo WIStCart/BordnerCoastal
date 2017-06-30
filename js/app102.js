@@ -1464,7 +1464,7 @@ function refreshPoints(){
 // Media query for when the app traverses the tablet/desktop threshold
 var jsMediaQuery = function() {
 	console.log("Called")
-	if (window.matchMedia('(max-width: 768px)').matches){
+	if (window.matchMedia('(max-width: 767px)').matches){
 			desktopMode = false;
 			console.log("~~ tablet mode engaged")
 			console.log("Transforming to tablet")
