@@ -23,11 +23,6 @@ body{
 	background-color: #041e2b;
 }
 
-
-
-
-
-
 /* apply this class for animation transitions between classes */
 .transition-class{
     -webkit-transition: all 0.5s ease;
@@ -161,7 +156,8 @@ body{
 		background-color: rgba(0,0,0,.25) !important;
 	}
 	.map-view{
-		height: 100vh !important;
+		//height: 100vh !important;
+		height: 100%!important;
 	}
 	#legendButton{
 		visibility: visible;
@@ -214,6 +210,10 @@ body{
 		transform:  rotate(-90deg);
 		text-align-last: left;
 		left: 50%;
+	}
+	.leaflet-control-zoom.leaflet-bar.leaflet-control {
+	    visibility: hidden;
+		height: 0px;
 	}
 }
 
@@ -400,6 +400,13 @@ body{
 	height: 500px;
 }
 
+/* share permanent URL in modal */
+.form-control {
+    margin-bottom: 5px;
+}
+.form-control-share-button {
+	margin-right: 5px !important;
+}
 
 /* leaflet customized css */
 .radio, .checkbox{
@@ -407,7 +414,10 @@ body{
 	font-size: 8pt;
 	height: 10px;
 	line-height: 2;
-	margin-top: 5px;
+	margin-top: 2px;
+}
+.checkbox-label-density {
+    padding-left: 10px !important;
 }
 
 /* leaflet customized css */

@@ -1309,7 +1309,7 @@ function setUpMap(){
 				'<label><input type="checkbox" name="overlayType" id="density1">Coverage 1 Density</label>' +
 			'</div>' +
 			'<div id="densityLegend" class="checkbox" style="display:none">' +
-				'<label><img src="https://maps.sco.wisc.edu/BordnerCoastal/BordnerIcon/pattern4.png" class="densityLegend"> Good</label><label><img src="https://maps.sco.wisc.edu/BordnerCoastal/BordnerIcon/pattern3.png" class="densityLegend"> Medium</label><label><img src="https://maps.sco.wisc.edu/BordnerCoastal/BordnerIcon/pattern2.png" class="densityLegend"> Poor</label><label><img src="https://maps.sco.wisc.edu/BordnerCoastal/BordnerIcon/pattern1.png" class="densityLegend"> Scattered</label>' +
+				'<label><img src="https://maps.sco.wisc.edu/BordnerCoastal/BordnerIcon/pattern4.png" class="densityLegend"> Good</label><label class="checkbox-label-density"><img src="https://maps.sco.wisc.edu/BordnerCoastal/BordnerIcon/pattern3.png" class="densityLegend"> Medium</label><label  class="checkbox-label-density"><img src="https://maps.sco.wisc.edu/BordnerCoastal/BordnerIcon/pattern2.png" class="densityLegend"> Poor</label><label  class="checkbox-label-density"><img src="https://maps.sco.wisc.edu/BordnerCoastal/BordnerIcon/pattern1.png" class="densityLegend"> Scattered</label>' +
 			'</div>' +
 			'<label class="legend-label">Basemap</label>' +
 			'<div class="radio">' +
@@ -1760,7 +1760,7 @@ function dispatchButtonClick(e, buttonClicked){
 			openLayerListTablet();
 			return
 		} else if (buttonClicked == "infoButton"){
-			 configInfoShareModal();
+			 $("#aboutModal").modal('show');
 			 return
 		}else if (buttonClicked == "shareButton"){
 			 configInfoShareModal();
