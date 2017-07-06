@@ -79,13 +79,11 @@
 			transition: all 2s ease;
 		}
 		.transition-class{
-
+			pointer-events: none;
+			cursor: none;
 		}
 		#tocIcon{
 			margin-left: 15px;
-		}
-		.toc-button{
-			// nothing yet;
 		}
 	</style>
 </head>
@@ -508,7 +506,7 @@
 									'<div style="width:10px; height:30px; float:left;"></div>' +
 									'<div style="text-align:left; color:gray;">' +
 										item.level1 +
-										'<span class="toc-button transition-class" id="tocButton'+ level1Item +'Scroll">' +
+										'<span class="transition-class" id="tocButton'+ level1Item +'Scroll">' +
 											'<span id="tocIcon" class="icon-class glyphicon glyphicon-chevron-down transition-class"></span>' +
 										'</span>' +	
 									'</div>' +	
