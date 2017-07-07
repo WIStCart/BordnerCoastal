@@ -67,7 +67,12 @@
   <div id="legendModal" class="modal fade" role="dialog">
     <div class="modal-dialog" role="document">
       <div class="modal-content">
-        <h3 class='page-header' id='legendModalHeader'>The Legend</h3>
+        <h3 class='page-header'>
+			<div id='legendModalHeader'>The Legend</div>
+			<button type="button" class="close legend-close-btn" data-dismiss="modal" aria-label="Close">
+				<span aria-hidden="true">&times;</span>
+			</button>
+		</h3>
         <div class="modal-body" id="legendModalBody">
           <div id='modal-layerListHolder'></div>
         </div>

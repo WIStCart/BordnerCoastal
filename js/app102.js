@@ -2920,9 +2920,9 @@ function switchLevel(_levelEngaged, _level1Selected){
 		sublayer2.setCartoCSS(cartoCSSRules)
 		sublayer2.setInteraction(true)
 		displayLevel1Label(_level1Selected)
-		if (!desktopMode){
-			$("#legendModalHeader").text(titleCase(_level1Selected))
-		}
+		//if (!desktopMode){
+			//$("#legendModalHeader").text(titleCase(_level1Selected))
+		//}
 	}else{
 		sublayer1.show();
 		sublayer2.hide();

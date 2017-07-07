@@ -8,6 +8,9 @@ body{
 .layer-list-close-btn {
     margin-top: -10px;
 }
+.legend-close-btn{
+	margin-top: -31px;
+}
 .stylescroll::-webkit-scrollbar-track
 {
 	-webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3);
