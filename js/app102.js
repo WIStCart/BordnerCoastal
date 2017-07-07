@@ -1280,8 +1280,12 @@ function setUpMap(){
 	  $('.leaflet-pelias-search-icon').attr("data-toggle", "tooltip").attr("title","Search")
 	$("#layerList")
 		.html(
-		'<button class="btn btn-primary btn-sm btn-close layer-list-close-btn pull-right"><span class="glyphicon glyphicon-remove"></span></button>' +
-		'<h4 class="layer-list-header">Table of Contents</h4>' +
+		//'<button class="btn btn-primary btn-sm btn-close layer-list-close-btn pull-right"><span class="glyphicon glyphicon-remove"></span></button>' +
+		'<h4 class="layer-list-header">Table of Contents' +
+		'<button type="button" class="close layer-list-close-btn" data-dismiss="modal" aria-label="Close">' +
+			'<span aria-hidden="true">&times;</span>' +
+		'</button>' +
+		'</h4>' +
 		'<div class="col-xs-12" id="layerListBody">' +
 		'<label class="legend-label">Feature Type</label>' +
 			'<div class="feature-type-radio-group">' +
