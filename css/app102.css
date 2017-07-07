@@ -153,6 +153,20 @@ body{
 
 /* for css when *TABLET* mode is engaged */
 @media (max-width: 767px){
+	#level1Label {
+		position: relative !important;
+		top: 0px !important;
+		left: 0px !important;
+		font-size: 12pt !important;
+		margin-top: 0px !important;
+		margin-bottom: 5px !important;
+	}
+	#legendModalBody{
+		padding-top: 5px !important;
+	}
+	.layer-list-close-btn {
+		margin-top: -5px;
+	}
 	.toc-view{
 		background-color:  rgba(255,255,255,0) !important;
 	}

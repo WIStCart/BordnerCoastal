@@ -1693,6 +1693,7 @@ function transformToDesktop(){
 	isLegendOpen = true;
 
 	$("#legend-back").removeClass("col-xs-8").addClass("col-sm-2")
+	$("#level1Label").insertAfter("#legend-back");
 	// if (typeof(bordner) != "undefined"){
 	// 	//happens tablet --> desktop
 	// 	setupInfoWindow(bordner);
@@ -1715,6 +1716,7 @@ function transformToTablet(){
 	map.invalidateSize()
 
 	$("#legend-back").addClass("col-xs-8").removeClass("col-sm-2")
+	$("#level1Label").prependTo("#legend");
 }
 
 function mailTheView(e,clickID){
@@ -1893,7 +1895,7 @@ function displayUserLocation(pos){
 
 // Whenever the modal is closed...
 $('.modal').on('hidden.bs.modal', function () {
-	$("#map").append($(".leaflet-control-container").addClass( "leaflet-control-container-tablet-custom" ));
+	//$("#map").append($(".leaflet-control-container").addClass( "leaflet-control-container-tablet-custom" ));
 	$( "#legend" ).removeClass( "legend-off" );
 })
 
@@ -2712,12 +2714,14 @@ function dispatchLegendClick(level1Selected){
 		//go from level one to level 2
 		levelEngaged = 2;
 		$("#legend-back").show();
+		$("#level1Label").show();
 		$("#legend-header").hide();
 		replaceQueryValue("polygonFilter", level1Selected.split(" ").join("_"))
 	}else{
 		//go from level 2 to level 1
 		levelEngaged = 1;
 		$("#legend-back").hide();
+		$("#level1Label").hide();
 		$("#legend-header").show();
 		replaceQueryValue("polygonFilter", undefined)
 	}
@@ -2901,7 +2905,9 @@ function displayLevel1Label(level1Selected){
 		var boxHeight = $("#legendHolder").height();
 		$("#level1Label").show();
 	}else{
-		$("#level1Label").hide();
+		$("#level1Label").show();
+		$("#level1Label").prependTo("#legend");
+		//$("#level1Label").hide();
 	}
 }
 
