@@ -153,6 +153,10 @@ body{
 
 /* for css when *TABLET* mode is engaged */
 @media (max-width: 767px){
+	.leaflet-control-zoom.leaflet-bar.leaflet-control {
+	    visibility: hidden;
+		height: 0px;
+	}
 	#level1Label {
 		position: relative !important;
 		top: 0px !important;
@@ -232,10 +236,6 @@ body{
 		transform:  rotate(-90deg);
 		text-align-last: left;
 		left: 50%;
-	}
-	.leaflet-control-zoom.leaflet-bar.leaflet-control {
-	    visibility: hidden;
-		height: 0px;
 	}
 }
 
