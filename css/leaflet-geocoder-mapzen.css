@@ -34,8 +34,8 @@
 
 /* Match touch styles in Leaflet v1 */
 .leaflet-touch .leaflet-pelias-control {
-  width: 30px;
-  height: 30px;
+  width: 25px;
+  height: 25px;
   line-height: 30px;
 }
 
@@ -157,6 +157,8 @@ only screen and (min-device-pixel-ratio: 2) {
 	background-color: transparent !important;
 	//top:23%;
 	opacity: 0.5;
+	left: -1px;
+    top: -1px;
 }
 .leaflet-pelias-expanded .leaflet-pelias-search-icon{
 	top:17%;
@@ -223,6 +225,7 @@ only screen and (min-device-pixel-ratio: 2) {
 
 .leaflet-pelias-search-icon.leaflet-pelias-loading {
   background-image: url('images/loading.gif');
+  
 }
 
 @media only screen and (min--moz-device-pixel-ratio: 2),
