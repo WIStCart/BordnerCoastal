@@ -345,11 +345,12 @@
 				var futureItem = "";
 				if (tempClasses2.classes[i+1]){
 					futureItem = tempClasses2.classes[i+1]["level1"]
+					futureItem2 = tempClasses2.classes[i+1]["level2"]
 				}
 				if (tempClasses2.classes[i]["level1"] == futureItem){
 					console.log(item.level1 + " --- " + item.level2)
 					// not last class in group
-					if (tempClasses2.classes[i]["level2"] == futureItem){
+					if (tempClasses2.classes[i]["level2"] == futureItem2){
 						// Multiple codes in group, list out the codes for use in definition
 					}else{
 						// Create level 2 definition
