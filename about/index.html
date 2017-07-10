@@ -338,64 +338,66 @@
 				var augmentedDef = ""
 				if(yellowDocClassDefinitions[item.code]){
 					var augItem = yellowDocClassDefinitions[item.code]
-					augmentedDef =  '<p><b>' + augItem.Class_Name + "</b>: " + augItem.Class_Definition  + '</p>'  //'<li><b>YELLOW DEF. GENERAL: </b>' + augItem.General_Group + ": " + augItem.General_Group_Definition  + '</li>' +		
-														
+					augmentedDef =  '<p><b>' + augItem.Class_Name + "</b>: " + augItem.Class_Definition  + '</p>'  //'<li><b>YELLOW DEF. GENERAL: </b>' + augItem.General_Group + ": " + augItem.General_Group_Definition  + '</li>' +											
 				}
-				if (i+1 < tempClasses2.classes.length){
-					var level1Item = (item.level1).replace(/ /g, "_");
-					var level2Item = (item.level2).replace(/ /g, "_");
-					if (tempClasses2.classes[i]["level1"] == tempClasses2.classes[i+1]["level1"]){
-						// not last class in group
-						if (tempClasses2.classes[i]["level2"] == tempClasses2.classes[i+1]["level2"]){
-							// Multiple codes in group, list out the codes for use in definition
-						}else{
-							// Create level 2 definition
-							//console.log(item.level2)
-							level2HTMl = level2HTMl + 
-							'<div>' +
-								'<div id="' + level2Item + '" class="normal-legend-element transition-class" style="background-color:' + item.color2 + '; width:50px; height:30px; float:left; padding-bottom:5px;"></div>' +
+				var level1Item = (item.level1).replace(/ /g, "_");
+				var level2Item = (item.level2).replace(/ /g, "_");
+				var futureItem = "";
+				if (tempClasses2.classes[i+1]){
+					futureItem = tempClasses2.classes[i+1]["level1"]
+				}
+				if (tempClasses2.classes[i]["level1"] == futureItem){
+					console.log(item.level1 + " --- " + item.level2)
+					// not last class in group
+					if (tempClasses2.classes[i]["level2"] == futureItem){
+						// Multiple codes in group, list out the codes for use in definition
+					}else{
+						// Create level 2 definition
+						//console.log(item.level2)
+						level2HTMl = level2HTMl + 
+						'<div>' +
+							'<div id="' + level2Item + '" class="normal-legend-element transition-class" style="background-color:' + item.color2 + '; width:50px; height:30px; float:left; padding-bottom:5px;"></div>' +
+							'<div style="width:10px; height:30px; float:left;"></div>' +
+							'<div style="text-align:left; color:gray;">' +
+								item.level2 + augmentedDef +
+							'</div>' + 
+						'</div><br/>'
+					}
+				}else{
+					// last class in group
+					console.log(item.level1 + " --- " + item.level2)
+					level1HTMl = level1HTMl + 
+					'<div class="card chev-closed" name="' + level1Item +'Scroll" id="' + level1Item + 'Scroll" onClick="dispatchButtonClick(event, this.id)" style="padding-left:10px; padding-right:10px;">' +
+						'<div class="card-header" role="tab" id="headingOne">' +
+							'<a data-toggle="collapse" data-parent="#accordion2" href="#collapse' + level1Item + '" aria-expanded="false" aria-controls="collapse' + level1Item + '" style="text-decoration: none;">' +
+								'<div style="background-color:' + item.color1 + '; width:50px; height:30px; float:left; padding-bottom:5px;"></div>' +
 								'<div style="width:10px; height:30px; float:left;"></div>' +
 								'<div style="text-align:left; color:gray;">' +
-									item.level2 + augmentedDef +
-								'</div>' + 
-							'</div><br/>'
-						}
-					}else{
-						// last class in group
-						//console.log(item.level1 + " --- " + item.level2)
-						level1HTMl = level1HTMl + 
-						'<div class="card chev-closed" name="' + level1Item +'Scroll" id="' + level1Item + 'Scroll" onClick="dispatchButtonClick(event, this.id)" style="padding-left:10px; padding-right:10px;">' +
-							'<div class="card-header" role="tab" id="headingOne">' +
-								'<a data-toggle="collapse" data-parent="#accordion2" href="#collapse' + level1Item + '" aria-expanded="false" aria-controls="collapse' + level1Item + '" style="text-decoration: none;">' +
-									'<div style="background-color:' + item.color1 + '; width:50px; height:30px; float:left; padding-bottom:5px;"></div>' +
+									item.level1 +
+									'<span class="transition-class" id="tocButton'+ level1Item +'Scroll">' +
+										'<span id="tocIcon" class="icon-class glyphicon glyphicon-chevron-down transition-class"></span>' +
+									'</span>' +	
+								'</div>' +	
+							'</a>' +
+						'</div>' +
+						'<a name="' + level1Item + '" style="position: absolute; top:-100px;"></a>' +
+						'</br>' +
+						'<div id="collapse' + level1Item + '" class="collapse" style="padding-left:70px;" name="' + level1Item + '" role="tabpanel" aria-labelledby="heading' + level1Item + '">' +
+							 '<div class="card-block">' +
+								level2HTMl +
+								'<div>' +
+									'<div id="' + level2Item + '" class="normal-legend-element transition-class" style="background-color:' + item.color2 + '; width:50px; height:30px; float:left; padding-bottom:5px;"></div>' +
 									'<div style="width:10px; height:30px; float:left;"></div>' +
 									'<div style="text-align:left; color:gray;">' +
-										item.level1 +
-										'<span class="transition-class" id="tocButton'+ level1Item +'Scroll">' +
-											'<span id="tocIcon" class="icon-class glyphicon glyphicon-chevron-down transition-class"></span>' +
-										'</span>' +	
-									'</div>' +	
-								'</a>' +
+										item.level2 + augmentedDef +
+									'</div>' + 
+								'</div><br/>' +
 							'</div>' +
-							'<a name="' + level1Item + '" style="position: absolute; top:-100px;"></a>' +
-							'</br>' +
-							'<div id="collapse' + level1Item + '" class="collapse" style="padding-left:70px;" name="' + level1Item + '" role="tabpanel" aria-labelledby="heading' + level1Item + '">' +
-								 '<div class="card-block">' +
-									level2HTMl +
-									'<div>' +
-										'<div id="' + level2Item + '" class="normal-legend-element transition-class" style="background-color:' + item.color2 + '; width:50px; height:30px; float:left; padding-bottom:5px;"></div>' +
-										'<div style="width:10px; height:30px; float:left;"></div>' +
-										'<div style="text-align:left; color:gray;">' +
-											item.level2 + augmentedDef +
-										'</div>' + 
-									'</div><br/>' +
-								'</div>' +
-							'</div>' + 
-						'</div>'
-						level2HTMl = ""
+						'</div>' + 
+					'</div>'
+					level2HTMl = ""
 					}
 				}
-			}
 			$( "#accordion" ).append( level1HTMl );
 		});
 		function dispatchButtonClick(e,idIN){
