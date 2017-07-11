@@ -2128,7 +2128,7 @@ function drawPolyFilterDesktop(el, _levelEngaged, _level1Selected){
 			if (levelEngaged == 1){
 					dispatchLegendClick(d.name.toLowerCase())
 			}else {
-				window.open(window.location.origin+window.location.pathname+'about#'+d.name.replace(/ /g, "_"))
+				window.open('about/#'+d.name.replace(/ /g, "_"))
 			}
 		})
 		//change colors on hover
@@ -2142,6 +2142,7 @@ function drawPolyFilterDesktop(el, _levelEngaged, _level1Selected){
 				self.style('fill', newColor)
 				d3.selectAll("." + d.name.split(" ").join("_")).style('fill', newColor)
 			}else {		
+				/*
 				var self = d3.select(this)
 				//set old color so we can recover it
 				var oldColor = self.style('fill')
@@ -2153,6 +2154,7 @@ function drawPolyFilterDesktop(el, _levelEngaged, _level1Selected){
                 tt.style("top", d3.select(this).attr("y")+"px");
                 tt.style("display", "inline-block");
                 tt.html("Class definition");
+				*/
 			}
 			//make taller
 			// self.attr('y', 0)
@@ -2178,7 +2180,7 @@ function drawPolyFilterTablet(el, _levelEngaged, _level1Selected){
 	//draw the filter swatches vertically instead of horizontally to improve readability of labels
 
 	var props = getLevelProps(_levelEngaged, _level1Selected)
-
+	console.log(props)
 	$(el).empty();
 		// console.log(summary)
 		var width = $(el).width();
@@ -2244,7 +2246,7 @@ function drawPolyFilterTablet(el, _levelEngaged, _level1Selected){
 			if (levelEngaged == 1){
 					dispatchLegendClick(d.name.toLowerCase())
 			}else {
-				window.open(window.location.origin+window.location.pathname+'about#'+d.name.replace(/ /g, "_"))
+				window.open('about/#'+d.name.replace(/ /g, "_"))
 			}
 		})
 		//change colors on hover
@@ -2258,6 +2260,7 @@ function drawPolyFilterTablet(el, _levelEngaged, _level1Selected){
 				self.style('fill', newColor)
 				d3.selectAll("." + d.name.split(" ").join("_")).style('fill', newColor)
 			}else {		
+				/*
 				var self = d3.select(this)
 				//set old color so we can recover it
 				var oldColor = self.style('fill')
@@ -2269,6 +2272,7 @@ function drawPolyFilterTablet(el, _levelEngaged, _level1Selected){
                 tt.style("top", d3.select(this).attr("y")+"px");
                 tt.style("display", "inline-block");
                 tt.html("Class definition");
+				*/
 			}
 			//make taller
 			// self.attr('y', 0)
@@ -2425,6 +2429,10 @@ function drawPolygonHistogramDesktop(data, _levelEngaged, el, histogramScale){
 				level1Selected = d.type.toLowerCase()
 				if (_levelEngaged == 1){
 						dispatchLegendClick(level1Selected)
+				} else {
+					console.log("A")
+					console.log(d)
+					window.open('about/#'+d.type.replace(/ /g, "_"))
 				}
 			})
 			//change colors on hover
@@ -2469,6 +2477,10 @@ function drawPolygonHistogramDesktop(data, _levelEngaged, el, histogramScale){
 				level1Selected = d.type.toLowerCase()
 				if (_levelEngaged == 1){
 						dispatchLegendClick(level1Selected)
+				} else {
+					console.log("B")
+					console.log(d)
+					window.open('about/#'+d.type.replace(/ /g, "_"))
 				}
 			})
 			//change colors on hover
@@ -2593,6 +2605,8 @@ function drawPolygonHistogramTablet(data, _levelEngaged, el, histogramScale){
 				level1Selected = d.type.toLowerCase()
 				if (_levelEngaged == 1){
 						dispatchLegendClick(level1Selected)
+				} else {
+					window.open('about/#'+d.type.replace(/ /g, "_"))
 				}
 			})
 
@@ -2613,6 +2627,8 @@ function drawPolygonHistogramTablet(data, _levelEngaged, el, histogramScale){
 				level1Selected = d.type.toLowerCase()
 				if (_levelEngaged == 1){
 						dispatchLegendClick(level1Selected)
+				} else {
+					window.open('about/#'+d.type.replace(/ /g, "_"))
 				}
 			})
 	svg.append('text')

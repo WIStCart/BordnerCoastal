@@ -237,6 +237,9 @@ body{
 		text-align-last: left;
 		left: 50%;
 	}
+	.geocode-search-button{
+		visibility:hidden;	
+	}
 }
 
 /* for css when *DESKTOP* mode is engaged */
