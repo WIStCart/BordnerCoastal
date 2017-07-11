@@ -261,8 +261,13 @@ body{
 		width: 0px;
 		height: 0px;
 	}
-
-
+}	
+/* for special case on Wisconsin Coastal Management Logo*/
+@media (min-width: 990px){
+	.long-image-desktop{
+		position: relative;
+		top: 100px;
+	}
 }
 
 /* glyphicons */

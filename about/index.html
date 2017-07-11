@@ -85,6 +85,14 @@
 		#tocIcon{
 			margin-left: 15px;
 		}
+		/* for special case on Wisconsin Coastal Management Logo*/
+		@media (min-width: 990px){
+			.long-image-desktop{
+				position: relative;
+				top: 100px;
+			}
+		}
+
 	</style>
 </head>
 
@@ -273,12 +281,16 @@
             <div class="col-md-12">
                 <p>Funded by the Wisconsin Coastal Management Program and the National Oceanic and Atmospheric Administration, Office for Coastal Management under the Coastal Zone Management Act, Grant #NA16NOS4190108</p>
 				<div style="text-align: center;">
-					<a href="http://www.doa.state.wi.us/divisions/intergovernmental-relations/Wisconsin-Coastal-Management" target="_bLank">
-						<img src="../img/branding/WCMP.png" alt="WCMP" style="width:100%; max-width:476px; max-height:72px;">
-					</a></br>
-					<a href="http://www.noaa.gov/" target="_blank">
-						<img src="../img/branding/NOAA.gif" alt="NOAA" style="width:25%; max-width:384px; max-height:384px;">
-					</a>
+					<div class="col-md-6 long-image-desktop">
+						<a href="http://www.doa.state.wi.us/divisions/intergovernmental-relations/Wisconsin-Coastal-Management" target="_blank">
+							<img src="../img/branding/WCMP.png" alt="WCMP" style="width:100%;">
+						</a>
+					</div>
+					<div class="col-md-6">
+						<a href="http://www.noaa.gov/" target="_blank">
+							<img src="../img/branding/NOAA.gif" alt="NOAA" style="width:75%; border-radius: 6px;">
+						</a>
+					</div>
 				</div>
 				<p>
 				The Bordner digitizing project has also received funding from the UW-Madison Graduate School, the UW-Madison College of Agriculture and Life Sciences, Wisconsin Alumni Research Foundation Research Fund, and the Wisconsin Alumni Research Foundation Kellett Mid-Career Faculty Award.
@@ -298,12 +310,16 @@
             <div class="col-md-12">
                 <p>A joint effort of the <a href="http://labs.russell.wisc.edu/landscape/" target="_blank">Forest Ecosystem and Landscape Ecology Lab</a> and the <a href="http://www.sco.wisc.edu/" target="_blank">State Cartographer's Office</a>.</p>
                 <div style="text-align: center;">
-					<a href="http://labs.russell.wisc.edu/landscape/" target="_blank">
-						<img src="../img/branding/FLEL.gif" alt="FLEL" style="width:100%; max-width:400px; max-height:145px;">
-					</a></br>
-					<a href="http://www.sco.wisc.edu/" target="_blank">
-						<img src="../img/branding/SCO.png" alt="SCO" style="width:95%; max-width:300px; max-height:170px; border-radius: 6px;">
-					</a>
+					<div class="col-md-6">
+						<a href="http://labs.russell.wisc.edu/landscape/" target="_blank">
+							<img src="../img/branding/FLEL.gif" alt="FLEL" style="width:100%;">
+						</a>
+					</div>
+					<div class="col-md-6">
+						<a href="http://www.sco.wisc.edu/" target="_blank">
+							<img src="../img/branding/SCO.png" alt="SCO" style="width:95%; border-radius: 6px;">
+						</a>
+					</div>
 				</div>
 			</div>
         </div>
