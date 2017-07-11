@@ -356,8 +356,8 @@
 					var augItem = yellowDocClassDefinitions[item.code]
 					augmentedDef =  '<p><b>' + augItem.Class_Name + "</b>: " + augItem.Class_Definition  + '</p>'  //'<li><b>YELLOW DEF. GENERAL: </b>' + augItem.General_Group + ": " + augItem.General_Group_Definition  + '</li>' +											
 				}
-				var level1Item = (item.level1).replace(/ /g, "_");
-				var level2Item = (item.level2).replace(/ /g, "_");
+				var level1Item = (item.level1).replace(/ |,|\.|\)|\(/g, "_");
+				var level2Item = (item.level2).replace(/ |,|\.|\)|\(/g, "_");
 				var futureItem = "";
 				if (tempClasses2.classes[i+1]){
 					futureItem = tempClasses2.classes[i+1]["level1"]
@@ -434,16 +434,16 @@
 			var url = document.location.toString();
 			if (url.match('#') ) {
 				for(var i = 0; i < tempClasses2.classes.length; i++) {
-					if ((tempClasses2.classes[i]["level2"]).replace(/ /g, "_") == url.split('#')[1]){
-						$('[name="'+ (tempClasses2.classes[i]["level1"]).replace(/ /g, "_") +'"]').addClass('in');	
-						var idHash = (tempClasses2.classes[i]["level1"]).replace(/ /g, "_") + "Scroll";
+					if ((tempClasses2.classes[i]["level2"]).replace(/ |,|\.|\)|\(/g, "_") == url.split('#')[1]){
+						$('[name="'+ (tempClasses2.classes[i]["level1"]).replace(/ |,|\.|\)|\(/g, "_") +'"]').addClass('in');	
+						var idHash = (tempClasses2.classes[i]["level1"]).replace(/ |,|\.|\)|\(/g, "_") + "Scroll";
 						//console.log(idHash)
 						$("#tocButton" + idHash).html('<span id="tocIcon" class="icon-class glyphicon glyphicon-chevron-up transition-class"></span>')
 						$("#" + idHash).removeClass( "chev-closed")
 						$("#" + idHash).addClass( "chev-open")
 						
 						$('html, body').animate({
-						   'scrollTop':   $('[name="' + (tempClasses2.classes[i]["level1"]).replace(/ /g, "_") + 'Scroll"]').offset().top - 100
+						   'scrollTop':   $('[name="' + (tempClasses2.classes[i]["level1"]).replace(/ |,|\.|\)|\(/g, "_") + 'Scroll"]').offset().top - 100
 						}, 1000);
 						$('#' + url.split('#')[1]).addClass('selected-legend-element')
 						$('#' + url.split('#')[1]).removeClass('normal-legend-element')
