@@ -939,7 +939,7 @@ function destroyMobileInfowindow(){
 }
 
 function enableDesktopMouseover(){
-	$(".infobox").append("<p id='level1-set'></p>")
+	$("#infobox").append("<p id='level1-set'></p>")
 }
 
 
@@ -988,11 +988,11 @@ function onLineOver(e, latln, pxPos, data, layer){
 		//only dispaly the infobox if the feature is within its zoom level
 		if (isFeatureInZoom(data.line_type, 'lines') && (showInfoboxOnHover) && desktopMode){
 			if (typeof(lineTypeSelected) == "undefined"){
-			$(".infobox").show()
+			$("#infobox").show()
 			$("#level1-set").html(lineName)
 			}else{
 				if (data.line_type == lineTypeSelected){
-					$(".infobox").show()
+					$("#infobox").show()
 					$("#level1-set").html(lineName)
 				}
 			}
@@ -1002,7 +1002,7 @@ function onLineOver(e, latln, pxPos, data, layer){
 
 function onLineOut(e, latln, pxPos, data, layer){
 	if (legendType == "lines" &&(!showInfoboxOnHover)){
-		$(".infobox").hide()
+		$("#infobox").hide()
 	}
 }
 
@@ -1013,7 +1013,7 @@ function onPointOver(e, latln, pxPos, data, layer){
 				if ((typeof(pointTypeSelected) != "undefined") && (data.point_type != pointTypeSelected) && desktopMode){
 					return;
 				}
-				$(".infobox").show()
+				$("#infobox").show()
 				$("#level1-set").html(pointName)
 			}
 	}
@@ -1021,14 +1021,14 @@ function onPointOver(e, latln, pxPos, data, layer){
 
 function onPointOut(e, latln, pxPos, data, layer){
 	if(legendType == "points" &&(!showInfoboxOnHover)){
-		$(".infobox").hide();
+		$("#infobox").hide();
 	}
 }
 
 function onPolyOver(e, latln, pxPos, data, layer){
 	if ((legendType == "polygons") && showInfoboxOnHover && desktopMode){
 		if (typeof(level1Selected) == 'undefined'){
-			$(".infobox").show()
+			$("#infobox").show()
 			level1 = getLevel1FromCode(data.cov1)
 			$("#level1-set").html(level1)
 		}else{
@@ -1040,7 +1040,7 @@ function onPolyOver(e, latln, pxPos, data, layer){
 				var theLabel = lev2
 			}
 			if (lev1.toLowerCase() == level1Selected.toLowerCase()){
-				$(".infobox").show()
+				$("#infobox").show()
 				$("#level1-set").html(theLabel)
 			}
 		}
@@ -1049,7 +1049,7 @@ function onPolyOver(e, latln, pxPos, data, layer){
 
 function onPolyOut(e, latln, pxPos, data, layer){
 	if (legendType == "polygons" &&(!showInfoboxOnHover)){
-		$(".infobox").hide()
+		$("#infobox").hide()
 	}
 }
 
@@ -1687,6 +1687,7 @@ function transformToDesktop(){
 	$("#legend").appendTo("#toc");
 
 	$("#infobox").removeClass("infobox-mobile")
+	$("#infobox").addClass("infobox-desktop")
 
 	// destroyMobileInfowindow();
 	enableDesktopMouseover();
@@ -1711,6 +1712,7 @@ function transformToTablet(){
 	isLegendOpen = false;
 
 	$("#infobox").addClass("infobox-mobile")
+	$("#infobox").removeClass("infobox-desktop")
 
 	map.closePopup();
 	map.invalidateSize()
