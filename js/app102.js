@@ -1162,11 +1162,11 @@ function onMapFeatureClick(e, latln, pxPos, data, layer){
 function toggleMobileClickWindow(){
 	if (isMobileClickWindowOpen){
 		dockMobileInfowindow();
-		$("#dock-mobile-info").html("<span class='glyphicon glyphicon-chevron-left'></span>")
+		$("#dock-mobile-info").html("<span class='glyphicon glyphicon-chevron-down'></span>")
 		isMobileClickWindowOpen = false;
 	}else{
 		isMobileClickWindowOpen = true;
-		$("#dock-mobile-info").html("<span class='glyphicon glyphicon-chevron-right'></span>")
+		$("#dock-mobile-info").html("<span class='glyphicon glyphicon-chevron-up'></span>")
 		expandMobileInfowindow();
 	}
 }
