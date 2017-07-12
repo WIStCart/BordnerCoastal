@@ -1287,35 +1287,35 @@ function setUpMap(){
 		'</button>' +
 		'</h4>' +
 		'<div class="col-xs-12" id="layerListBody">' +
-		'<label class="legend-label">Feature Type</label>' +
+		'<label class="legend-label">Bordner Map Features</label>' +
 			'<div class="feature-type-radio-group">' +
 				'<div class="radio">' +
-					'<label><input type="radio" name="featureType" id="featurePolygons">Polygons</label>' +
+					'<label><input type="radio" name="featureType" id="featurePolygons">Land use/land cover</label>' +
 				'</div>' +
 				'<div class="radio">' +
-					'<label><input type="radio" name="featureType" id="featurePoints">Points</label>' +
+					'<label><input type="radio" name="featureType" id="featurePoints">Buildings, economic, and natural features</label>' +
 				'</div>' +
 				'<div class="radio">' +
-					'<label><input type="radio" name="featureType" id="featureLines">Lines</label>' +
+					'<label><input type="radio" name="featureType" id="featureLines">Transportation, water, and infrastructure</label>' +
 				'</div>' +
 			'</div>' +
-			'<label class="legend-label">Overlays</label>' +
+			'<label class="legend-label">Additional Map Layers</label>' +
 			'<div class="checkbox">' +
-				'<label><input type="checkbox" name="overlayType" id="labelsOverlay">Labels</label>' +
+				'<label><input type="checkbox" name="overlayType" id="labelsOverlay">Base map labels</label>' +
 			'</div>' +
 			'<div class="checkbox">' +
-				'<label><input type="checkbox" name="overlayType" id="counties" >Counties</label>' +
+				'<label><input type="checkbox" name="overlayType" id="counties" >County boundaries</label>' +
 			'</div>' +
 			'<div class="checkbox">' +
-				'<label><input type="checkbox" name="overlayType" id="townships" >PLSS</label>' +
+				'<label><input type="checkbox" name="overlayType" id="townships" >Public land survey township boundaries</label>' +
 			'</div>' +
 			'<div class="checkbox">' +
-				'<label><input type="checkbox" name="overlayType" id="density1">Coverage 1 Density</label>' +
+				'<label><input type="checkbox" name="overlayType" id="density1">Forest density</label>' +
 			'</div>' +
 			'<div id="densityLegend" class="checkbox" style="display:none">' +
 				'<label><img src="https://maps.sco.wisc.edu/BordnerCoastal/BordnerIcon/pattern4.png" class="densityLegend"> Good</label><label class="checkbox-label-density"><img src="https://maps.sco.wisc.edu/BordnerCoastal/BordnerIcon/pattern3.png" class="densityLegend"> Medium</label><label  class="checkbox-label-density"><img src="https://maps.sco.wisc.edu/BordnerCoastal/BordnerIcon/pattern2.png" class="densityLegend"> Poor</label><label  class="checkbox-label-density"><img src="https://maps.sco.wisc.edu/BordnerCoastal/BordnerIcon/pattern1.png" class="densityLegend"> Scattered</label>' +
 			'</div>' +
-			'<label class="legend-label">Basemap</label>' +
+			'<label class="legend-label">Base Map</label>' +
 			'<div class="radio">' +
 				'<label><input type="radio" name="basemapType" id="streetsBasemap">Streets</label>' +
 			'</div>' +
@@ -1323,9 +1323,9 @@ function setUpMap(){
 				'<label><input type="radio" name="basemapType" id="satelliteBasemap">Satellite</label>' +
 			'</div>' +
 			'<div class="radio">' +
-				'<label><input type="radio" name="basemapType" id="historicBasemap" >Historic Imagery</label>' +
+				'<label><input type="radio" name="basemapType" id="historicBasemap" >1930s aerial photography</label>' +
 			'</div>' +
-			'<label class="legend-label">Polygon Opacity</label>' +
+			'<label class="legend-label">Land Use/Land Cover Opacity</label>' +
 			'<input type="text" value="50" id="rangeSlider" data-slider-min="0" data-slider-max="100" data-slider-step="1" data-slider-value="' +  layerOpacity*100 + '" data-slider-ticks="[0, 100]"  / >' +
 		'</div>')
 
