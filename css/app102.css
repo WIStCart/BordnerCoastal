@@ -876,6 +876,36 @@ button.active{
 	padding-bottom: 12px;
 	height: 35px;
 }
+/* Transparency slider */
+/* The scrubber */
+.slider-handle { 
+	background-image: -webkit-linear-gradient(left,#333 0,#000 100%);
+    background-image: -o-linear-gradient(left,#333 0,#000 100%);
+    background-image: linear-gradient(to right,#333 0,#000 100%);
+	opacity: 1;
+}
+.slider-track {
+    background-image: -webkit-linear-gradient(right,#999 0,#ddd 100%);
+    background-image: -o-linear-gradient(right,#999 0,#ddd 100%);
+    background-image: linear-gradient(to left,#999 0,#ddd 100%);
+}
+.slider-tick.in-selection {
+    background-image: -webkit-linear-gradient(left,#ddd 100%,#ddd 100%);
+    background-image: -o-linear-gradient(left,#ddd 100%,#ddd 100%);
+    background-image: linear-gradient(to right,#ddd 100%,#ddd 100%);
+}
+/* Max tick */
+.slider-tick {
+    background-image: -webkit-linear-gradient(left,#999 0,# 100%);
+    background-image: -o-linear-gradient(left,#999 0,#333 100%);
+    background-image: linear-gradient(to right,#999 0,#333 100%);
+	opacity: 1;
+}
+.slider-selection.tick-slider-selection {
+    background-image: -webkit-linear-gradient(left,#ddd 0,#000 100%);
+    background-image: -o-linear-gradient(left,#ddd 0,#000 100%);
+    background-image: linear-gradient(to right,#ddd 0,#000 100%);
+}
 
 .infobox-desktop{
 	padding-left: 20px;
