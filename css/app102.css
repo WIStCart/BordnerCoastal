@@ -230,6 +230,9 @@ body{
 	.checkbox+.checkbox, .radio+.radio {
 		margin-top: -2.5px;
 	}
+	#legend-back {
+		max-width: 126px !important;
+	}
 }
 
 /* for css when *PHONE* mode is engaged */
@@ -717,6 +720,7 @@ div.legendTooltip {
 
 #legend-back{
 	display: none;
+	max-width: 17%;
 	/*font: 14px sans-serif;*/
 	/*color: black;*/
 	/*fill: black;*/
