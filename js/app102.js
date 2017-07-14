@@ -1447,7 +1447,8 @@ function setUpMap(){
 			closeLayerListDesktop();
 		}
 	})
-
+	
+	$('#splashModal').modal('show');
 	// Done, tell the console!
 	console.log("setUpMap() complete. desktopMode = " + desktopMode)
 }
@@ -1469,14 +1470,18 @@ function refreshPoints(){
 var jsMediaQuery = function() {
 	console.log("Called")
 	if (window.matchMedia('(max-width: 767px)').matches){
+		if (desktopMode){
 			desktopMode = false;
 			console.log("~~ tablet mode engaged")
 			console.log("Transforming to tablet")
 			transformToTablet();
+		}
 	}else{
-		desktopMode = true;
-		console.log("~~ desktop mode engaged")
-		transformToDesktop();
+		if (desktopMode === false){
+			desktopMode = true;
+			console.log("~~ desktop mode engaged")
+			transformToDesktop();
+		}
 	}
 };
 
