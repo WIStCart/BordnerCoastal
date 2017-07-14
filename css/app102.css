@@ -227,6 +227,9 @@ body{
 	.legend-item {
 		line-height: 0.9;
 	}
+	.checkbox+.checkbox, .radio+.radio {
+		margin-top: -2.5px;
+	}
 }
 
 /* for css when *PHONE* mode is engaged */
