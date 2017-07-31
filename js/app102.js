@@ -100,8 +100,14 @@ var ozaukee = L.tileLayer('https://maps.sco.wisc.edu/BordnerCoastal/BordnerTile/
 var douglas = L.tileLayer('https://maps.sco.wisc.edu/BordnerCoastal/BordnerTile/Douglas/{z}/{x}/{y}.png', {
  	attribution: 'WHAI'
 });
+var bayfield = L.tileLayer('https://maps.sco.wisc.edu/BordnerCoastal/BordnerTile/Bayfield/{z}/{x}/{y}.png', {
+ 	attribution: 'WHAI'
+});
+var oconto = L.tileLayer('https://maps.sco.wisc.edu/BordnerCoastal/BordnerTile/Oconto/{z}/{x}/{y}.png', {
+ 	attribution: 'WHAI'
+});
 
-var historicBasemap = L.layerGroup([kewaunee, racine, kenosha, ozaukee, douglas])
+var historicBasemap = L.layerGroup([kewaunee, racine, kenosha, ozaukee, douglas, bayfield, oconto])
 
 // Create CartoCSS
 function getPolyStyle(level, level1Selected){
@@ -687,6 +693,7 @@ function parseURL(){
 	var pointFilterParam = $.query.get("pointFilter");
 	if (validatePointFilterParam(pointFilterParam)){
 		pointTypeSelected = pointFilterParam
+		console.log(pointTypeSelected)
 	}
 
 	//layer opacity
@@ -749,7 +756,9 @@ function validateLineFilterParam(param){
 }
 
 function validatePointFilterParam(param){
+	console.log(param)
 	var paramChoices = _.pluck(pointLegend, "type");
+	console.log(paramChoices)
 	if (paramChoices.indexOf(param) > -1){
 		return true;
 	}
@@ -1537,6 +1546,23 @@ function turnOnFeatureType(featureTypeCalled){
 			break;
 		default:
 			console.log("unidentified feature type called")
+			/*switch(legendType){
+				case "points":
+					featureTypeCalled = "featurePoints"
+					setTimeout(function(featureTypeCalled){
+						$( "#featurePoints" ).trigger( "click" )
+						//showOnlyPoints()				
+					}, 500)
+					break;
+				case "lines":
+					setTimeout(function(featureTypeCalled){
+						$( "#featureLines" ).trigger( "click" )
+						//showOnlyLines()				
+					}, 500)
+				case "polygons":
+					break;
+			}*/
+			
 	}
 }
 
