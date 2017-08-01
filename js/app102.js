@@ -474,7 +474,7 @@ var cartoCSSLines = getLineCSS('none')
       user_name: 'sco-admin',
       type: 'cartodb',
       sublayers: [{type: "cartodb",
-			sql: 'SELECT * FROM final_coastal_den1',
+			sql: 'SELECT * FROM final_coastal_polygons',
 			cartocss: cartoCSSDensity,
 			layerIndex: 6
 	}]
