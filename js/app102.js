@@ -85,16 +85,16 @@ var satelliteBasemap =  L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest
 });
 
 
-var kewaunee = 	L.tileLayer('https://maps.sco.wisc.edu/V1/bordner/03_WHAI_Tiles/00_Demo_Kewaunee/{z}/{x}/{y}.png', {
+var kewaunee = 	L.tileLayer('https://maps.sco.wisc.edu/BordnerCoastal/BordnerTile/Kewaunee/{z}/{x}/{y}.png', {
  	attribution: 'WHAI'
 });
-var racine = L.tileLayer('https://maps.sco.wisc.edu/BordnerCoastal/BordnerTile/Racine/{z}/{x}/{y}.png', {
+var racine = L.tileLayer('https://maps.sco.wisc.edu/BordnerCoastal/BordnerTile/Racine2/{z}/{x}/{y}.png', {
  	attribution: 'WHAI'
 });
 var kenosha = L.tileLayer('https://maps.sco.wisc.edu/BordnerCoastal/BordnerTile/Kenosha/{z}/{x}/{y}.png', {
  	attribution: 'WHAI'
 });
-var ozaukee = L.tileLayer('https://maps.sco.wisc.edu/BordnerCoastal/BordnerTile/Ozaukee/{z}/{x}/{y}.png', {
+var ozaukee = L.tileLayer('https://maps.sco.wisc.edu/BordnerCoastal/BordnerTile/Ozaukee2/{z}/{x}/{y}.png', {
  	attribution: 'WHAI'
 });
 var douglas = L.tileLayer('https://maps.sco.wisc.edu/BordnerCoastal/BordnerTile/Douglas/{z}/{x}/{y}.png', {
@@ -106,8 +106,26 @@ var bayfield = L.tileLayer('https://maps.sco.wisc.edu/BordnerCoastal/BordnerTile
 var oconto = L.tileLayer('https://maps.sco.wisc.edu/BordnerCoastal/BordnerTile/Oconto/{z}/{x}/{y}.png', {
  	attribution: 'WHAI'
 });
+var ashland = L.tileLayer('https://maps.sco.wisc.edu/BordnerCoastal/BordnerTile/Ashland/{z}/{x}/{y}.png', {
+ 	attribution: 'WHAI'
+});
+var brown = L.tileLayer('https://maps.sco.wisc.edu/BordnerCoastal/BordnerTile/Brown/{z}/{x}/{y}.png', {
+ 	attribution: 'WHAI'
+});
 
-var historicBasemap = L.layerGroup([kewaunee, racine, kenosha, ozaukee, douglas, bayfield, oconto])
+var iron = L.tileLayer('https://maps.sco.wisc.edu/BordnerCoastal/BordnerTile/Iron6/{z}/{x}/{y}.png', {
+ 	attribution: 'WHAI'
+});
+
+var marinette = L.tileLayer('https://maps.sco.wisc.edu/BordnerCoastal/BordnerTile/Marinette/{z}/{x}/{y}.png', {
+ 	attribution: 'WHAI'
+});
+
+var manitowoc = L.tileLayer('https://maps.sco.wisc.edu/BordnerCoastal/BordnerTile/Manitowoc/{z}/{x}/{y}.png', {
+ 	attribution: 'WHAI'
+});
+
+var historicBasemap = L.layerGroup([kewaunee, racine, kenosha, ozaukee, douglas, bayfield, oconto, ashland, brown, iron, marinette, manitowoc]);
 
 // Create CartoCSS
 function getPolyStyle(level, level1Selected){
