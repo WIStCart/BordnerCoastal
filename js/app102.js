@@ -20,7 +20,7 @@ var counties;
 var townships;
 var density1;
 var lines;
-var infowindowVars = ['cov1','cov2', 'cov3', 'cov4', /*'cov5',*/
+var infowindowVars = ['cartodb_id','cov1','cov2', 'cov3', 'cov4', /*'cov5',*/
 					'den1', 'den2', 'den3', 'den4', /*'den5',*/
 					'pctcov1', 'pctcov2', 'pctcov3', 'pctcov4', /*'pctcov5',*/
 					'mindiam1','mindiam2','mindiam3','mindiam4',/*'mindiam5',*/
@@ -40,6 +40,8 @@ var pointTypeSelected;
 var histogramScale = "linear";
 var showInfoboxOnHover = true;
 var basemapChoice = "streets";
+var sql2 = new cartodb.SQL({ user: 'sco-admin', format: 'geojson' });
+var polygon;
 
 //overlays on the map
 var labelsAreOn = false;
@@ -129,8 +131,8 @@ var historicBasemap = L.layerGroup([kewaunee, racine, kenosha, ozaukee, douglas,
 
 // Create CartoCSS
 function getPolyStyle(level, level1Selected){
-	console.log(level)
-	console.log(level1Selected)
+	//CS: console.log(level)
+	//CS: console.log(level1Selected)
 	if (level == "none"){
 		return "#layer{polygon-opacity: 0;}"
 	}
@@ -153,7 +155,7 @@ function getPolyStyle(level, level1Selected){
 			}
 		}
 	}
-	// console.log(style)
+	// //CS: console.log(style)
 	style += "}";
 	return style;
 };
@@ -517,7 +519,7 @@ var cartoCSSLines = getLineCSS('none')
 	},{type: "cartodb",
 			sql: 'SELECT * FROM final_coastal_polygons',
 			cartocss: cartoCSSRules,
-			interactivity: ['cov1', 'cov2'],
+			interactivity: ['cartodb_id','cov1', 'cov2'],
 			layerIndex:2
 	}]
     }, { https: true })
@@ -711,7 +713,7 @@ function parseURL(){
 	var pointFilterParam = $.query.get("pointFilter");
 	if (validatePointFilterParam(pointFilterParam)){
 		pointTypeSelected = pointFilterParam
-		console.log(pointTypeSelected)
+		//CS: console.log(pointTypeSelected)
 	}
 
 	//layer opacity
@@ -774,9 +776,9 @@ function validateLineFilterParam(param){
 }
 
 function validatePointFilterParam(param){
-	console.log(param)
+	//CS: console.log(param)
 	var paramChoices = _.pluck(pointLegend, "type");
-	console.log(paramChoices)
+	//CS: console.log(paramChoices)
 	if (paramChoices.indexOf(param) > -1){
 		return true;
 	}
@@ -920,6 +922,9 @@ function setupInteraction(layer, _levelEngaged, _visibility){
 	// setupInfoWindow(layer)
 
 	layer.bind('featureClick', onMapFeatureClick)
+	layer.bind('featureClick',function(e, pos, latlng, data) {
+            showFeature(data.cartodb_id)
+    });
 	//manage the population of the infobox
 
 	setupGeocoderSearch()
@@ -1080,6 +1085,28 @@ function onPolyOut(e, latln, pxPos, data, layer){
 	}
 }
 
+function showFeature(cartodb_id) {
+	sql2.execute("SELECT the_geom as the_geom from final_coastal_polygons WHERE cartodb_id = {{cartodb_id}}", {cartodb_id: cartodb_id} ).done(function(geojson) {
+		if (polygon) {
+		  map.removeLayer(polygon);
+		}
+		console.log(geojson)
+		polygon = L.geoJson(geojson, { 
+		  style: {
+			color: "#000",
+			fillColor: "#fff",
+			fillOpacity: 0.0,
+			weight: 2,
+			opacity: 0.65
+		  }
+		}).addTo(map);
+	});
+	$( ".leaflet-popup-close-button" ).click(function() {
+	  map.removeLayer(polygon)
+	});
+	
+}
+
 function isFeatureInZoom(code, featureType){
 	var zooms = getZoomLevelsFromCode(code, featureType);
 	var currentZoom = map.getZoom();
@@ -1145,7 +1172,9 @@ function getLevelProps(level, level1Selected){
 
 function onMapFeatureClick(e, latln, pxPos, data, layer){
 	map.panTo(latln)
-
+	console.log(e)
+	console.log(data)
+	console.log(layer)
 	//mark the infowindow as open
 	isInfowindowOpen = true;
 	//hide the infowindow if it's been filtered out by legend interaction
@@ -1167,7 +1196,7 @@ function onMapFeatureClick(e, latln, pxPos, data, layer){
 		$(".cartodb-infowindow").hide()
 		isInfowindowOpen = false;
 	}
-
+	
 	if (!desktopMode){
 		$("#infobox").show();
 		windowContent = formatCoverageForInfowindow(data)
@@ -1394,8 +1423,8 @@ function setUpMap(){
 		// --> $("#featureLines").prop("checked", true);
 
 	// Explicitly set current basemap and click its radio button
-	console.log("basemapChoice")
-	console.log(basemapChoice)
+	//CS: console.log("basemapChoice")
+	//CS: console.log(basemapChoice)
 	switch(basemapChoice) {
 		case "streets":
 			currentBasemap = streetsBasemap;
@@ -1410,7 +1439,7 @@ function setUpMap(){
 			$( "#historicBasemap" ).trigger( "click" );
 			break;
 		default:
-			console.log("unidentified basemap called")
+			//CS: console.log("unidentified basemap called")
 			currentBasemap = streetsBasemap;
 			$( "#streetsBasemap" ).trigger( "click" );
 	}
@@ -1430,13 +1459,13 @@ function setUpMap(){
 	// For dynamic legend queries (in progress)
 	map.on('moveend', function() {
 		if (legendType == "polygons"){
-			console.log("polygons.")
+			//CS: console.log("polygons.")
 					drawThisView(map.getBounds(), map.getZoom(), levelEngaged, level1Selected);
 		}else if (legendType == "lines"){
-			console.log("lines")
+			//CS: console.log("lines")
 			refreshLines();
 		}else if (legendType == "points"){
-			console.log("points")
+			//CS: console.log("points")
 			refreshPoints();
 		}
 
@@ -1462,7 +1491,7 @@ function setUpMap(){
 
 	// //close the layer list when the close button is clicked
 	$(".layer-list-close-btn").click(function(){
-		console.log("been clicked")
+		//CS: console.log("been clicked")
 		if (desktopMode){
 			closeLayerListDesktop();
 		}
@@ -1477,7 +1506,7 @@ function setUpMap(){
 	
 	$('#splashModal').modal('show');
 	// Done, tell the console!
-	console.log("setUpMap() complete. desktopMode = " + desktopMode)
+	//CS: console.log("setUpMap() complete. desktopMode = " + desktopMode)
 }
 
 function refreshLines(){
@@ -1488,7 +1517,7 @@ function refreshLines(){
 
 function refreshPoints(){
 	if (typeof(pointTypeSelected) == "undefined"){
-		console.log("Refreshing all points")
+		//CS: console.log("Refreshing all points")
 		showAllPoints();
 	}
 }
@@ -1496,12 +1525,12 @@ function refreshPoints(){
 // Media query for when the app traverses the tablet/desktop threshold
 var firstCall = "yes"
 var jsMediaQuery = function() {
-	console.log("Called")
+	//CS: console.log("Called")
 	if (window.matchMedia('(max-width: 767px)').matches){
 		if (desktopMode){
 			desktopMode = false;
-			console.log("~~ tablet mode engaged")
-			console.log("Transforming to tablet")
+			//CS: console.log("~~ tablet mode engaged")
+			//CS: console.log("Transforming to tablet")
 			transformToTablet();
 		}
 	}else{
@@ -1514,7 +1543,7 @@ var jsMediaQuery = function() {
 		}
 		if (desktopMode === false){
 			desktopMode = true;
-			console.log("~~ desktop mode engaged")
+			//CS: console.log("~~ desktop mode engaged")
 			transformToDesktop();
 		}
 	}
@@ -1571,7 +1600,7 @@ function turnOnFeatureType(featureTypeCalled){
 			$("#legend-header").text("Point Features").show();
 			break;
 		default:
-			console.log("unidentified feature type called")
+			//CS: console.log("unidentified feature type called")
 			/*switch(legendType){
 				case "points":
 					featureTypeCalled = "featurePoints"
@@ -1652,7 +1681,7 @@ function turnOnBasemap(basemapCalled){
 	map.addLayer(window[basemapCalled]);
 	if(basemapCalled == "historicBasemap"){
 		window[basemapCalled].eachLayer(function(layer){
-			console.log(layer)
+			//CS: console.log(layer)
 			layer.bringToBack();
 		});
 	}else{
@@ -1689,7 +1718,7 @@ function reflectChangeLayerInQueryString(overlayCalled, didAdd){
 // To dock/undock the table of contents from bottom
 function toggleLegend(evt){
 	evt.preventDefault();
-	console.log(isLegendOpen)
+	//CS: console.log(isLegendOpen)
 	if (isLegendOpen){
 		isLegendOpen = false;
 		$("#tocButton").addClass('toc-button-closed').show();
@@ -1698,7 +1727,7 @@ function toggleLegend(evt){
 		$("#toc").removeClass('toc-view-open')
 		$("#toc").addClass('toc-view-closed')
 		if (desktopMode){
-			console.log("desktopMode")
+			//CS: console.log("desktopMode")
 			$("#neatline").show();
 		}
 
@@ -1713,8 +1742,8 @@ function toggleLegend(evt){
 
 		if (legendType == "polygons"){
 			setTimeout(function(){
-				console.log(levelEngaged)
-				console.log(level1Selected)
+				//CS: console.log(levelEngaged)
+				//CS: console.log(level1Selected)
 				drawThisView(map.getBounds(), map.getZoom(), levelEngaged, level1Selected)
 			}, 100)
 		}else if (legendType == "lines"){
@@ -1727,7 +1756,7 @@ function toggleLegend(evt){
 
 // To configure desktop view (not called upon pageload - all HTML defaults to desktop styles)
 function transformToDesktop(){
-	console.log("Transforming to desktop")
+	//CS: console.log("Transforming to desktop")
 	$("#tocModal").modal('hide');
 	$("#infoModal").modal('hide');
 	$("#aboutModal").modal('hide');
@@ -1779,8 +1808,8 @@ function transformToTablet(){
 }
 
 function mailTheView(e,clickID){
-	console.log(e)
-	console.log(clickID)
+	//CS: console.log(e)
+	//CS: console.log(clickID)
 	document.location.href = "mailto:csee@wisc.edu?Subject=Coastal%20Bordner%20Feedback";
 }
 
@@ -1790,7 +1819,7 @@ function dispatchButtonClick(e, buttonClicked){
 	e.preventDefault()
 	e.stopPropagation()
 	if (desktopMode == true){
-		console.log("Dispatching button click in DESKTOP MODE")
+		//CS: console.log("Dispatching button click in DESKTOP MODE")
 		if (buttonClicked == 'locateMeButton'){
 			geoLocate();
 		}else if (buttonClicked == "layerListButton"){
@@ -1809,11 +1838,11 @@ function dispatchButtonClick(e, buttonClicked){
 			window.location = "./";
 			return
 		}else{
-			console.log("Unknown button, returning...")
+			//CS: console.log("Unknown button, returning...")
 			return;
 		}
 	}else{
-		console.log("Dispatching button click in TABLET MODE")
+		//CS: console.log("Dispatching button click in TABLET MODE")
 		//tablet mode
 		if (buttonClicked == 'locateMeButton'){	
 			geoLocate();
@@ -1837,7 +1866,7 @@ function dispatchButtonClick(e, buttonClicked){
 			window.location = "./";
 			return
 		}else{
-			console.log("Unknown button, returning...")
+			//CS: console.log("Unknown button, returning...")
 			return;
 		}
 	}
@@ -1960,7 +1989,7 @@ $('.modal').on('hidden.bs.modal', function () {
 
 // Handle toggle of the level 1/level 2 checkbox
 function toggleCheckbox(checkObj){
-	console.log(checkObj.checked) // true = level 2, false = level 1
+	//CS: console.log(checkObj.checked) // true = level 2, false = level 1
 }
 
 // Extends the leaflet control for creating the buttons in the lower left of the map
@@ -2041,7 +2070,7 @@ function drawThisView(boundsIn, zoomIn, _levelEngaged, _level1Selected){
 		// level1 = (Deciduous)
 		// level2 = (Scrub Oak)
 		//var _levelEngaged = "1"
-		//console.log(zoomIn)
+		////CS: console.log(zoomIn)
 		if ((zoomIn >= semanticZoomLevel) && (legendType === "polygons")){
 			//draw the legend
 			if (_levelEngaged == "1"){
@@ -2051,7 +2080,7 @@ function drawThisView(boundsIn, zoomIn, _levelEngaged, _level1Selected){
 				//detailed view of sing class
 				cartoQuery = generateSpecificLayerQuery(boundsIn, _level1Selected)
 			}
-			// console.log(cartoQuery)
+			// //CS: console.log(cartoQuery)
 			sql.execute(cartoQuery)
 				.done(function(data) {
 					$("#legendHolder").empty();
@@ -2084,7 +2113,7 @@ function drawThisView(boundsIn, zoomIn, _levelEngaged, _level1Selected){
 					adjustTabletLegend()
 				})
 				.error(function(errors) {
-					console.log("errors:" + errors);
+					//CS: console.log("errors:" + errors);
 				})
 		}else{
 			//zoom < 13
@@ -2239,9 +2268,9 @@ function drawPolyFilterTablet(el, _levelEngaged, _level1Selected){
 	//draw the filter swatches vertically instead of horizontally to improve readability of labels
 
 	var props = getLevelProps(_levelEngaged, _level1Selected)
-	console.log(props)
+	//CS: console.log(props)
 	$(el).empty();
-		// console.log(summary)
+		// //CS: console.log(summary)
 		var width = $(el).width();
 		var height = $(el).height() - 25;
 
@@ -2489,8 +2518,8 @@ function drawPolygonHistogramDesktop(data, _levelEngaged, el, histogramScale){
 				if (_levelEngaged == 1){
 						dispatchLegendClick(level1Selected)
 				} else {
-					console.log("A")
-					console.log(d)
+					//CS: console.log("A")
+					//CS: console.log(d)
 					window.open('about/#'+d.type.replace(/ |,|\.|\)|\(/g, "_"))
 				}
 			})
@@ -2537,8 +2566,8 @@ function drawPolygonHistogramDesktop(data, _levelEngaged, el, histogramScale){
 				if (_levelEngaged == 1){
 						dispatchLegendClick(level1Selected)
 				} else {
-					console.log("B")
-					console.log(d)
+					//CS: console.log("B")
+					//CS: console.log(d)
 					window.open('about/#'+d.type.replace(/ |,|\.|\)|\(/g, "_"))
 				}
 			})
@@ -2752,7 +2781,7 @@ function summarize(data, level){
 	if (sorted[0].area == 0){
 		sorted.shift();
 	}
-	console.log(sorted)
+	//CS: console.log(sorted)
 	return sorted
 }
 
@@ -2808,7 +2837,7 @@ function dispatchLegendClick(level1Selected){
 
 
 function drawLineLegend(){
-	console.log("Drawing line legend")
+	//CS: console.log("Drawing line legend")
 	$("#legendHolder").empty();
 	$("#legendLogLinear").empty();
 	$("#legendHolder").addClass("stylescroll").addClass('autoscroll')
@@ -2884,7 +2913,7 @@ function drawPointLegend(){
 	$("#legendLogLinear").empty();
 	$("#legendHolder").addClass("stylescroll").addClass('autoscroll');
 	var pointlegendSorted = _.chain(pointLegend).sortBy("frequency").sortBy("class").unique(function(d){return d.group}).value()
-	console.log(pointlegendSorted)
+	//CS: console.log(pointlegendSorted)
 	for (var i=0; i < pointlegendSorted.length; i++){
 		var symbol = pointlegendSorted[i];
 		var legendEntry = makePointOrLineLegendItem(symbol);
@@ -2950,7 +2979,7 @@ function showAllPoints(){
 	var pointStyle = getPointCSS("all", map.getZoom());
 	points.setCartoCSS(pointStyle);
 	points.bringToFront();
-	console.log(basemapChoice);
+	//CS: console.log(basemapChoice);
 }
 
 function showOnePoint(pointType){
@@ -3015,7 +3044,7 @@ function switchLevel(_levelEngaged, _level1Selected){
 //////////////////// Stock code for enabling map queries against CARTO server
 var Map = cdb.core.View.extend({
 	initialize: function() {
-	  console.log("Map.initialize")
+	  //CS: console.log("Map.initialize")
 	  _.bindAll(this, '_initMap');
 	  this.filters = this.options.filters;
 	  this._getVizJson();
@@ -3064,7 +3093,7 @@ var Map = cdb.core.View.extend({
 var Filters = cdb.core.View.extend({
 
 	initialize: function() {
-	  console.log("Filters.initialize")
+	  //CS: console.log("Filters.initialize")
 	  _.bindAll(this, 'render');
 	  this._getActions();
 	},
@@ -3115,7 +3144,7 @@ var Filters = cdb.core.View.extend({
 // create a word cloud just for fun...
 var word_count = {};
 function createWordCloud(hashedDivID, tempC, _drawLevel){
-	//console.log(tempC)
+	////CS: console.log(tempC)
 	$(hashedDivID).empty();
 	for (var key in tempC) {
 		var value = tempC[key];
