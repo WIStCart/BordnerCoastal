@@ -1494,6 +1494,7 @@ function refreshPoints(){
 }
 
 // Media query for when the app traverses the tablet/desktop threshold
+var firstCall = "yes"
 var jsMediaQuery = function() {
 	console.log("Called")
 	if (window.matchMedia('(max-width: 767px)').matches){
@@ -1504,6 +1505,13 @@ var jsMediaQuery = function() {
 			transformToTablet();
 		}
 	}else{
+		if (firstCall = "yes"){
+			firstCall = "no"
+			desktopMode = false;
+			transformToTablet();
+			desktopMode = true;
+			transformToDesktop();
+		}
 		if (desktopMode === false){
 			desktopMode = true;
 			console.log("~~ desktop mode engaged")
