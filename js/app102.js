@@ -56,6 +56,11 @@ var canDoGeolocation;
 
 var isMobileClickWindowOpen = true;
 
+/* Always use HTTPS! */
+if (location.protocol != 'https:')
+{
+ location.href = 'https:' + window.location.href.substring(window.location.protocol.length);
+}
 
 //limit panning
 var north = 47.5
@@ -86,48 +91,83 @@ var satelliteBasemap =  L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest
 	attribution: 'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community'
 });
 
-
 var kewaunee = 	L.tileLayer('https://maps.sco.wisc.edu/BordnerCoastal/BordnerTile/Kewaunee/{z}/{x}/{y}.png', {
- 	attribution: 'WHAI'
+ 	attribution: 'WHAI',
+ 	bounds: new L.latLngBounds([[44.327162,-87.766194],[44.67706,-86.778398]]),
+ 	noWrap: true
 });
 var racine = L.tileLayer('https://maps.sco.wisc.edu/BordnerCoastal/BordnerTile/Racine2/{z}/{x}/{y}.png', {
- 	attribution: 'WHAI'
+ 	attribution: 'WHAI',
+ 	bounds: new L.latLngBounds([[42.6108171,-88.30806],[42.843609,-87.043899]]),
+ 	noWrap: true
 });
 var kenosha = L.tileLayer('https://maps.sco.wisc.edu/BordnerCoastal/BordnerTile/Kenosha/{z}/{x}/{y}.png', {
- 	attribution: 'WHAI'
+ 	attribution: 'WHAI',
+ 	bounds: new L.latLngBounds([[42.4917199,-88.305891],[42.669875,-87.0198629]]),
+ 	noWrap: true
 });
 var ozaukee = L.tileLayer('https://maps.sco.wisc.edu/BordnerCoastal/BordnerTile/Ozaukee2/{z}/{x}/{y}.png', {
- 	attribution: 'WHAI'
+ 	attribution: 'WHAI',
+ 	bounds: new L.latLngBounds([[43.1908159,-88.06379],[43.5434179,-87.1190079]]),
+ 	noWrap: true
 });
 var douglas = L.tileLayer('https://maps.sco.wisc.edu/BordnerCoastal/BordnerTile/Douglas/{z}/{x}/{y}.png', {
- 	attribution: 'WHAI'
+ 	attribution: 'WHAI',
+ 	bounds: new L.latLngBounds([[46.1569631,-92.293705],[46.8932129,-91.5493488]]),
+ 	noWrap: true
 });
 var bayfield = L.tileLayer('https://maps.sco.wisc.edu/BordnerCoastal/BordnerTile/Bayfield/{z}/{x}/{y}.png', {
- 	attribution: 'WHAI'
+ 	attribution: 'WHAI',
+ 	bounds: new L.latLngBounds([[46.15463,-91.5539819],[47.210962,-90.732857]]),
+ 	noWrap: true
 });
 var oconto = L.tileLayer('https://maps.sco.wisc.edu/BordnerCoastal/BordnerTile/Oconto/{z}/{x}/{y}.png', {
- 	attribution: 'WHAI'
+ 	attribution: 'WHAI',
+ 	bounds: new L.latLngBounds([[44.67236,-88.680066],[45.3786821,-87.760071]]),
+ 	noWrap: true
 });
 var ashland = L.tileLayer('https://maps.sco.wisc.edu/BordnerCoastal/BordnerTile/Ashland/{z}/{x}/{y}.png', {
- 	attribution: 'WHAI'
+ 	attribution: 'WHAI',
+ 	bounds: new L.latLngBounds([[45.980505,-90.9283409],[47.3098219,-89.9571019]]),
+ 	noWrap: true
 });
 var brown = L.tileLayer('https://maps.sco.wisc.edu/BordnerCoastal/BordnerTile/Brown/{z}/{x}/{y}.png', {
- 	attribution: 'WHAI'
+ 	attribution: 'WHAI',
+ 	bounds: new L.latLngBounds([[44.240379,-88.252569],[44.679815,-87.758048]]),
+ 	noWrap: true
 });
-
 var iron = L.tileLayer('https://maps.sco.wisc.edu/BordnerCoastal/BordnerTile/Iron6/{z}/{x}/{y}.png', {
- 	attribution: 'WHAI'
+ 	attribution: 'WHAI',
+ 	bounds: new L.latLngBounds([[45.9813489,-90.55228],[46.7981819,-89.9281269]]),
+ 	noWrap: true
 });
-
 var marinette = L.tileLayer('https://maps.sco.wisc.edu/BordnerCoastal/BordnerTile/Marinette/{z}/{x}/{y}.png', {
- 	attribution: 'WHAI'
+ 	attribution: 'WHAI',
+ 	bounds: new L.latLngBounds([[44.7643671,-88.4281021],[45.7956369,-87.4427599]]),
+ 	noWrap: true
 });
-
 var manitowoc = L.tileLayer('https://maps.sco.wisc.edu/BordnerCoastal/BordnerTile/Manitowoc/{z}/{x}/{y}.png', {
- 	attribution: 'WHAI'
+ 	attribution: 'WHAI',
+ 	bounds: new L.latLngBounds([[43.8915849,-88.04378],[44.3288248,-86.9234029]]),
+ 	noWrap: true
+});
+var sheboygan = L.tileLayer('https://maps.sco.wisc.edu/BordnerCoastal/BordnerTile/Sheboygan/{z}/{x}/{y}.png', {
+ 	attribution: 'WHAI',
+ 	bounds: new L.latLngBounds([[43.5414329,-88.162274],[43.8951549,-87.0753349]]),
+ 	noWrap: true
 });
 
-var historicBasemap = L.layerGroup([kewaunee, racine, kenosha, ozaukee, douglas, bayfield, oconto, ashland, brown, iron, marinette, manitowoc]);
+var historicBasemap = L.layerGroup([kewaunee, racine, kenosha, ozaukee, douglas, bayfield, oconto, ashland, brown, iron, marinette, manitowoc, sheboygan]);
+//var historicBasemap = L.layerGroup([brown]);
+
+// Open the layer list when the splash modal closes
+$("#splashModal").on('hidden.bs.modal', function (e) {
+	if (desktopMode == true){
+		dispatchButtonClick(e, "layerListButton")
+	}
+});
+
+
 
 // Create CartoCSS
 function getPolyStyle(level, level1Selected){
