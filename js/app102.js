@@ -156,8 +156,13 @@ var sheboygan = L.tileLayer('https://maps.sco.wisc.edu/BordnerCoastal/BordnerTil
  	bounds: new L.latLngBounds([[43.5414329,-88.162274],[43.8951549,-87.0753349]]),
  	noWrap: true
 });
+var door = L.tileLayer('https://maps.sco.wisc.edu/BordnerCoastal/BordnerTile/Door/{z}/{x}/{y}.png', {
+ 	attribution: 'WHAI',
+ 	// bounds: new L.latLngBounds([[44.674961,-87.736862],[45.429852,-86.763954]]),
+ 	// noWrap: true
+});
 
-var historicBasemap = L.layerGroup([kewaunee, racine, kenosha, ozaukee, douglas, bayfield, oconto, ashland, brown, iron, marinette, manitowoc, sheboygan]);
+var historicBasemap = L.layerGroup([kewaunee, racine, kenosha, ozaukee, douglas, bayfield, oconto, ashland, brown, iron, marinette, manitowoc, sheboygan, door]);
 //var historicBasemap = L.layerGroup([brown]);
 
 // Open the layer list when the splash modal closes
