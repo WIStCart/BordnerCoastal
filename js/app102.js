@@ -186,8 +186,19 @@ var florence = L.tileLayer('https://maps.sco.wisc.edu/BordnerCoastal/BordnerTile
  	noWrap: true
 });
 
+var calumet = L.tileLayer('https://maps.sco.wisc.edu/BordnerCoastal/BordnerTile/Calumet/{z}/{x}/{y}.png', {
+ 	attribution: 'WHAI',
+ 	bounds: new L.latLngBounds([[43.863542,-88.409729],[44.248642,-88.026194]]),
+ 	noWrap: true
+});
 
-var historicBasemap = L.layerGroup([kenosha, racine, milwaukee, ozaukee, sheboygan, manitowoc, kewaunee, door, brown, oconto, marinette, iron, ashland, bayfield, douglas, forest, vilas, florence]);
+var washington = L.tileLayer('https://maps.sco.wisc.edu/BordnerCoastal/BordnerTile/Washington/{z}/{x}/{y}.png', {
+ 	attribution: 'WHAI',
+ 	bounds: new L.latLngBounds([[43.184151,-88.427582],[43.550539,-88.032074]]),
+ 	noWrap: true
+});
+
+var historicBasemap = L.layerGroup([kenosha, racine, milwaukee, ozaukee, sheboygan, manitowoc, kewaunee, door, brown, oconto, marinette, iron, ashland, bayfield, douglas, forest, vilas, florence, calumet, washington]);
 //var historicBasemap = L.layerGroup([brown]);
 
 // Open the layer list when the splash modal closes
