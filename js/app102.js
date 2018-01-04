@@ -106,7 +106,7 @@ var milwaukee = L.tileLayer('https://maps.sco.wisc.edu/BordnerCoastal/BordnerTil
  	bounds: new L.latLngBounds([[42.842117,-88.070876],[43.194967,-87.063984]]),
  	noWrap: true
 });
-var ozaukee = L.tileLayer('https://maps.sco.wisc.edu/BordnerCoastal/BordnerTile/Ozaukee/{z}/{x}/{y}.png', {
+var ozaukee = L.tileLayer('https://maps.sco.wisc.edu/BordnerCoastal/BordnerTile/Ozaukee2/{z}/{x}/{y}.png', {
  	attribution: 'WHAI',
  	bounds: new L.latLngBounds([[43.1908159,-88.06379],[43.5434179,-87.1190079]]),
  	noWrap: true
