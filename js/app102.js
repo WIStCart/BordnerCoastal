@@ -6,6 +6,7 @@ var totalFeatures = 0
 var map;
 var sql = new cartodb.SQL({ user: 'sco-admin' });
 var currentBasemap;
+var currentBasemapString = "";
 var bordner;
 var classConfigs = {};
 var level1Membership = {};
@@ -55,6 +56,7 @@ var theLocation;
 var canDoGeolocation;
 
 var historicSatelliteSwiperAdded = false;
+var primaryCall = true;
 var isMobileClickWindowOpen = true;
 
 /* Always use HTTPS! */
@@ -1795,42 +1797,46 @@ function showAllPolygons(){
 
 // To turn on the appropriate basemap, note, the radio button's id must match the basemap's variable name
 function turnOnBasemap(basemapCalled){
-	console.log(basemapCalled)
-	if(((basemapCalled == "streetsBasemap") || (basemapCalled == "satelliteBasemap"))&&(!im_using_a_terrible_browser)){
-		if (historicSatelliteSwiperAdded){
-			historicSatelliteSwiperAdded = false;
-			$('.leaflet-sbs-range').addClass("leaflet-sbs-range-OFF")
-			map.removeLayer(historicBasemap);
-			map.removeLayer(satelliteBasemapSlider);
+	console.log(basemapCalled  + " = " + currentBasemapString)
+	if (basemapCalled != currentBasemapString){
+		primaryCall = false
+		if(((basemapCalled == "streetsBasemap") || (basemapCalled == "satelliteBasemap"))&&(!im_using_a_terrible_browser)){
+			if (historicSatelliteSwiperAdded){
+				historicSatelliteSwiperAdded = false;
+				$('.leaflet-sbs-range').addClass("leaflet-sbs-range-OFF")
+				map.removeLayer(historicBasemap);
+				map.removeLayer(satelliteBasemapSlider);
+			}
 		}
-	}
-	
-	map.removeLayer(currentBasemap)
-	
-	if(basemapCalled == "historicBasemap"){
-		if (!im_using_a_terrible_browser){
-			map.addLayer(historicBasemap);
-			window[basemapCalled].eachLayer(function(layer){
-				//CS: console.log(layer)
-				layer.bringToBack();
-			});
-			map.addLayer(satelliteBasemapSlider);
-			satelliteBasemapSlider.bringToBack();
-			historicSatelliteSwiperAdded = true;
-			$('.leaflet-sbs-range').removeClass("leaflet-sbs-range-OFF")
+		
+		map.removeLayer(currentBasemap)
+		
+		if(basemapCalled == "historicBasemap"){
+			if (!im_using_a_terrible_browser){
+				map.addLayer(historicBasemap);
+				window[basemapCalled].eachLayer(function(layer){
+					//CS: console.log(layer)
+					layer.bringToBack();
+				});
+				map.addLayer(satelliteBasemapSlider);
+				satelliteBasemapSlider.bringToBack();
+				historicSatelliteSwiperAdded = true;
+				$('.leaflet-sbs-range').removeClass("leaflet-sbs-range-OFF")
+			}else{
+				map.addLayer(historicBasemap);
+				window[basemapCalled].eachLayer(function(layer){
+					//CS: console.log(layer)
+					layer.bringToBack();
+				});
+			}
 		}else{
-			map.addLayer(historicBasemap);
-			window[basemapCalled].eachLayer(function(layer){
-				//CS: console.log(layer)
-				layer.bringToBack();
-			});
+			map.addLayer(window[basemapCalled]);
+			window[basemapCalled].bringToBack();
 		}
-	}else{
-		map.addLayer(window[basemapCalled]);
-		window[basemapCalled].bringToBack();
+		currentBasemap = window[basemapCalled]
+		currentBasemapString = basemapCalled;
+		replaceQueryValue("basemap", basemapCalled.replace("Basemap", ""));
 	}
-	currentBasemap = window[basemapCalled]
-	replaceQueryValue("basemap", basemapCalled.replace("Basemap", ""));
 }
 
 // To turn on the appropriate basemap, note, the radio button's id must match the basemap's variable name
