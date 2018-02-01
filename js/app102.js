@@ -54,12 +54,25 @@ var navIsOn = false;
 var theLocation;
 var canDoGeolocation;
 
+var historicSatelliteSwiperAdded = false;
 var isMobileClickWindowOpen = true;
 
 /* Always use HTTPS! */
 if (location.protocol != 'https:')
 {
  location.href = 'https:' + window.location.href.substring(window.location.protocol.length);
+}
+
+var im_using_a_terrible_browser = notIE();
+function notIE(){
+    var ua = window.navigator.userAgent;
+    if (ua.indexOf('Edge/') > 0 || 
+        ua.indexOf('Trident/') > 0 || 
+        ua.indexOf('MSIE ') > 0){
+       return true;
+    }else{
+        return false;                
+    }
 }
 
 //limit panning
@@ -88,6 +101,10 @@ var streetsBasemap = L.tileLayer('https://cartodb-basemaps-{s}.global.ssl.fastly
 });
 
 var satelliteBasemap =  L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+	attribution: 'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community'
+});
+
+var satelliteBasemapSlider =  L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
 	attribution: 'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community'
 });
 
@@ -205,6 +222,9 @@ var menominee = L.tileLayer('https://maps.sco.wisc.edu/BordnerCoastal/BordnerTil
 
 var historicBasemap = L.layerGroup([kenosha, racine, milwaukee, ozaukee, sheboygan, manitowoc, kewaunee, door, brown, oconto, marinette, iron, ashland, bayfield, douglas, forest, vilas, florence, calumet, washington, menominee]);
 //var historicBasemap = L.layerGroup([brown]);
+
+var historicSatelliteSwiper = L.control.sideBySide(historicBasemap, satelliteBasemapSlider)
+
 
 // Open the layer list when the splash modal closes
 $("#splashModal").on('hidden.bs.modal', function (e) {
@@ -399,7 +419,16 @@ window.onload = function() {
 		maxZoom: 18,
 		maxBounds: bounds
 	});
-
+	
+	if (!im_using_a_terrible_browser){
+		historicSatelliteSwiperAdded = false;
+		map.addLayer(historicBasemap);
+		map.addLayer(satelliteBasemapSlider);
+		map.addControl(historicSatelliteSwiper)
+		map.removeLayer(historicBasemap);
+		map.removeLayer(satelliteBasemapSlider);
+		$('.leaflet-sbs-range').addClass("leaflet-sbs-range-OFF")
+	}
 
 	// Add county layer
 	var cartoCSSCounty = "#layer { " +
@@ -1766,14 +1795,38 @@ function showAllPolygons(){
 
 // To turn on the appropriate basemap, note, the radio button's id must match the basemap's variable name
 function turnOnBasemap(basemapCalled){
+	console.log(basemapCalled)
+	if(((basemapCalled == "streetsBasemap") || (basemapCalled == "satelliteBasemap"))&&(!im_using_a_terrible_browser)){
+		if (historicSatelliteSwiperAdded){
+			historicSatelliteSwiperAdded = false;
+			$('.leaflet-sbs-range').addClass("leaflet-sbs-range-OFF")
+			map.removeLayer(historicBasemap);
+			map.removeLayer(satelliteBasemapSlider);
+		}
+	}
+	
 	map.removeLayer(currentBasemap)
-	map.addLayer(window[basemapCalled]);
+	
 	if(basemapCalled == "historicBasemap"){
-		window[basemapCalled].eachLayer(function(layer){
-			//CS: console.log(layer)
-			layer.bringToBack();
-		});
+		if (!im_using_a_terrible_browser){
+			map.addLayer(historicBasemap);
+			window[basemapCalled].eachLayer(function(layer){
+				//CS: console.log(layer)
+				layer.bringToBack();
+			});
+			map.addLayer(satelliteBasemapSlider);
+			satelliteBasemapSlider.bringToBack();
+			historicSatelliteSwiperAdded = true;
+			$('.leaflet-sbs-range').removeClass("leaflet-sbs-range-OFF")
+		}else{
+			map.addLayer(historicBasemap);
+			window[basemapCalled].eachLayer(function(layer){
+				//CS: console.log(layer)
+				layer.bringToBack();
+			});
+		}
 	}else{
+		map.addLayer(window[basemapCalled]);
 		window[basemapCalled].bringToBack();
 	}
 	currentBasemap = window[basemapCalled]
