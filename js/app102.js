@@ -1448,12 +1448,9 @@ function setUpMap(){
 		  autocomplete: false, // Turn off autocomplete in order to get "bounds" option to work (also see line 769 and 772 in leaflet-geocoder-mapzen.js for the slight hack to make this work).
 		  layers: ['venue','address','county','locality','region','localadmin','neighbourhood'] // Other options include: ['venue', 'address', 'country', 'region', 'county', 'locality', 'localadmin','neighbourhood'] 
 		}
-	  //var geocoder = L.control.geocoder('search-te2euuB', options).addTo(map); // Note, Mapzen api is engaged through CS's github account
-	  var geocoder = L.Control.geocoder().addTo(map); // Needed to roll back to version 1.5.4 of https://github.com/perliedman/leaflet-control-geocoder for compatibility with this app's version of Carto.js (which is built from ~leaflet 1.0)
-	  //$('.leaflet-pelias-control').appendTo('#geocodeSearchButton')
-	  $('.leaflet-control-geocoder-icon').html("").addClass('button-icon-class').addClass('glyphicon').addClass('glyphicon-search')//.removeClass('leaflet-control-geocoder-icon')
-	  $('.leaflet-control-geocoder').appendTo('#geocodeSearchButton').attr("data-toggle","tooltip")//.attr("title","Search for a Place")//.addClass("leaflet-control-custom") //leaflet-bar leaflet-control
-	  //$('.leaflet-pelias-search-icon').attr("data-toggle", "tooltip").attr("title","Search")
+	  var geocoder = L.control.geocoder('search-te2euuB', options).addTo(map); // Note, Mapzen api is engaged through CS's github account
+	  $('.leaflet-pelias-control').appendTo('#geocodeSearchButton')
+	  $('.leaflet-pelias-search-icon').attr("data-toggle", "tooltip").attr("title","Search")
 	$("#layerList")
 		.html(
 		//'<button class="btn btn-primary btn-sm btn-close layer-list-close-btn pull-right"><span class="glyphicon glyphicon-remove"></span></button>' +

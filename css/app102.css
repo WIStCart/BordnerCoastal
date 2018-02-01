@@ -261,7 +261,7 @@ body{
 		left: 50%;
 	}
 	.geocode-search-button{
-		//visibility:hidden;	
+		visibility:hidden;	
 	}
 }
 
@@ -488,13 +488,6 @@ body{
 	text-align: center;
 	margin-top: 5px!important;
 	float: none;
-}
-.leaflet-control-geocoder-icon {
-	width: 29px;
-	height: 29px;
-	color: #999999;
-	background-image: none !important;
-	top: 0px;
 }
 
 /*Aligns zoom controls with other custom controls*/
