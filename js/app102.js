@@ -1797,7 +1797,6 @@ function showAllPolygons(){
 
 // To turn on the appropriate basemap, note, the radio button's id must match the basemap's variable name
 function turnOnBasemap(basemapCalled){
-	console.log(basemapCalled  + " = " + currentBasemapString)
 	if (basemapCalled != currentBasemapString){
 		primaryCall = false
 		if(((basemapCalled == "streetsBasemap") || (basemapCalled == "satelliteBasemap"))&&(!im_using_a_terrible_browser)){
