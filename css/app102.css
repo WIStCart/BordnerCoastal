@@ -76,22 +76,6 @@ body{
 	color: white;
 }
 
-.leaflet-sbs-range {
-    left: 0px;
-}
-.leaflet-sbs-divider {
-    width: 0px !important;
-}
-
-.slider.slider-horizontal .slider-tick-container {
-    opacity: 0 !important;
-}
-.leaflet-sbs-range-OFF{
-    //display: none !important;
-	position: unset !important;
-	height: 0px !important;
-}
-
 /* next 3 media queries to resolve issues on narriw height screens */
 @media (max-height: 650px){
 	.toc-button{
