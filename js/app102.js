@@ -202,8 +202,25 @@ var menominee = L.tileLayer('https://maps.sco.wisc.edu/BordnerCoastal/BordnerTil
  	bounds: new L.latLngBounds([[44.855492,-88.98214],[45.118011,-88.483551]]),
  	noWrap: true
 });
+var oneida = L.tileLayer('https://maps.sco.wisc.edu/BordnerCoastal/BordnerTile/Oneida/{z}/{x}/{y}.png', {
+ 	attribution: 'WHAI',
+ 	bounds: new L.latLngBounds([[45.910815,-90.063806],[45.371177,-88.8195553]]),
+ 	noWrap: true
+});
 
-var historicBasemap = L.layerGroup([kenosha, racine, milwaukee, ozaukee, sheboygan, manitowoc, kewaunee, door, brown, oconto, marinette, iron, ashland, bayfield, douglas, forest, vilas, florence, calumet, washington, menominee]);
+var outagamie = L.tileLayer('https://maps.sco.wisc.edu/BordnerCoastal/BordnerTile/Outagamie/{z}/{x}/{y}.png', {
+ 	attribution: 'WHAI',
+ 	bounds: new L.latLngBounds([[44.633562, -88.791568],[44.234670, -88.097511]]),
+ 	noWrap: true
+});
+
+var winnebago = L.tileLayer('https://maps.sco.wisc.edu/BordnerCoastal/BordnerTile/Winnebago/{z}/{x}/{y}.png', {
+ 	attribution: 'WHAI',
+ 	bounds: new L.latLngBounds([[44.331621, -88.960851],[43.881881, -88.317578]]),
+ 	noWrap: true
+});
+
+var historicBasemap = L.layerGroup([kenosha, racine, milwaukee, oneida, ozaukee, outagamie, sheboygan, manitowoc, kewaunee, door, brown, oconto, marinette, iron, ashland, bayfield, douglas, forest, vilas, florence, calumet, washington, winnebago, menominee]);
 //var historicBasemap = L.layerGroup([brown]);
 
 // Open the layer list when the splash modal closes
@@ -1593,9 +1610,18 @@ function setUpMap(){
 		}
 	})
 	
+	setTimeout(
+		function(){
+			if ($("#counties")["0"].checked){
+				if (counties){
+					counties.bringToFront()
+				}
+			}
+		}, 300)
 	$('#splashModal').modal('show');
 	// Done, tell the console!
 	//CS: console.log("setUpMap() complete. desktopMode = " + desktopMode)
+	
 }
 
 function refreshLines(){
