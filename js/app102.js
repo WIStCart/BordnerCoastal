@@ -220,7 +220,25 @@ var winnebago = L.tileLayer('https://maps.sco.wisc.edu/BordnerCoastal/BordnerTil
  	noWrap: true
 });
 
-var historicBasemap = L.layerGroup([kenosha, racine, milwaukee, oneida, ozaukee, outagamie, sheboygan, manitowoc, kewaunee, door, brown, oconto, marinette, iron, ashland, bayfield, douglas, forest, vilas, florence, calumet, washington, winnebago, menominee]);
+var shawano = L.tileLayer('https://maps.sco.wisc.edu/BordnerCoastal/BordnerTile/Shawano/{z}/{x}/{y}.png', {
+ 	attribution: 'WHAI',
+	bounds: new L.latLngBounds([[45.029665, -89.224370],[44.584746, -88.242664]]),
+ 	noWrap: true
+});
+
+var langlade = L.tileLayer('https://maps.sco.wisc.edu/BordnerCoastal/BordnerTile/Langlade/{z}/{x}/{y}.png', {
+ 	attribution: 'WHAI',
+	bounds: new L.latLngBounds([[45.470015, -89.425985],[45.028917, -88.638174]]),
+ 	noWrap: true
+});
+
+var dodge = L.tileLayer('https://maps.sco.wisc.edu/BordnerCoastal/BordnerTile/Dodge/{z}/{x}/{y}.png', {
+ 	attribution: 'WHAI',
+	bounds: new L.latLngBounds([[43.633542, -89.009569],[43.194697, -88.400388]]),
+ 	noWrap: true
+});
+
+var historicBasemap = L.layerGroup([kenosha, racine, milwaukee, oneida, ozaukee, outagamie, sheboygan, manitowoc, kewaunee, door, brown, oconto, marinette, iron, ashland, bayfield, douglas, forest, vilas, florence, calumet, washington, winnebago, menominee, shawano, langlade, dodge]);
 //var historicBasemap = L.layerGroup([brown]);
 
 // Open the layer list when the splash modal closes
