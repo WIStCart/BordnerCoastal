@@ -5,11 +5,16 @@ Collaborative project between Forest Landscape and Ecology Lab (FLEL) and State 
 Here are the general steps to updating the Bordner data in CARTO:
 1) We have received updates from FLEL in the past - the data has been prepared for integration completely, so no processing needed on our end except anything mentioned here. Save the data to: Z:\PROJECTS\Bordner_Coastal_Grant\ this is where past data has been prepped. Use the naming syntax XX_Bordner_Update_MMDDYY. Follow along with the Folder numbers within the direcotry here for example purposes: Z:\PROJECTS\Bordner_Coastal_Grant\01_App_Data_Updates\01_Bordner_Update_040519.
 2) Folder "01" export each of the 3 feature classes to .shp, titled:
-  ```final_coastal_polygonsMMDDYY```
-  ```final_coastal_linesMMDDYY```
-  ```final_coastal_pointsMMDDYY```
-x) Login to CARTO using the SCO account (see login instructions in keys)
-y) ```final_coastal_points```, ```final_costal_polygons```, ```final_coastal_lines``` are the three live feature tables. Archive the ones being updated by appending old + datestamp (e.g. "_old_040519"). 
+- ```final_coastal_polygonsMMDDYY```
+- ```final_coastal_linesMMDDYY```
+- ```final_coastal_pointsMMDDYY```
+3) Login to CARTO using the SCO account (see login instructions in keys). Ensure that the schemas of the new .shps match that of their matching tables in CARTO. 
+4) Zip each of the shapefiles, and upload each to CARTO. 
+5) ```final_coastal_points```, ```final_costal_polygons```, ```final_coastal_lines``` are the three live feature tables in CARTO. Archive the ones being updated by appending old + datestamp (e.g. "_old_040519"). NOTE THAT THIS WILL BREAKE THE APP FOR A SHORT WHILE WHILE YOU SWAP THINGS OUT.
+6) In CARTO, rename these tables and make them public.
+- ```final_coastal_polygonsMMDDYY```
+- ```final_coastal_linesMMDDYY```
+- ```final_coastal_pointsMMDDYY```
 
 ### Browser API
 The application has a number of URL parameters that allow users to programmatically create map configurations. At the current time, the options include:
