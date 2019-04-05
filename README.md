@@ -3,8 +3,13 @@ Collaborative project between Forest Landscape and Ecology Lab (FLEL) and State 
 
 ### Data updates
 Here are the general steps to updating the Bordner data in CARTO:
-1) We have recieved updates from FLEL in the past - the data has been prepared for integration completely, so no processing needed on our end ecept anything mentioned here.
-2) 
+1) We have received updates from FLEL in the past - the data has been prepared for integration completely, so no processing needed on our end except anything mentioned here. Save the data to: Z:\PROJECTS\Bordner_Coastal_Grant\ this is where past data has been prepped. Use the naming syntax XX_Bordner_Update_MMDDYY. Follow along with the Folder numbers within the direcotry here for example purposes: Z:\PROJECTS\Bordner_Coastal_Grant\01_App_Data_Updates\01_Bordner_Update_040519.
+2) Folder "01" export each of the 3 feature classes to .shp, titled:
+  ```final_coastal_polygonsMMDDYY```
+  ```final_coastal_linesMMDDYY```
+  ```final_coastal_pointsMMDDYY```
+x) Login to CARTO using the SCO account (see login instructions in keys)
+y) ```final_coastal_points```, ```final_costal_polygons```, ```final_coastal_lines``` are the three live feature tables. Archive the ones being updated by appending old + datestamp (e.g. "_old_040519"). 
 
 ### Browser API
 The application has a number of URL parameters that allow users to programmatically create map configurations. At the current time, the options include:
