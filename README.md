@@ -8,7 +8,9 @@ Here are the general steps to updating the Bordner data in CARTO:
 - ```final_coastal_polygonsMMDDYY```
 - ```final_coastal_linesMMDDYY```
 - ```final_coastal_pointsMMDDYY```
-3) Login to CARTO using the SCO account (see login instructions in keys). Ensure that the schemas of the new .shps match that of their matching tables in CARTO. 
+3) Login to CARTO using the SCO account (see login instructions in keys). Ensure that the schemas of the new .shps match that of their matching tables in CARTO. When comparing schemas, note the following:
+- CARTO tables will automatically set all fieldnames to lowercase (so no need to worry about case differences)
+- There may be extra fields in the new data - it is ok to delete them or keep them.
 4) Zip each of the shapefiles, and upload each to CARTO. 
 5) ```final_coastal_points```, ```final_costal_polygons```, ```final_coastal_lines``` are the three live feature tables in CARTO. Archive the ones being updated by appending old + datestamp (e.g. "_old_040519"). NOTE THAT THIS WILL BREAKE THE APP FOR A SHORT WHILE WHILE YOU SWAP THINGS OUT.
 6) In CARTO, rename these tables and make them public.
