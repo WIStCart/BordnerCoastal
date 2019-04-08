@@ -7,7 +7,8 @@ Here are the general steps to updating the Bordner data in CARTO:
 2) Folder "01" export each of the 3 feature classes to .shp, titled:
 - ```final_coastal_polygonsMMDDYY``` *The polygon layer will be too big for CARTO to handle. There are some other steps that need to be done to this layer as well. Perform these steps for polys:
   a) The "area" field *WAS* need to but is no longer, no action needed on this item.
-  b) Menominee is lilely a gap in the new data. We'll add menomineesection polygons to the poly data as a placeholder.  
+  b) You can test the schema by simply uploading a small chunk of data to CARTO before proceeding to the next steps of chunking the big dataset up.
+  b) Menominee is lilely a gap in the new data. We'll add menominee PLSS section polygons to the poly data as a placeholder.  
   
 - ```final_coastal_linesMMDDYY``` *The 040519 update to lines worked (size was not an issue)
 - ```final_coastal_pointsMMDDYY``` *The 040519 update to points worked (size was not an issue)
