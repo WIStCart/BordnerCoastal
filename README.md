@@ -5,10 +5,12 @@ Collaborative project between Forest Landscape and Ecology Lab (FLEL) and State 
 Here are the general steps to updating the Bordner data in CARTO:
 1) We have received updates from FLEL in the past - the data has been prepared for integration completely, so no processing needed on our end except anything mentioned here. Save the data to: Z:\PROJECTS\Bordner_Coastal_Grant\ this is where past data has been prepped. Use the naming syntax XX_Bordner_Update_MMDDYY. Follow along with the Folder numbers within the direcotry here for example purposes: Z:\PROJECTS\Bordner_Coastal_Grant\01_App_Data_Updates\01_Bordner_Update_040519.
 2) Folder "01" export each of the 3 feature classes to .shp, titled:
-- ```final_coastal_polygonsMMDDYY``` *The polygon layer will be too big for CARTO to handle. So do this:
-  ..........
-- ```final_coastal_linesMMDDYY```
-- ```final_coastal_pointsMMDDYY```
+- ```final_coastal_polygonsMMDDYY``` *The polygon layer will be too big for CARTO to handle. There are some other steps that need to be done to this layer as well. Perform these steps for polys:
+  a) The "area" field *WAS* need to but is no longer, no action needed on this item.
+  b) Menominee is lilely a gap in the new data. We'll add menomineesection polygons to the poly data as a placeholder.  
+  
+- ```final_coastal_linesMMDDYY``` *The 040519 update to lines worked (size was not an issue)
+- ```final_coastal_pointsMMDDYY``` *The 040519 update to points worked (size was not an issue)
 3) Login to CARTO using the SCO account (see login instructions in keys). Ensure that the schemas of the new .shps match that of their matching tables in CARTO. When comparing schemas, note the following:
 - CARTO tables will automatically set all fieldnames to lowercase (so no need to worry about case differences)
 - There may be extra fields in the new data - it is ok to delete them or keep them.
