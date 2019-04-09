@@ -20,6 +20,11 @@ Here are the general steps to updating the Bordner data in CARTO:
 
 *This query will return the number of records in a table:
   ```SELECT count(*) AS exact_count FROM final_coastal_polygons```
+  
+ *It may be desireable to do it this way:
+  ```SINSERT INTO final_coastal_polygons_040819_0_100k (the_geom, the_geom_webmercator, cov1, mindiam1, maxdiam1, den1, pctcov1, cov2, mindiam2, maxdiam2, den2, pctcov2, cov3, mindiam3, maxdiam3, den3, pctcov3, cov4, mindiam4, maxdiam4, den4, pctcov4, extradigit, judgementc, judgemen_1, notes, judgemen_2, judgemen_3, ha, cov5, mindiam5, maxdiam5, den5, pctcov5, shape_leng, shape_area, area)  ```S
+  
+  ```SSELECT the_geom, the_geom_webmercator, cov1, mindiam1, maxdiam1, den1, pctcov1, cov2, mindiam2, maxdiam2, den2, pctcov2, cov3, mindiam3, maxdiam3, den3, pctcov3, cov4, mindiam4, maxdiam4, den4, pctcov4, extradigit, judgementc, judgemen_1, notes, judgemen_2, judgemen_3, ha, cov5, mindiam5, maxdiam5, den5, pctcov5, shape_leng, shape_area, area FROM final_coastal_polygons_040819_300_350k WHERE (cartodb_id >= 20000) AND (cartodb_id < 40000)  ```S
 
   b) Menominee is likely a gap in the new data. We'll add menominee PLSS section polygons to the poly data as a placeholder.  
   
