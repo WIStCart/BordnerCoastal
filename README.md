@@ -8,20 +8,20 @@ Here are the general steps to updating the Bordner data in CARTO:
 - ```final_coastal_polygonsMMDDYY``` *The polygon layer will be too big for CARTO to handle. There are some other steps that need to be done to this layer as well. Perform these steps for polys:
   a) The "area" field *WAS* need to but is no longer, no action needed on this item.
   b) You can test the schema by simply uploading a small chunk of data to CARTO before proceeding to the next steps of chunking the big dataset up.
-  c) If #b above checks out then chunk the data into 100k chunks (should be ok to use FID), zip the file and load it to CARTO (use a good naming scheme. When you have a batch in CARTO, use a query like this one to merge it into an existing table (this SQL will write the new features into the "final_coastal_polygons_040819_0_100k" table):
+  c) If #b above checks out then chunk the data into 100k segments (should be ok to use FID to query them), zip the file and load it to CARTO (use a good naming scheme. When you have a batch in CARTO, use a query like this one to merge it into an existing table (this SQL will write the new features into the "final_coastal_polygons_040819_0_100k" table). Your first upload could be 300k in size, but after that I have only had success merging 100k at a time:
   
   ```INSERT INTO final_coastal_polygons_040819_0_100k (the_geom, the_geom_webmercator, cov1, mindiam1, maxdiam1, den1, pctcov1, cov2, mindiam2, maxdiam2, den2, pctcov2, cov3, mindiam3, maxdiam3, den3, pctcov3, cov4, mindiam4, maxdiam4, den4, pctcov4, extradigit, judgementc, judgemen_1, notes, judgemen_2, judgemen_3, ha, cov5, mindiam5, maxdiam5, den5, pctcov5, shape_leng, shape_area, area)```
 
   ```SELECT the_geom, the_geom_webmercator, cov1, mindiam1, maxdiam1, den1, pctcov1, cov2, mindiam2, maxdiam2, den2, pctcov2, cov3, mindiam3, maxdiam3, den3, pctcov3, cov4, mindiam4, maxdiam4, den4, pctcov4, extradigit, judgementc, judgemen_1, notes, judgemen_2, judgemen_3, ha, cov5, mindiam5, maxdiam5, den5, pctcov5, shape_leng, shape_area, area FROM final_coastal_polygons_040819_100_200k```
 
-*Note, you'll want to explicitly handle the field names, as done in the sample above (there may be a more precise way) trying to write the cartodb_id into another table will throw an error so that is the reason the "\*" isnt used above.
+*Note, you'll want to explicitly handle the field names, as done in the sample above (there may be a more precise way) trying to write the cartodb_id into another table will throw an error so that is the reason the "\*" astirix/wildcard isnt used above.
 
 *Also, 100,000 record chunks may be too big - if you get an error when doing the merge, split the 100,000 chunk in two and try in 2 pieces.
 
 *This query will return the number of records in a table:
   ```SELECT count(*) AS exact_count FROM final_coastal_polygons```
   
-*It may be desireable to do it this way - using lrger .zip data uploads:
+*It may be desireable to do it this way - to do the merge on segments using lrger .zip data uploads:
   ```SINSERT INTO final_coastal_polygons_040819_0_100k (the_geom, the_geom_webmercator, cov1, mindiam1, maxdiam1, den1, pctcov1, cov2, mindiam2, maxdiam2, den2, pctcov2, cov3, mindiam3, maxdiam3, den3, pctcov3, cov4, mindiam4, maxdiam4, den4, pctcov4, extradigit, judgementc, judgemen_1, notes, judgemen_2, judgemen_3, ha, cov5, mindiam5, maxdiam5, den5, pctcov5, shape_leng, shape_area, area)  ```S
   
   ```SELECT the_geom, the_geom_webmercator, cov1, mindiam1, maxdiam1, den1, pctcov1, cov2, mindiam2, maxdiam2, den2, pctcov2, cov3, mindiam3, maxdiam3, den3, pctcov3, cov4, mindiam4, maxdiam4, den4, pctcov4, extradigit, judgementc, judgemen_1, notes, judgemen_2, judgemen_3, ha, cov5, mindiam5, maxdiam5, den5, pctcov5, shape_leng, shape_area, area FROM final_coastal_polygons_040819_300_350k WHERE (cartodb_id >= 20000) AND (cartodb_id < 40000)```
