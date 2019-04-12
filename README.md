@@ -3,12 +3,17 @@ Collaborative project between Forest Landscape and Ecology Lab (FLEL) and State 
 
 ### Data updates
 Here are the general steps to updating the Bordner data in CARTO:
-1) We have received updates from FLEL in the past - the data has been prepared for integration completely, so no processing needed on our end except anything mentioned here. Save the data to: Z:\PROJECTS\Bordner_Coastal_Grant\ this is where past data has been prepped. Use the naming syntax XX_Bordner_Update_MMDDYY. Follow along with the Folder numbers within the direcotry here for example purposes: Z:\PROJECTS\Bordner_Coastal_Grant\01_App_Data_Updates\01_Bordner_Update_040519.
+1) Updates from FLEL in the past have been prepared for integration - no processing needed on our end except anything mentioned here.
+- Save the data to: Z:\PROJECTS\Bordner_Coastal_Grant\ (this is where past data has been prepped). Use the naming syntax XX_Bordner_Update_MMDDYY. Follow along with the Folder numbers within the direcotry here for example purposes: Z:\PROJECTS\Bordner_Coastal_Grant\01_App_Data_Updates\01_Bordner_Update_040519.
 2) Folder "01" export each of the 3 feature classes to .shp, titled in a similar manner to this:
 - ```final_coastal_linesMMDDYY``` *The 040519 update to lines worked (size was not an issue)
 - ```final_coastal_pointsMMDDYY``` *The 040519 update to points worked (size was not an issue)
-- ```final_coastal_polygonsMMDDYY``` *The polygon layer will be too big for CARTO to handle. Thus, there are some other steps that need to be done to this layer as well. Proceed with step 3 for polys.
-3) Perform these steps for preparing polys:
+- ```final_coastal_polygonsMMDDYY``` *The polygon layer will be too big for CARTO to handle. Thus, there are some other steps that need to be done to this layer as well. Read ahead to step 6 for a process for polys.
+4) Login to CARTO using the SCO account (see login instructions in keys). Ensure that the schemas of the new .shps match that of their matching tables in CARTO. When comparing schemas, note the following:
+- CARTO tables will automatically set all fieldnames to lowercase (so no need to worry about case differences)
+- There may be extra fields in the new data - it is ok to delete them or keep them.
+5) Zip each of the shapefiles, and upload each to CARTO. 
+6) Perform/read these steps/notes for preparing polys:
 - Note that the "area" field *WAS* need to but is no longer, no action needed on this item.
 - You can test the schema by simply uploading a small chunk of data to CARTO before proceeding to the next steps of chunking the big dataset up.
 - If the poly data's schema checks out then chunk the data into 100k segments (should be ok to use FID to query them), zip the file and load it to CARTO (use a good naming scheme. When you have a batch in CARTO, use a query like this one to merge it into an existing table (this SQL will write the new features into the "final_coastal_polygons_040819_0_100k" table). Your first upload could be 300k in size, but after that I have only had success merging 100k at a time:
@@ -24,19 +29,15 @@ Here are the general steps to updating the Bordner data in CARTO:
 - This query will return the number of records in a table:
   ```SELECT count(*) AS exact_count FROM final_coastal_polygons```
   
-- *It may be desireable to do it this way - to do the merge on segments using lrger .zip data uploads:
+- It may be desireable to do it this way - to do the merge on segments using lrger .zip data uploads:
   ```SINSERT INTO final_coastal_polygons_040819_0_100k (the_geom, the_geom_webmercator, cov1, mindiam1, maxdiam1, den1, pctcov1, cov2, mindiam2, maxdiam2, den2, pctcov2, cov3, mindiam3, maxdiam3, den3, pctcov3, cov4, mindiam4, maxdiam4, den4, pctcov4, extradigit, judgementc, judgemen_1, notes, judgemen_2, judgemen_3, ha, cov5, mindiam5, maxdiam5, den5, pctcov5, shape_leng, shape_area, area)  ```S
   
   ```SELECT the_geom, the_geom_webmercator, cov1, mindiam1, maxdiam1, den1, pctcov1, cov2, mindiam2, maxdiam2, den2, pctcov2, cov3, mindiam3, maxdiam3, den3, pctcov3, cov4, mindiam4, maxdiam4, den4, pctcov4, extradigit, judgementc, judgemen_1, notes, judgemen_2, judgemen_3, ha, cov5, mindiam5, maxdiam5, den5, pctcov5, shape_leng, shape_area, area FROM final_coastal_polygons_040819_300_350k WHERE (cartodb_id >= 20000) AND (cartodb_id < 40000)```
 
-  b) Menominee and Milwaukee (no survey performed) will likely contain a gap in the new data. We'll add menominee PLSS section polygons to the poly data as a placeholder.
+- Menominee and Milwaukee (no survey performed) will likely contain a gap in the new data. We'll add menominee PLSS section polygons to the poly data as a placeholder.
 
-4) Login to CARTO using the SCO account (see login instructions in keys). Ensure that the schemas of the new .shps match that of their matching tables in CARTO. When comparing schemas, note the following:
-- CARTO tables will automatically set all fieldnames to lowercase (so no need to worry about case differences)
-- There may be extra fields in the new data - it is ok to delete them or keep them.
-5) Zip each of the shapefiles, and upload each to CARTO. 
-5) ```final_coastal_points```, ```final_costal_polygons```, ```final_coastal_lines``` are the three live feature tables in CARTO. Archive the ones being updated by appending old + datestamp (e.g. "_old_040519"). NOTE THAT THIS WILL BREAKE THE APP FOR A SHORT WHILE WHILE YOU SWAP THINGS OUT.
-6) In CARTO, rename these tables and make them public.
+7) ```final_coastal_points```, ```final_costal_polygons```, ```final_coastal_lines``` are the three live feature tables in CARTO. Archive the ones being updated by appending old + datestamp (e.g. "_old_040519"). NOTE THAT THIS WILL BREAKE THE APP FOR A SHORT WHILE WHILE YOU SWAP THINGS OUT.
+8) In CARTO, rename these tables and make them public.
 - ```final_coastal_polygonsMMDDYY```
 - ```final_coastal_linesMMDDYY```
 - ```final_coastal_pointsMMDDYY```
