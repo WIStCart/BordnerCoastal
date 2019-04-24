@@ -58,7 +58,10 @@ Here are the general steps to updating the Bordner data in CARTO:
   
   ```SELECT the_geom, the_geom_webmercator, cov1, mindiam1, maxdiam1, den1, pctcov1, cov2, mindiam2, maxdiam2, den2, pctcov2, cov3, mindiam3, maxdiam3, den3, pctcov3, cov4, mindiam4, maxdiam4, den4, pctcov4, extradigit, judgementc, judgemen_1, notes, judgemen_2, judgemen_3, ha, cov5, mindiam5, maxdiam5, den5, pctcov5, shape_leng, shape_area, area FROM final_coastal_polygons_040819_300_350k WHERE (cartodb_id >= 20000) AND (cartodb_id < 40000)```
 
-- Menominee and Milwaukee (no survey performed) will likely contain a gap in the new data. We'll add menominee PLSS section polygons to the poly data as a placeholder.
+- Menominee and Milwaukee (no survey performed) will likely contain a gap in the new data. We'll add menominee PLSS section polygons to the poly data as a placeholder. A formula like this one can be used to grab the sections from an older table and push them into the new table:
+```INSERT INTO final_coastal_polygons (the_geom, the_geom_webmercator, cov1, mindiam1, maxdiam1, den1, pctcov1, cov2, mindiam2, maxdiam2, den2, pctcov2, cov3, mindiam3, maxdiam3, den3, pctcov3, cov4, mindiam4, maxdiam4, den4, pctcov4, judgementc, judgemen_1, notes, judgemen_2, judgemen_3, cov5, mindiam5, maxdiam5, den5, pctcov5, shape_leng, shape_area)```
+
+SELECT the_geom, the_geom_webmercator, cov1, mindiam1, maxdiam1, den1, pctcov1, cov2, mindiam2, maxdiam2, den2, pctcov2, cov3, mindiam3, maxdiam3, den3, pctcov3, cov4, mindiam4, maxdiam4, den4, pctcov4, judgementc, judgemen_1, notes, judgemen_2, judgemen_3, cov5, mindiam5, maxdiam5, den5, pctcov5, shape_leng, shape_area FROM final_coastal_polygons_old_2019 WHERE cov1 = 'UNSURVEYED'
 
 7) ```final_coastal_points```, ```final_costal_polygons```, ```final_coastal_lines``` are the three live feature tables in CARTO. Archive the ones being updated by appending old + datestamp (e.g. "_old_040519"). NOTE THAT THIS WILL BREAKE THE APP FOR A SHORT WHILE WHILE YOU SWAP THINGS OUT.
 8) In CARTO, rename these tables and make them public.
