@@ -2,6 +2,22 @@
 Collaborative project between Forest Landscape and Ecology Lab (FLEL) and State Cartographer's Office (SCO). Web-based mapping application featuring point, line, and polygon data digitized from the Wisconsin Land Economic Inventory (a.k.a. "Bordner" survey maps) for Wisconsin's coastal counties.
 
 ### Data updates
+Here are the general steps to updating the polygon classification schema in JavaScript:
+1) The classification of the polygons is configured within the *temp_classes.js* file within the ```tempclasses2``` variable that holds a JSON formatted data for each class' attribute/configuration:
+  - code (pairs with GIS data), 
+  - name (display name in popup that appears on click of map feature) 
+  - level1 (display name in legend and legend page),
+  - level2 (display name in legend and legend page), 
+  - color1 (hex for class1), 
+  - color2 (hex for class1), 
+  - class (used for variablizing elements dynamically). 
+
+  A change to this file will impact; 
+  - 1) the map classification/style
+  - 2) the legend (levels 1 and 2)
+  - 3) the Bordner legend page (on page https://dev.sco.wisc.edu/bordnercoastal/codie/BordnerCoastal/about/)
+  
+  
 Here are the general steps to updating the Bordner data in CARTO:
 1) Updates from FLEL in the past have been prepared for integration - no processing needed on our end except anything mentioned here.
 - Save the data to: Z:\PROJECTS\Bordner_Coastal_Grant\ (this is where past data has been prepped). Use the naming syntax XX_Bordner_Update_MMDDYY. Follow along with the Folder numbers within the direcotry here for example purposes: Z:\PROJECTS\Bordner_Coastal_Grant\01_App_Data_Updates\01_Bordner_Update_040519.
