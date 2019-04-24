@@ -16,7 +16,14 @@ Here are the general steps to updating the polygon classification schema in Java
   - 1) the map classification/style
   - 2) the legend (levels 1 and 2)
   - 3) the Bordner legend page (on page https://dev.sco.wisc.edu/bordnercoastal/codie/BordnerCoastal/about/)
-  
+
+2) To begin an update, examine what exists in the .xlsx that was used for the last update (file:///Z:\PROJECTS\Bordner_Coastal_Grant\01_App_Data_Updates\03_Schema_Update_040519\frequency_2019.xlsx)
+3) Like was done within the above.xlsx on the V1_Schema_for_VLOOKUP tab, parse the tempClasses2 json into columns and then use the "code" attribut eto erform a VLOOKUP to the new data (we want to preserve the existing hex colors as best as possible)
+4) recreate the contcatentation as seen in update tab, column L.
+5) copy the concatenated data into the JSON within temp_classes.js
+**** Make sure to keep the UNSURVEYED element!!****
+```{"code":"UNSURVEYED","name":"Unsurveyed Area","level2":"Unsurveyed Area","level1":"Unsurveyed Area","class":"Unsurveyed Area","color1":"#e0d46b","color2":"#e0d46b"}```
+
   
 Here are the general steps to updating the Bordner data in CARTO:
 1) Updates from FLEL in the past have been prepared for integration - no processing needed on our end except anything mentioned here.
