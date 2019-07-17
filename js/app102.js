@@ -477,22 +477,22 @@ window.onload = function() {
 
 	"}"
 
-	cartodb.createLayer(map, {
-      user_name: 'sco-admin',
-      type: 'cartodb',
-      sublayers: [{type: "cartodb",
-			sql: 'SELECT * FROM bordner_county_bnds',
-			cartocss: cartoCSSCounty,
-			layerIndex:4
-	}]
-	}, { https: true })
-	// .addTo(map)
-	.done(function(layer){
-		counties = layer;
-		if (countiesAreOn){
-			$("#counties").trigger('click') //add to the map
-		}
-	})
+	// cartodb.createLayer(map, {
+    //   user_name: 'sco-admin',
+    //   type: 'cartodb',
+    //   sublayers: [{type: "cartodb",
+	// 		sql: 'SELECT * FROM bordner_county_bnds',
+	// 		cartocss: cartoCSSCounty,
+	// 		layerIndex:4
+	// }]
+	// }, { https: true })
+	// // .addTo(map)
+	// .done(function(layer){
+	// 	counties = layer;
+	// 	if (countiesAreOn){
+	// 		$("#counties").trigger('click') //add to the map
+	// 	}
+	// })
 
 	// Add township layer
 	var cartoCSSTown = "#layer { " +
@@ -541,56 +541,56 @@ window.onload = function() {
 	  		"line-width: 5;" +
 		"}"+
 	"}"
-	cartodb.createLayer(map, {
-      user_name: 'sco-admin',
-      type: 'cartodb',
-      sublayers: [{type: "cartodb",
-			sql: 'SELECT * FROM twpppoly',
-			cartocss: cartoCSSTown,
-			layerIndex:3
-	}]
-	}, { https: true })
-	// .addTo(map)
-	.done(function(layer){
-		townships = layer;
-		if (townshipsAreOn){
-			$("#townships").trigger('click') //add to the map
-		}
-	})
+	// cartodb.createLayer(map, {
+    //   user_name: 'sco-admin',
+    //   type: 'cartodb',
+    //   sublayers: [{type: "cartodb",
+	// 		sql: 'SELECT * FROM twpppoly',
+	// 		cartocss: cartoCSSTown,
+	// 		layerIndex:3
+	// }]
+	// }, { https: true })
+	// // .addTo(map)
+	// .done(function(layer){
+	// 	townships = layer;
+	// 	if (townshipsAreOn){
+	// 		$("#townships").trigger('click') //add to the map
+	// 	}
+	// })
 
 
 var cartoCSSLines = getLineCSS('none')
 
-	lines = cartodb.createLayer(map, {
-      user_name: 'sco-admin',
-      type: 'cartodb',
-      sublayers: [{type: "cartodb",
-			sql: 'SELECT * FROM final_coastal_lines',
-			cartocss: cartoCSSLines,
-			interactivity: ['line_type'],
-			layerIndex: 5
-	}]
-}, { https: true })
-		.addTo(map)
-		.done(function(layer){
-			lines = layer
-			lines.setInteraction(true)
+// 	lines = cartodb.createLayer(map, {
+//       user_name: 'sco-admin',
+//       type: 'cartodb',
+//       sublayers: [{type: "cartodb",
+// 			sql: 'SELECT * FROM final_coastal_lines',
+// 			cartocss: cartoCSSLines,
+// 			interactivity: ['line_type'],
+// 			layerIndex: 5
+// 	}]
+// }, { https: true })
+// 		.addTo(map)
+// 		.done(function(layer){
+// 			lines = layer
+// 			lines.setInteraction(true)
 
-			lines.bind('featureOver', onLineOver)
-			lines.bind('featureOut', onLineOut)
+// 			lines.bind('featureOver', onLineOver)
+// 			lines.bind('featureOut', onLineOut)
 
-			lines.setOpacity(layerOpacity)
+// 			lines.setOpacity(layerOpacity)
 
-			if ((legendType == "lines") && (typeof(lineTypeSelected) !="undefined")){
-				setTimeout(function(){triggerPointOrLineLegendClick(lineTypeSelected)}, 100)
-			}
-			$('#rangeSlider').slider().on('change', function (ev) {
-					ev.preventDefault();
-					layerOpacity.points = this.value / 100;
-					//lines.setOpacity(layerOpacity);
-					replaceQueryValue("layerOpacity", this.value)
-			});
-	})
+// 			if ((legendType == "lines") && (typeof(lineTypeSelected) !="undefined")){
+// 				setTimeout(function(){triggerPointOrLineLegendClick(lineTypeSelected)}, 100)
+// 			}
+// 			$('#rangeSlider').slider().on('change', function (ev) {
+// 					ev.preventDefault();
+// 					layerOpacity.points = this.value / 100;
+// 					//lines.setOpacity(layerOpacity);
+// 					replaceQueryValue("layerOpacity", this.value)
+// 			});
+// 	})
 
 	// add bordner density1 layer
 	var cartoCSSDensity = "#layer { "+
@@ -611,94 +611,94 @@ var cartoCSSLines = getLineCSS('none')
 			"polygon-pattern-alignment: local; polygon-pattern-gamma:1; polygon-pattern-simplify: 5; polygon-pattern-opacity: 0.45;"+
 		"}"+
 	"}"
-	cartodb.createLayer(map, {
-      user_name: 'sco-admin',
-      type: 'cartodb',
-      sublayers: [{type: "cartodb",
-			sql: 'SELECT * FROM final_coastal_polygons',
-			cartocss: cartoCSSDensity,
-			layerIndex: 6
-	}]
-	}, { https: true })
-	.done(function(layer){
-		density1 = layer;
+	// cartodb.createLayer(map, {
+    //   user_name: 'sco-admin',
+    //   type: 'cartodb',
+    //   sublayers: [{type: "cartodb",
+	// 		sql: 'SELECT * FROM final_coastal_polygons',
+	// 		cartocss: cartoCSSDensity,
+	// 		layerIndex: 6
+	// }]
+	// }, { https: true })
+	// .done(function(layer){
+	// 	density1 = layer;
 
-	});
+	// });
 
 	// add bordner layer
 	createStyles()
 	cartoCSSRules = getPolyStyle("level1");
 	// Promise for the first layer
-	cartodb.createLayer(map, {
-      user_name: 'sco-admin',
-      type: 'cartodb',
-      sublayers: [{type: "cartodb",
-			sql: 'SELECT * FROM final_coastal_polygons',
-			cartocss: cartoCSSRules,
-			interactivity: infowindowVars,
-			layerIndex:1
-	},{type: "cartodb",
-			sql: 'SELECT * FROM final_coastal_polygons',
-			cartocss: cartoCSSRules,
-			interactivity: ['cartodb_id','cov1', 'cov2'],
-			layerIndex:2
-	}]
-    }, { https: true })
-	.addTo(map) // add cartodb layer and basemap to map object
-	.done(function(layer) {
-		bordner = layer;
-		//layer.setOpacity(layerOpacity);
-		layer.setInteraction(true);
-		setupSublayer(layer, 1, "visible");
-		setupSublayer(layer, 2, "hidden");
-		$('#rangeSlider').slider().on('change', function (ev) {
-			ev.preventDefault();
-			layerOpacity.polygons = this.value / 100;
-			layer.setOpacity(layerOpacity);
-			replaceQueryValue("layerOpacity", this.value)
-		});
-		layer.setOpacity(layerOpacity);
-		layer.bind('featureOver', onPolyOver)
-		layer.bind('featureOut', onPolyOut)
+	// cartodb.createLayer(map, {
+    //   user_name: 'sco-admin',
+    //   type: 'cartodb',
+    //   sublayers: [{type: "cartodb",
+	// 		sql: 'SELECT * FROM final_coastal_polygons',
+	// 		cartocss: cartoCSSRules,
+	// 		interactivity: infowindowVars,
+	// 		layerIndex:1
+	// },{type: "cartodb",
+	// 		sql: 'SELECT * FROM final_coastal_polygons',
+	// 		cartocss: cartoCSSRules,
+	// 		interactivity: ['cartodb_id','cov1', 'cov2'],
+	// 		layerIndex:2
+	// }]
+    // }, { https: true })
+	// .addTo(map) // add cartodb layer and basemap to map object
+	// .done(function(layer) {
+	// 	bordner = layer;
+	// 	//layer.setOpacity(layerOpacity);
+	// 	layer.setInteraction(true);
+	// 	setupSublayer(layer, 1, "visible");
+	// 	setupSublayer(layer, 2, "hidden");
+	// 	$('#rangeSlider').slider().on('change', function (ev) {
+	// 		ev.preventDefault();
+	// 		layerOpacity.polygons = this.value / 100;
+	// 		layer.setOpacity(layerOpacity);
+	// 		replaceQueryValue("layerOpacity", this.value)
+	// 	});
+	// 	layer.setOpacity(layerOpacity);
+	// 	layer.bind('featureOver', onPolyOver)
+	// 	layer.bind('featureOut', onPolyOut)
 
-		//could add a render event if we updated the leaflet version
+	// 	//could add a render event if we updated the leaflet version
 
-		//dispatch the filter, if required in the url parameter
-		if ((typeof(level1Selected) != "undefined") && (legendType == "polygons")){
-			dispatchLegendClick(level1Selected)
-		}
-		setupInfoWindow(bordner);
-	});
+	// 	//dispatch the filter, if required in the url parameter
+	// 	if ((typeof(level1Selected) != "undefined") && (legendType == "polygons")){
+	// 		dispatchLegendClick(level1Selected)
+	// 	}
+	// 	setupInfoWindow(bordner);
+	// });
 
 	var cartoCSSPoints = getPointCSS('none')
 
-	 cartodb.createLayer(map, {
-	      user_name: 'sco-admin',
-	      type: 'cartodb',
-	      sublayers: [{type: "cartodb",
-				sql: 'SELECT * FROM final_coastal_points',
-				cartocss: cartoCSSPoints,
-				interactivity: ['point_type'],
-				layerIndex: 6
-		}]
-	}, { https: true })
-			.addTo(map)
-			.done(function(layer){
-				points = layer
-				points.setInteraction(true)
-				points.bind('featureOver', onPointOver)
-				points.bind('featureOut', onPointOut)
-				points.setOpacity(layerOpacity)
-				if ((legendType == "points") && (typeof(pointTypeSelected) !="undefined")){
-					setTimeout(function(){triggerPointOrLineLegendClick(pointTypeSelected)}, 100)
-				}
-				$('#rangeSlider').slider().on('change', function (ev) {
-						ev.preventDefault();
-						layerOpacity = this.value / 100;
-						//lines.setOpacity(layerOpacity);
-						replaceQueryValue("layerOpacity", this.value)
-				});
-		})
+	//  cartodb.createLayer(map, {
+	//       user_name: 'sco-admin',
+	//       type: 'cartodb',
+	//       sublayers: [{type: "cartodb",
+	// 			sql: 'SELECT * FROM final_coastal_points',
+	// 			cartocss: cartoCSSPoints,
+	// 			interactivity: ['point_type'],
+	// 			layerIndex: 6
+	// 	}]
+	// }, { https: true })
+	// 		.addTo(map)
+	// 		.done(function(layer){
+	// 			points = layer
+	// 			points.setInteraction(true)
+	// 			points.bind('featureOver', onPointOver)
+	// 			points.bind('featureOut', onPointOut)
+	// 			points.setOpacity(layerOpacity)
+	// 			if ((legendType == "points") && (typeof(pointTypeSelected) !="undefined")){
+	// 				setTimeout(function(){triggerPointOrLineLegendClick(pointTypeSelected)}, 100)
+	// 			}
+	// 			$('#rangeSlider').slider().on('change', function (ev) {
+	// 					ev.preventDefault();
+	// 					layerOpacity = this.value / 100;
+	// 					//lines.setOpacity(layerOpacity);
+	// 					replaceQueryValue("layerOpacity", this.value)
+	// 			});
+	// 	})
 
 	//add state boundary
 	var cartoCSSState = "#layer {"+
@@ -734,16 +734,217 @@ var cartoCSSLines = getLineCSS('none')
   	"}"+
 	"}"
 
+	// cartodb.createLayer(map, {
+    //   user_name: 'sco-admin',
+    //   type: 'cartodb',
+    //   sublayers: [{type: "cartodb",
+	// 		sql: 'SELECT * FROM final_coastal_state_boundary',
+	// 		cartocss: cartoCSSState,
+	// 		layerIndex:8
+	// }]
+	// }, { https: true })
+	// .addTo(map);
+
+	/********************************* Combination of layers as sublayers ********************************/
+
 	cartodb.createLayer(map, {
-      user_name: 'sco-admin',
-      type: 'cartodb',
-      sublayers: [{type: "cartodb",
-			sql: 'SELECT * FROM final_coastal_state_boundary',
-			cartocss: cartoCSSState,
-			layerIndex:8
-	}]
+		user_name: 'sco-admin',
+		type: 'cartodb',
+		sublayers: [
+			{
+				type: "cartodb",
+				sql: 'SELECT * FROM bordner_county_bnds',
+				cartocss: cartoCSSCounty,
+				// layerIndex:4
+			},{
+				type: "cartodb",
+				sql: 'SELECT * FROM twpppoly',
+				cartocss: cartoCSSTown,
+				// layerIndex:3
+			},{
+				type: "cartodb",
+				sql: 'SELECT * FROM final_coastal_polygons',
+				cartocss: cartoCSSDensity,
+				// layerIndex: 6
+			}
+		]
+	  }, { https: true })
+	  // .addTo(map)
+	  .done(function(layer){
+
+		  counties = layer.getSubLayer(0);
+		  if (countiesAreOn){
+			  $("#counties").trigger('click') //add to the map
+		  }
+
+		  townships = layer.getSubLayer(1);
+		  if (townshipsAreOn){
+			  $("#townships").trigger('click') //add to the map
+		  }
+
+		  density1 = layer.getSubLayer(2);
+
+	  })
+
+
+	cartodb.createLayer(map, {
+		user_name: 'sco-admin',
+		type: 'cartodb',
+		sublayers: [
+			{
+				type: "cartodb",
+				sql: 'SELECT * FROM final_coastal_lines',
+				cartocss: cartoCSSLines,
+				interactivity: ['line_type'],
+				opacity: layerOpacity
+				// layerIndex: 5
+			},{
+				type: "cartodb",
+				sql: 'SELECT * FROM final_coastal_points',
+				cartocss: cartoCSSPoints,
+				interactivity: ['point_type'],
+				opacity: layerOpacity
+				// layerIndex: 6
+			},{
+				type: "cartodb",
+				sql: 'SELECT * FROM final_coastal_state_boundary',
+				cartocss: cartoCSSState,
+				// layerIndex:8
+			}
+		]
 	}, { https: true })
-	.addTo(map);
+		  .addTo(map)
+		  .done(function(layer){
+
+			  lines = layer.getSubLayer(0);
+			  lines.setInteraction(true)
+  
+			  lines.bind('featureOver', onLineOver)
+			  lines.bind('featureOut', onLineOut)
+  
+			//   lines.setOpacity(layerOpacity)
+  
+			  if ((legendType == "lines") && (typeof(lineTypeSelected) !="undefined")){
+				  setTimeout(function(){triggerPointOrLineLegendClick(lineTypeSelected)}, 100)
+			  }
+			  $('#rangeSlider').slider().on('change', function (ev) {
+					  ev.preventDefault();
+					  layerOpacity.points = this.value / 100;
+					  replaceQueryValue("layerOpacity", this.value)
+			  });
+
+			  points = layer.getSubLayer(1);
+			  points.setInteraction(true)
+			  points.bind('featureOver', onPointOver)
+			  points.bind('featureOut', onPointOut)
+			//   points.setOpacity(layerOpacity)
+			  if ((legendType == "points") && (typeof(pointTypeSelected) !="undefined")){
+				  setTimeout(function(){triggerPointOrLineLegendClick(pointTypeSelected)}, 100)
+			  }
+			  $('#rangeSlider').slider().on('change', function (ev) {
+					  ev.preventDefault();
+					  layerOpacity = this.value / 100;
+					  replaceQueryValue("layerOpacity", this.value)
+			  });
+
+
+	  })
+
+	//   cartodb.createLayer(map, {
+	// 	user_name: 'sco-admin',
+	// 	type: 'cartodb',
+	// 	sublayers: [{type: "cartodb",
+	// 		  sql: 'SELECT * FROM final_coastal_polygons',
+	// 		  cartocss: cartoCSSDensity,
+	// 		  layerIndex: 6
+	//   }]
+	//   }, { https: true })
+	//   .done(function(layer){
+	// 	  density1 = layer;
+  
+	//   });
+
+	  cartodb.createLayer(map, {
+		user_name: 'sco-admin',
+		type: 'cartodb',
+		sublayers: [{type: "cartodb",
+			  sql: 'SELECT * FROM final_coastal_polygons',
+			  cartocss: cartoCSSRules,
+			  interactivity: infowindowVars,
+			  layerIndex:1
+	  },{type: "cartodb",
+			  sql: 'SELECT * FROM final_coastal_polygons',
+			  cartocss: cartoCSSRules,
+			  interactivity: ['cartodb_id','cov1', 'cov2'],
+			  layerIndex:2
+	  }]
+	  }, { https: true })
+	  .addTo(map) // add cartodb layer and basemap to map object
+	  .done(function(layer) {
+		  bordner = layer;
+		  //layer.setOpacity(layerOpacity);
+		  layer.setInteraction(true);
+		  setupSublayer(layer, 1, "visible");
+		  setupSublayer(layer, 2, "hidden");
+		  $('#rangeSlider').slider().on('change', function (ev) {
+			  ev.preventDefault();
+			  layerOpacity.polygons = this.value / 100;
+			  layer.setOpacity(layerOpacity);
+			  replaceQueryValue("layerOpacity", this.value)
+		  });
+		  layer.setOpacity(layerOpacity);
+		  layer.bind('featureOver', onPolyOver)
+		  layer.bind('featureOut', onPolyOut)
+  
+		  //could add a render event if we updated the leaflet version
+  
+		  //dispatch the filter, if required in the url parameter
+		  if ((typeof(level1Selected) != "undefined") && (legendType == "polygons")){
+			  dispatchLegendClick(level1Selected)
+		  }
+		  setupInfoWindow(bordner);
+	  });
+
+// 	  cartodb.createLayer(map, {
+// 		user_name: 'sco-admin',
+// 		type: 'cartodb',
+// 		sublayers: [{type: "cartodb",
+// 			  sql: 'SELECT * FROM final_coastal_points',
+// 			  cartocss: cartoCSSPoints,
+// 			  interactivity: ['point_type'],
+// 			  layerIndex: 6
+// 	  }]
+//   }, { https: true })
+// 		  .addTo(map)
+// 		  .done(function(layer){
+// 			  points = layer
+// 			  points.setInteraction(true)
+// 			  points.bind('featureOver', onPointOver)
+// 			  points.bind('featureOut', onPointOut)
+// 			  points.setOpacity(layerOpacity)
+// 			  if ((legendType == "points") && (typeof(pointTypeSelected) !="undefined")){
+// 				  setTimeout(function(){triggerPointOrLineLegendClick(pointTypeSelected)}, 100)
+// 			  }
+// 			  $('#rangeSlider').slider().on('change', function (ev) {
+// 					  ev.preventDefault();
+// 					  layerOpacity = this.value / 100;
+// 					  //lines.setOpacity(layerOpacity);
+// 					  replaceQueryValue("layerOpacity", this.value)
+// 			  });
+// 	  })
+
+	//   cartodb.createLayer(map, {
+	// 	user_name: 'sco-admin',
+	// 	type: 'cartodb',
+	// 	sublayers: [{type: "cartodb",
+	// 		  sql: 'SELECT * FROM final_coastal_state_boundary',
+	// 		  cartocss: cartoCSSState,
+	// 		  layerIndex:8
+	//   }]
+	//   }, { https: true })
+	//   .addTo(map);
+
+
 
 	// //add stateful URL
 	parseURL();
