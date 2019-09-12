@@ -921,72 +921,86 @@ window.onload = function() {
 
 	// Add layers to client
 	client.addLayers([counties, townships, density1, lines, points, boundary])
-		.then(() => {
-			console.log('Layers added');
-		})
-		.catch(cartoError => {
-			console.error(cartoError.message);
-		});
+		// .then(() => {
+		// 	console.log('Layers added');
+		// })
+		// .catch(cartoError => {
+		// 	console.error(cartoError.message);
+		// });
+
+	// Add event listeners to set up map after the layer is added to the map
+	var i = 0;
+	map.on('layeradd', function() {
+		i++;
+		console.log(i);
+		if(i == 1){
+			//add stateful URL
+			parseURL();
+
+			setUpMap();
+		}
+	});
 
 	// Add client layers to map
 	client.getLeafletLayer().addTo(map);
 
-	// Interactivity
-	if (countiesAreOn){
-		$("#counties").trigger('click') //add to the map
-	}
+	// // Interactivity
+	// if (countiesAreOn){
+	// 	$("#counties").trigger('click') //add to the map
+	// }
 
-	if (townshipsAreOn){
-		$("#townships").trigger('click') //add to the map
-	}
+	// if (townshipsAreOn){
+	// 	$("#townships").trigger('click') //add to the map
+	// }
   
 
-	lines.on('featureOver', function(featureEvent){onLineOver(featureEvent.data)})
-	lines.on('featureOut', function(featureEvent){onLineOut()})
+	// lines.on('featureOver', function(featureEvent){onLineOver(featureEvent.data)})
+	// lines.on('featureOut', function(featureEvent){onLineOut()})
 
-	if ((legendType == "lines") && (typeof(lineTypeSelected) !="undefined")){
-		setTimeout(function(){triggerPointOrLineLegendClick(lineTypeSelected)}, 100)
-	}
-	$('#rangeSlider').slider().on('change', function (ev) {
-			ev.preventDefault();
-			layerOpacity.points = this.value / 100;
-			replaceQueryValue("layerOpacity", this.value)
-	});
+	// if ((legendType == "lines") && (typeof(lineTypeSelected) !="undefined")){
+	// 	setTimeout(function(){triggerPointOrLineLegendClick(lineTypeSelected)}, 100)
+	// }
+	// $('#rangeSlider').slider().on('change', function (ev) {
+	// 		ev.preventDefault();
+	// 		layerOpacity.points = this.value / 100;
+	// 		replaceQueryValue("layerOpacity", this.value)
+	// });
 
-	points.on('featureOver', function(featureEvent){onPointOver(featureEvent.data)})
-	points.on('featureOut', function(featureEvent){onPointOut()})
+	// points.on('featureOver', function(featureEvent){onPointOver(featureEvent.data)})
+	// points.on('featureOut', function(featureEvent){onPointOut()})
 
-	if ((legendType == "points") && (typeof(pointTypeSelected) !="undefined")){
-		setTimeout(function(){triggerPointOrLineLegendClick(pointTypeSelected)}, 100)
-	}
-	$('#rangeSlider').slider().on('change', function (ev) {
-			ev.preventDefault();
-			layerOpacity = this.value / 100;
-			replaceQueryValue("layerOpacity", this.value)
-	});
+	// if ((legendType == "points") && (typeof(pointTypeSelected) !="undefined")){
+	// 	setTimeout(function(){triggerPointOrLineLegendClick(pointTypeSelected)}, 100)
+	// }
+	// $('#rangeSlider').slider().on('change', function (ev) {
+	// 		ev.preventDefault();
+	// 		layerOpacity = this.value / 100;
+	// 		replaceQueryValue("layerOpacity", this.value)
+	// });
 
 
 
-	// setupSublayer(layer, 1, "visible");
-	// setupSublayer(layer, 2, "hidden");
-	$('#rangeSlider').slider().on('change', function (ev) {
-		ev.preventDefault();
-		layerOpacity.polygons = this.value / 100;
-		density1.setOpacity(layerOpacity);
-		replaceQueryValue("layerOpacity", this.value)
-	});
+	// // setupSublayer(layer, 1, "visible");
+	// // setupSublayer(layer, 2, "hidden");
+	// $('#rangeSlider').slider().on('change', function (ev) {
+	// 	ev.preventDefault();
+	// 	layerOpacity.polygons = this.value / 100;
+	// 	density1.setOpacity(layerOpacity);
+	// 	replaceQueryValue("layerOpacity", this.value)
+	// });
 
-	// layer.setOpacity(layerOpacity);
-	density1.on('featureOver', function(featureEvent){onPolyOver(featureEvent.data)})
-	density1.on('featureOut', function(featureEvent){onPolyOut()})
+	// // layer.setOpacity(layerOpacity);
+	// density1.on('featureOver', function(featureEvent){onPolyOver(featureEvent.data)})
+	// density1.on('featureOut', function(featureEvent){onPolyOut()})
 
-	//could add a render event if we updated the leaflet version
+	// //could add a render event if we updated the leaflet version
 
-	//dispatch the filter, if required in the url parameter
-	if ((typeof(level1Selected) != "undefined") && (legendType == "polygons")){
-		dispatchLegendClick(level1Selected)
-	}
-	setupInfoWindow(bordner);
+	// //dispatch the filter, if required in the url parameter
+	// if ((typeof(level1Selected) != "undefined") && (legendType == "polygons")){
+	// 	dispatchLegendClick(level1Selected)
+	// }
+	// setupInfoWindow(bordner);
+
 
 
 
@@ -996,10 +1010,10 @@ window.onload = function() {
 
 
 
-	// //add stateful URL
-	parseURL();
+	// // //add stateful URL
+	// parseURL();
 
-	setUpMap();
+	// setUpMap();
 
 }; // end of onLoad
 
@@ -3140,6 +3154,7 @@ function getColor2FromLevel2(level2){
 
 
 function summarize(data, level){
+	console.log(data);
 	if (level == 1){
 		var colorFn = getColor1FromLevel1;
 		var prop = "level1"
