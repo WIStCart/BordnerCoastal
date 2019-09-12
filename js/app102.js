@@ -436,179 +436,305 @@ window.onload = function() {
 	});
 
 
-
-
-
-	
-
-
-
-
-
-
-
-
-
-
 	// add bordner layer
 	createStyles()
-	
-
-
-
-
-
-
-	
 
 
 
 	/********************************* Combination of layers as sublayers ********************************/
 
-	cartodb.createLayer(map, {
-		user_name: 'sco-admin',
-		type: 'cartodb',
-		sublayers: [
-			{
-				type: "cartodb",
-				sql: 'SELECT * FROM bordner_county_bnds',
-				cartocss: cartoCSSCounty,
-				// layerIndex:4
-			},{
-				type: "cartodb",
-				sql: 'SELECT * FROM twpppoly',
-				cartocss: cartoCSSTown,
-				// layerIndex:3
-			},{
-				type: "cartodb",
-				sql: 'SELECT * FROM final_coastal_polygons',
-				cartocss: cartoCSSDensity,
-				// layerIndex: 6
-			}
-		]
-	  }, { https: true })
-	  // .addTo(map)
-	  .done(function(layer){
+	// 	// Define layer styles
+	// var cartoCSSCounty = "#layer { " +
+	// 	"text-name: [county_nam];" +
+	//   	"text-face-name: 'Open Sans Regular';" +
+	//   	"text-fill: #151515;" +
+	//   	"text-halo-fill: #fff;" +
+	//   	"text-halo-radius: 1;" +
+	//   	"[zoom = 7]{text-size: 9;}" +
+	//   	"[zoom = 8]{text-size: 12;}" +
+	//   	"[zoom = 9]{text-size: 16;}" +
+	//   	"[zoom = 10]{text-size: 19;}" +
+	//   	"[zoom = 11]{text-size: 23;}" +
+	//   	"[zoom = 12]{text-size: 26;}" +
+	//   	"[zoom = 13]{text-size: 31;}" +
+	//   	"[zoom = 14]{text-size: 36;}" +
+	//   	"[zoom = 15]{text-size: 43;}" +
+	//   	"[zoom = 16]{text-size: 50;}" +
+	//   	"[zoom = 17]{text-size: 58;}" +
+	//   	"[zoom = 18]{text-size: 67;}" +
+	//   	"text-fill: #fff;"+
+	//   	"text-halo-fill: #000000;"+
+	//   	"polygon-opacity: 0;" +
+	//   	"::case {" +
+	//   		"[zoom < 12]{line-width: 3;}" +
+	// 		"[zoom >= 12]{line-width: 5;}" +
+	// 		"[zoom >= 14]{line-width: 7;}" +
+	// 		"[zoom >= 16]{line-width: 9;}" +
+    //   		"line-color:#7e7e7e;" +
+    //   	"}" +
+    //   	"::fill {" +
+	// 		"[zoom < 12]{line-width: 1;}" +
+	// 		"[zoom >= 12]{line-width: 2;}" +
+	// 		"[zoom >= 14]{line-width: 3;}" +
+	// 		"[zoom >= 16]{line-width: 4;}" +
+    //   		"line-color:#FFF;" +
+    //   	"}" +
+	//   	"line-opacity: 0.5;" +
+	//   	"line-comp-op: soft-light;" +
 
-		  counties = layer.getSubLayer(0);
-		  if (countiesAreOn){
-			  $("#counties").trigger('click') //add to the map
-		  }
+	// "}";
 
-		  townships = layer.getSubLayer(1);
-		  if (townshipsAreOn){
-			  $("#townships").trigger('click') //add to the map
-		  }
+	// var cartoCSSTown = "#layer { " +
+	// 	"polygon-opacity: 0;" +
+	// 	"line-color: #939393;" +
+	// 	"line-width: 0.5;" +
+	// 	"line-opacity: .80;" +
+	// 	"line-comp-op: soft-light;" +
+	// 	"[zoom > 8]{" +
+	//   		"line-width: 1;" +
+	// 	"}" +
+	//   	"[zoom > 10]{" +
+	// 		"text-name: 'T'+ [twp] + 'N R'+[rng]+[dirchar];" +
+	// 		"text-face-name: 'Open Sans Regular';" +
+	//   		"text-fill: #151515;" +
+	//   		"text-halo-fill: #fff;" +
+	//     	"text-halo-radius: 1;" +
+	//   		"text-size: 13;" +
+	//   		"line-width: 1.5;" +
+	//   	"}"+
+	// 	"[zoom > 12]{" +
+	// 		"text-name: 'T'+ [twp] + 'N R'+[rng]+[dirchar];" +
+	// 		"text-face-name: 'Open Sans Regular';" +
+	// 		"text-fill: #151515;" +
+	//   		"text-halo-fill: #fff;" +
+	//     	"text-halo-radius: 1;" +
+	//   		"text-size: 17;" +
+	//   		"line-width: 2.5;" +
+	// 	"}"+
+	// 	"[zoom > 14]{" +
+	// 		"text-name: 'T'+ [twp] + 'N R'+[rng]+[dirchar];" +
+	// 		"text-face-name: 'Open Sans Regular';" +
+	// 		"text-fill: #151515;" +
+	//   		"text-halo-fill: #fff;" +
+	// 		"text-halo-radius: 1;" +
+	//   		"text-size: 21;" +
+	//   		"line-width: 3.5;" +		
+	// 	"}"+
+	// 	"[zoom > 16]{" +
+	// 		"text-name: 'T'+ [twp] + 'N R'+[rng]+[dirchar];" +
+	// 		"text-face-name: 'Open Sans Regular';" +
+	// 		"text-fill: #151515;" +
+	// 		"text-halo-fill: #fff;" +
+	// 		"text-halo-radius: 1;" +
+	//   		"text-size: 25;" +
+	//   		"line-width: 5;" +
+	// 	"}"+
+	// "}";
 
-		  density1 = layer.getSubLayer(2);
+	// var cartoCSSDensity = "#layer { "+
+	// 	"[den1=1] {"+
+	// 		"polygon-pattern-file: url('http://maps.sco.wisc.edu/BordnerCoastal/BordnerIcon/pattern8.png');"+
+	// 		"polygon-pattern-alignment: local; polygon-pattern-gamma:1; polygon-pattern-simplify: 5; polygon-pattern-opacity: 0.45;"+
+	// 	"}"+
+	// 	"[den1=2] {"+
+	// 		"polygon-pattern-file: url('http://maps.sco.wisc.edu/BordnerCoastal/BordnerIcon/pattern7.png');"+
+	// 		"polygon-pattern-alignment: local; polygon-pattern-gamma:1; polygon-pattern-simplify: 5; polygon-pattern-opacity: 0.45;"+
+	// 	"}"+
+	// 	"[den1=3] {"+
+	// 		"polygon-pattern-file: url('http://maps.sco.wisc.edu/BordnerCoastal/BordnerIcon/pattern2.png');"+
+	// 		"polygon-pattern-alignment: local; polygon-pattern-gamma:1; polygon-pattern-simplify: 5; polygon-pattern-opacity: 0.45;"+
+	// 	"}"+
+	// 	"[den1=4] {"+
+	// 		"polygon-pattern-file: url('http://maps.sco.wisc.edu/BordnerCoastal/BordnerIcon/pattern5.png');"+
+	// 		"polygon-pattern-alignment: local; polygon-pattern-gamma:1; polygon-pattern-simplify: 5; polygon-pattern-opacity: 0.45;"+
+	// 	"}"+
+	// "}";
 
-	  })
+	// var cartoCSSLines = getLineCSS('none');
+
+	// var cartoCSSPoints = getPointCSS('none');
+
+	// //add state boundary
+	// var cartoCSSState = "#layer {"+
+	// 	"::case {"+
+	// 		"line-color:#d9d9d9;"+
+	// 		"[zoom < 7]{line-width:5;}"+
+	// 		"[zoom >= 7]{line-width:6;}"+
+	// 		"[zoom >= 9]{line-width:7;}"+
+	// 		"[zoom >= 10]{line-width:9;}"+
+	// 		"[zoom >= 11]{line-width:11;}"+
+	// 		"[zoom >= 12]{line-width:13;}"+
+	// 		"[zoom >= 13]{line-width:15;}"+
+	// 		"[zoom >= 14]{line-width:17;}"+
+	// 		"[zoom >= 15]{line-width:19;}"+
+	// 		"[zoom >= 16]{line-width:21;}"+
+	// 		"[zoom >= 17]{line-width:22;}"+
+	// 		"[zoom >= 18]{line-width:23;}"+
+	// 	"}"+
+	// 	"::fill {"+
+	// 		"line-color:#ff9595;"+
+	// 		"[zoom < 7]{line-width:2;}"+
+	// 		"[zoom >= 7]{line-width:2.5;}"+
+	// 		"[zoom >= 9]{line-width:3;}"+
+	// 		"[zoom >= 10]{line-width:3.5;}"+
+	// 		"[zoom >= 11]{line-width:4;}"+
+	// 		"[zoom >= 12]{line-width:4.5;}"+
+	// 		"[zoom >= 13]{line-width:5;}"+
+	// 		"[zoom >= 14]{line-width:5.5;}"+
+	// 		"[zoom >= 15]{line-width:6;}"+
+	// 		"[zoom >= 16]{line-width:6.5;}"+
+	// 		"[zoom >= 17]{line-width:6.75;}"+
+	// 		"[zoom >= 18]{line-width:7;}"+
+	// 	"}"+
+	// "}";
+
+	// cartoCSSRules = getPolyStyle("level1");
 
 
-	cartodb.createLayer(map, {
-		user_name: 'sco-admin',
-		type: 'cartodb',
-		sublayers: [
-			{
-				type: "cartodb",
-				sql: 'SELECT * FROM final_coastal_lines',
-				cartocss: cartoCSSLines,
-				interactivity: ['line_type'],
-				opacity: layerOpacity
-				// layerIndex: 5
-			},{
-				type: "cartodb",
-				sql: 'SELECT * FROM final_coastal_points',
-				cartocss: cartoCSSPoints,
-				interactivity: ['point_type'],
-				opacity: layerOpacity
-				// layerIndex: 6
-			},{
-				type: "cartodb",
-				sql: 'SELECT * FROM final_coastal_state_boundary',
-				cartocss: cartoCSSState,
-				// layerIndex:8
-			}
-		]
-	}, { https: true })
-		  .addTo(map)
-		  .done(function(layer){
 
-			  lines = layer.getSubLayer(0);
-			  lines.setInteraction(true)
+	// cartodb.createLayer(map, {
+	// 	user_name: 'sco-admin',
+	// 	type: 'cartodb',
+	// 	sublayers: [
+	// 		{
+	// 			type: "cartodb",
+	// 			sql: 'SELECT * FROM bordner_county_bnds',
+	// 			cartocss: cartoCSSCounty,
+	// 			// layerIndex:4
+	// 		},{
+	// 			type: "cartodb",
+	// 			sql: 'SELECT * FROM twpppoly',
+	// 			cartocss: cartoCSSTown,
+	// 			// layerIndex:3
+	// 		},{
+	// 			type: "cartodb",
+	// 			sql: 'SELECT * FROM final_coastal_polygons',
+	// 			cartocss: cartoCSSDensity,
+	// 			// layerIndex: 6
+	// 		}
+	// 	]
+	//   }, { https: true })
+	//   // .addTo(map)
+	//   .done(function(layer){
+
+	// 	  counties = layer.getSubLayer(0);
+	// 	  if (countiesAreOn){
+	// 		  $("#counties").trigger('click') //add to the map
+	// 	  }
+
+	// 	  townships = layer.getSubLayer(1);
+	// 	  if (townshipsAreOn){
+	// 		  $("#townships").trigger('click') //add to the map
+	// 	  }
+
+	// 	  density1 = layer.getSubLayer(2);
+
+	//   })
+
+
+	// cartodb.createLayer(map, {
+	// 	user_name: 'sco-admin',
+	// 	type: 'cartodb',
+	// 	sublayers: [
+	// 		{
+	// 			type: "cartodb",
+	// 			sql: 'SELECT * FROM final_coastal_lines',
+	// 			cartocss: cartoCSSLines,
+	// 			interactivity: ['line_type'],
+	// 			opacity: layerOpacity
+	// 			// layerIndex: 5
+	// 		},{
+	// 			type: "cartodb",
+	// 			sql: 'SELECT * FROM final_coastal_points',
+	// 			cartocss: cartoCSSPoints,
+	// 			interactivity: ['point_type'],
+	// 			opacity: layerOpacity
+	// 			// layerIndex: 6
+	// 		},{
+	// 			type: "cartodb",
+	// 			sql: 'SELECT * FROM final_coastal_state_boundary',
+	// 			cartocss: cartoCSSState,
+	// 			// layerIndex:8
+	// 		}
+	// 	]
+	// }, { https: true })
+	// 	  .addTo(map)
+	// 	  .done(function(layer){
+
+	// 		  lines = layer.getSubLayer(0);
+	// 		  lines.setInteraction(true)
   
-			  lines.bind('featureOver', onLineOver)
-			  lines.bind('featureOut', onLineOut)
+	// 		  lines.bind('featureOver', onLineOver)
+	// 		  lines.bind('featureOut', onLineOut)
   
-			//   lines.setOpacity(layerOpacity)
+	// 		//   lines.setOpacity(layerOpacity)
   
-			  if ((legendType == "lines") && (typeof(lineTypeSelected) !="undefined")){
-				  setTimeout(function(){triggerPointOrLineLegendClick(lineTypeSelected)}, 100)
-			  }
-			  $('#rangeSlider').slider().on('change', function (ev) {
-					  ev.preventDefault();
-					  layerOpacity.points = this.value / 100;
-					  replaceQueryValue("layerOpacity", this.value)
-			  });
+	// 		  if ((legendType == "lines") && (typeof(lineTypeSelected) !="undefined")){
+	// 			  setTimeout(function(){triggerPointOrLineLegendClick(lineTypeSelected)}, 100)
+	// 		  }
+	// 		  $('#rangeSlider').slider().on('change', function (ev) {
+	// 				  ev.preventDefault();
+	// 				  layerOpacity.points = this.value / 100;
+	// 				  replaceQueryValue("layerOpacity", this.value)
+	// 		  });
 
-			  points = layer.getSubLayer(1);
-			  points.setInteraction(true)
-			  points.bind('featureOver', onPointOver)
-			  points.bind('featureOut', onPointOut)
-			//   points.setOpacity(layerOpacity)
-			  if ((legendType == "points") && (typeof(pointTypeSelected) !="undefined")){
-				  setTimeout(function(){triggerPointOrLineLegendClick(pointTypeSelected)}, 100)
-			  }
-			  $('#rangeSlider').slider().on('change', function (ev) {
-					  ev.preventDefault();
-					  layerOpacity = this.value / 100;
-					  replaceQueryValue("layerOpacity", this.value)
-			  });
+	// 		  points = layer.getSubLayer(1);
+	// 		  points.setInteraction(true)
+	// 		  points.bind('featureOver', onPointOver)
+	// 		  points.bind('featureOut', onPointOut)
+	// 		//   points.setOpacity(layerOpacity)
+	// 		  if ((legendType == "points") && (typeof(pointTypeSelected) !="undefined")){
+	// 			  setTimeout(function(){triggerPointOrLineLegendClick(pointTypeSelected)}, 100)
+	// 		  }
+	// 		  $('#rangeSlider').slider().on('change', function (ev) {
+	// 				  ev.preventDefault();
+	// 				  layerOpacity = this.value / 100;
+	// 				  replaceQueryValue("layerOpacity", this.value)
+	// 		  });
+
+	//   })
 
 
-	  })
-
-
-	  cartodb.createLayer(map, {
-		user_name: 'sco-admin',
-		type: 'cartodb',
-		sublayers: [{type: "cartodb",
-			  sql: 'SELECT * FROM final_coastal_polygons',
-			  cartocss: cartoCSSRules,
-			  interactivity: infowindowVars,
-			  layerIndex:1
-	  },{type: "cartodb",
-			  sql: 'SELECT * FROM final_coastal_polygons',
-			  cartocss: cartoCSSRules,
-			  interactivity: ['cartodb_id','cov1', 'cov2'],
-			  layerIndex:2
-	  }]
-	  }, { https: true })
-	  .addTo(map) // add cartodb layer and basemap to map object
-	  .done(function(layer) {
-		  bordner = layer;
-		  //layer.setOpacity(layerOpacity);
-		  layer.setInteraction(true);
-		  setupSublayer(layer, 1, "visible");
-		  setupSublayer(layer, 2, "hidden");
-		  $('#rangeSlider').slider().on('change', function (ev) {
-			  ev.preventDefault();
-			  layerOpacity.polygons = this.value / 100;
-			  layer.setOpacity(layerOpacity);
-			  replaceQueryValue("layerOpacity", this.value)
-		  });
-		  layer.setOpacity(layerOpacity);
-		  layer.bind('featureOver', onPolyOver)
-		  layer.bind('featureOut', onPolyOut)
+	//   cartodb.createLayer(map, {
+	// 	user_name: 'sco-admin',
+	// 	type: 'cartodb',
+	// 	sublayers: [{type: "cartodb",
+	// 		  sql: 'SELECT * FROM final_coastal_polygons',
+	// 		  cartocss: cartoCSSRules,
+	// 		  interactivity: infowindowVars,
+	// 		  layerIndex:1
+	//   },{type: "cartodb",
+	// 		  sql: 'SELECT * FROM final_coastal_polygons',
+	// 		  cartocss: cartoCSSRules,
+	// 		  interactivity: ['cartodb_id','cov1', 'cov2'],
+	// 		  layerIndex:2
+	//   }]
+	//   }, { https: true })
+	//   .addTo(map) // add cartodb layer and basemap to map object
+	//   .done(function(layer) {
+	// 	  bordner = layer;
+	// 	  //layer.setOpacity(layerOpacity);
+	// 	  layer.setInteraction(true);
+	// 	  setupSublayer(layer, 1, "visible");
+	// 	  setupSublayer(layer, 2, "hidden");
+	// 	  $('#rangeSlider').slider().on('change', function (ev) {
+	// 		  ev.preventDefault();
+	// 		  layerOpacity.polygons = this.value / 100;
+	// 		  layer.setOpacity(layerOpacity);
+	// 		  replaceQueryValue("layerOpacity", this.value)
+	// 	  });
+	// 	  layer.setOpacity(layerOpacity);
+	// 	  layer.bind('featureOver', onPolyOver)
+	// 	  layer.bind('featureOut', onPolyOut)
   
-		  //could add a render event if we updated the leaflet version
+	// 	  //could add a render event if we updated the leaflet version
   
-		  //dispatch the filter, if required in the url parameter
-		  if ((typeof(level1Selected) != "undefined") && (legendType == "polygons")){
-			  dispatchLegendClick(level1Selected)
-		  }
-		  setupInfoWindow(bordner);
-	  });
+	// 	  //dispatch the filter, if required in the url parameter
+	// 	  if ((typeof(level1Selected) != "undefined") && (legendType == "polygons")){
+	// 		  dispatchLegendClick(level1Selected)
+	// 	  }
+	// 	  setupInfoWindow(bordner);
+	//   });
 
 
 
@@ -781,10 +907,16 @@ window.onload = function() {
 	// Define layers
 	const counties = new carto.layer.Layer(countiesSource, cartoCSSCounty);
 	const townships = new carto.layer.Layer(townshipsSource, cartoCSSTown);
-	const density1 = new carto.layer.Layer(density1Source, cartoCSSDensity);
+	const density1 = new carto.layer.Layer(density1Source, cartoCSSDensity, {
+		featureOverColumns: ['cov1']
+	});
 
-	const lines = new carto.layer.Layer(linesSource, cartoCSSLines);
-	const points = new carto.layer.Layer(pointsSource, cartoCSSPoints);
+	const lines = new carto.layer.Layer(linesSource, cartoCSSLines, {
+		featureOverColumns: ['line_type']
+	});
+	const points = new carto.layer.Layer(pointsSource, cartoCSSPoints, {
+		featureOverColumns: ['point_type']
+	});
 	const boundary = new carto.layer.Layer(boundarySource, cartoCSSState); // Was unnamed before carto v4
 
 	// Add layers to client
@@ -799,7 +931,62 @@ window.onload = function() {
 	// Add client layers to map
 	client.getLeafletLayer().addTo(map);
 
-	// TODO: Interactivity
+	// Interactivity
+	if (countiesAreOn){
+		$("#counties").trigger('click') //add to the map
+	}
+
+	if (townshipsAreOn){
+		$("#townships").trigger('click') //add to the map
+	}
+  
+
+	lines.on('featureOver', function(featureEvent){onLineOver(featureEvent.data)})
+	lines.on('featureOut', function(featureEvent){onLineOut()})
+
+	if ((legendType == "lines") && (typeof(lineTypeSelected) !="undefined")){
+		setTimeout(function(){triggerPointOrLineLegendClick(lineTypeSelected)}, 100)
+	}
+	$('#rangeSlider').slider().on('change', function (ev) {
+			ev.preventDefault();
+			layerOpacity.points = this.value / 100;
+			replaceQueryValue("layerOpacity", this.value)
+	});
+
+	points.on('featureOver', function(featureEvent){onPointOver(featureEvent.data)})
+	points.on('featureOut', function(featureEvent){onPointOut()})
+
+	if ((legendType == "points") && (typeof(pointTypeSelected) !="undefined")){
+		setTimeout(function(){triggerPointOrLineLegendClick(pointTypeSelected)}, 100)
+	}
+	$('#rangeSlider').slider().on('change', function (ev) {
+			ev.preventDefault();
+			layerOpacity = this.value / 100;
+			replaceQueryValue("layerOpacity", this.value)
+	});
+
+
+
+	// setupSublayer(layer, 1, "visible");
+	// setupSublayer(layer, 2, "hidden");
+	$('#rangeSlider').slider().on('change', function (ev) {
+		ev.preventDefault();
+		layerOpacity.polygons = this.value / 100;
+		density1.setOpacity(layerOpacity);
+		replaceQueryValue("layerOpacity", this.value)
+	});
+
+	// layer.setOpacity(layerOpacity);
+	density1.on('featureOver', function(featureEvent){onPolyOver(featureEvent.data)})
+	density1.on('featureOut', function(featureEvent){onPolyOut()})
+
+	//could add a render event if we updated the leaflet version
+
+	//dispatch the filter, if required in the url parameter
+	if ((typeof(level1Selected) != "undefined") && (legendType == "polygons")){
+		dispatchLegendClick(level1Selected)
+	}
+	setupInfoWindow(bordner);
 
 
 
@@ -1199,7 +1386,7 @@ function onMapClick(){
 }
 
 //functions for events on particular feature types
-function onLineOver(e, latln, pxPos, data, layer){
+function onLineOver(data){
 	if (legendType == "lines"){
 		var lineName = getPointOrLineNameFromCode(data.line_type, 'lines');
 		//only dispaly the infobox if the feature is within its zoom level
@@ -1217,13 +1404,13 @@ function onLineOver(e, latln, pxPos, data, layer){
 	}
 }
 
-function onLineOut(e, latln, pxPos, data, layer){
+function onLineOut(){
 	if (legendType == "lines" &&(!showInfoboxOnHover)){
 		$("#infobox").hide()
 	}
 }
 
-function onPointOver(e, latln, pxPos, data, layer){
+function onPointOver(data){
 	if (legendType == "points"){
 			var pointName = getPointOrLineNameFromCode(data.point_type, 'points');
 			if (isFeatureInZoom(data.point_type, 'points') && (showInfoboxOnHover)){
@@ -1236,13 +1423,13 @@ function onPointOver(e, latln, pxPos, data, layer){
 	}
 }
 
-function onPointOut(e, latln, pxPos, data, layer){
+function onPointOut(){
 	if(legendType == "points" &&(!showInfoboxOnHover)){
 		$("#infobox").hide();
 	}
 }
 
-function onPolyOver(e, latln, pxPos, data, layer){
+function onPolyOver(data){
 	if ((legendType == "polygons") && showInfoboxOnHover && desktopMode){
 		if (typeof(level1Selected) == 'undefined'){
 			$("#infobox").show()
@@ -1264,7 +1451,7 @@ function onPolyOver(e, latln, pxPos, data, layer){
 	}
 }
 
-function onPolyOut(e, latln, pxPos, data, layer){
+function onPolyOut(){
 	if (legendType == "polygons" &&(!showInfoboxOnHover)){
 		$("#infobox").hide()
 	}
