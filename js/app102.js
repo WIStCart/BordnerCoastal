@@ -905,19 +905,22 @@ window.onload = function() {
 	cartoCSSRules = new carto.style.CartoCSS(getPolyStyle("level1"));
 
 	// Define layers
-	const counties = new carto.layer.Layer(countiesSource, cartoCSSCounty);
-	const townships = new carto.layer.Layer(townshipsSource, cartoCSSTown);
-	const density1 = new carto.layer.Layer(density1Source, cartoCSSDensity, {
+	counties = new carto.layer.Layer(countiesSource, cartoCSSCounty);
+	townships = new carto.layer.Layer(townshipsSource, cartoCSSTown);
+	density1 = new carto.layer.Layer(density1Source, cartoCSSDensity, {
 		featureOverColumns: ['cov1']
 	});
 
-	const lines = new carto.layer.Layer(linesSource, cartoCSSLines, {
+	lines = new carto.layer.Layer(linesSource, cartoCSSLines, {
 		featureOverColumns: ['line_type']
 	});
-	const points = new carto.layer.Layer(pointsSource, cartoCSSPoints, {
+	points = new carto.layer.Layer(pointsSource, cartoCSSPoints, {
 		featureOverColumns: ['point_type']
 	});
-	const boundary = new carto.layer.Layer(boundarySource, cartoCSSState); // Was unnamed before carto v4
+	boundary = new carto.layer.Layer(boundarySource, cartoCSSState); // Was unnamed before carto v4
+
+	// These two were originally sublayers of the layer "bordner"
+	
 
 	// Add layers to client
 	client.addLayers([counties, townships, density1, lines, points, boundary])
@@ -945,17 +948,17 @@ window.onload = function() {
 	client.getLeafletLayer().addTo(map);
 
 	// // Interactivity
-	// if (countiesAreOn){
-	// 	$("#counties").trigger('click') //add to the map
-	// }
+	if (countiesAreOn){
+		$("#counties").trigger('click') //add to the map
+	}
 
-	// if (townshipsAreOn){
-	// 	$("#townships").trigger('click') //add to the map
-	// }
+	if (townshipsAreOn){
+		$("#townships").trigger('click') //add to the map
+	}
   
 
-	// lines.on('featureOver', function(featureEvent){onLineOver(featureEvent.data)})
-	// lines.on('featureOut', function(featureEvent){onLineOut()})
+	lines.on('featureOver', function(featureEvent){onLineOver(featureEvent.data)})
+	lines.on('featureOut', function(featureEvent){onLineOut()})
 
 	// if ((legendType == "lines") && (typeof(lineTypeSelected) !="undefined")){
 	// 	setTimeout(function(){triggerPointOrLineLegendClick(lineTypeSelected)}, 100)
@@ -3292,18 +3295,21 @@ function listenToLineLegend(){
 
 function showNoLines(){
 	var lineStyle = getLineCSS("none");
-	lines.setCartoCSS(lineStyle);
+	// lines.setCartoCSS(lineStyle);
+	lines.getStyle().setContent(lineStyle);
 }
 
 function showAllLines(){
 	var lineStyle = getLineCSS("all", map.getZoom());
-	lines.setCartoCSS(lineStyle);
+	// lines.setCartoCSS(lineStyle);
+	lines.getStyle().setContent(lineStyle);
 	lines.bringToFront();
 }
 
 function showOneLine(lineType){
 	var lineStyle = getLineCSS(lineType);
-	lines.setCartoCSS(lineStyle);
+	// lines.setCartoCSS(lineStyle);
+	lines.getStyle().setContent(lineStyle);
 	lines.bringToFront();
 }
 
@@ -3372,18 +3378,21 @@ function listenToPolyLegend(){
 
 function showNoPoints(){
 	var pointStyle = getPointCSS("none");
-	points.setCartoCSS(pointStyle);
+	// points.setCartoCSS(pointStyle);
+	points.getStyle().setContent(pointStyle);
 }
 function showAllPoints(){
 	var pointStyle = getPointCSS("all", map.getZoom());
-	points.setCartoCSS(pointStyle);
+	// points.setCartoCSS(pointStyle);
+	points.getStyle().setContent(pointStyle);
 	points.bringToFront();
 	//CS: console.log(basemapChoice);
 }
 
 function showOnePoint(pointType){
 	var pointStyle = getPointCSS(pointType);
-	points.setCartoCSS(pointStyle);
+	// points.setCartoCSS(pointStyle);
+	points.getStyle().setContent(pointStyle);
 	points.bringToFront();
 }
 
