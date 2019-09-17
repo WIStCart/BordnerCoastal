@@ -920,6 +920,8 @@ window.onload = function() {
 	boundary = new carto.layer.Layer(boundarySource, cartoCSSState); // Was unnamed before carto v4
 
 	// These two were originally sublayers of the layer "bordner"
+	sublayer1 = new carto.layer.Layer(density1Source, cartoCSSRules);
+	sublayer2 = new carto.layer.Layer(density1Source, cartoCSSRules);
 	
 
 	// Add layers to client
@@ -944,6 +946,8 @@ window.onload = function() {
 		}
 	});
 
+	
+
 	// Add client layers to map
 	client.getLeafletLayer().addTo(map);
 
@@ -960,14 +964,14 @@ window.onload = function() {
 	lines.on('featureOver', function(featureEvent){onLineOver(featureEvent.data)})
 	lines.on('featureOut', function(featureEvent){onLineOut()})
 
-	// if ((legendType == "lines") && (typeof(lineTypeSelected) !="undefined")){
-	// 	setTimeout(function(){triggerPointOrLineLegendClick(lineTypeSelected)}, 100)
-	// }
-	// $('#rangeSlider').slider().on('change', function (ev) {
-	// 		ev.preventDefault();
-	// 		layerOpacity.points = this.value / 100;
-	// 		replaceQueryValue("layerOpacity", this.value)
-	// });
+	if ((legendType == "lines") && (typeof(lineTypeSelected) !="undefined")){
+		setTimeout(function(){triggerPointOrLineLegendClick(lineTypeSelected)}, 100)
+	}
+	$('#rangeSlider').slider().on('change', function (ev) {
+			ev.preventDefault();
+			layerOpacity.points = this.value / 100;
+			replaceQueryValue("layerOpacity", this.value)
+	});
 
 	// points.on('featureOver', function(featureEvent){onPointOver(featureEvent.data)})
 	// points.on('featureOut', function(featureEvent){onPointOut()})
@@ -1960,7 +1964,7 @@ function turnOnFeatureType(featureTypeCalled){
 			manageURLToPolygons();
 			$("#legendHolder").removeClass("stylescroll").removeClass("autoscroll")
 			drawThisView(map.getBounds(), map.getZoom(), levelEngaged, level1Selected)
-			if ((typeof(lines) == "undefined") || (typeof(points) == "undefined")){
+			if ((typeof(lines) == "undefined") || (typeof(points) == "undefined") || typeof($("#rangeSlider") == "undefined")){
 				setTimeout(function(featureTypeCalled){turnOnFeatureType(featureTypeCalled)}, 50) //this prevents on init load issues with undefined values
 			}else{
 				showOnlyPolygons();
@@ -2068,12 +2072,16 @@ function showOnlyPoints(){
 
 function showNoPolygons(){
 		// bordner.setCartoCSS(getPolyStyle("none"))
-		bordner.hide();
+		// bordner.hide();
+		sublayer1.hide();
+		sublayer2.hide();
 }
 
 function showAllPolygons(){
 	// bordner.setCartoCSS(getPolyStyle("level1"))
-	bordner.show();
+	// bordner.show();
+	sublayer1.show();
+	sublayer2.show();
 }
 
 // To turn on the appropriate basemap, note, the radio button's id must match the basemap's variable name
@@ -2095,9 +2103,13 @@ function turnOnBasemap(basemapCalled){
 // To turn on the appropriate basemap, note, the radio button's id must match the basemap's variable name
 function turnOnOverlay(overlayCalled){
 	if (map.hasLayer(window[overlayCalled])){
+		console.log(overlayCalled)
+		console.log(window[overlayCalled])
 		map.removeLayer(window[overlayCalled]);
 		didAdd = false;
 	}else{
+		console.log(overlayCalled)
+		console.log(window[overlayCalled])
 		map.addLayer(window[overlayCalled]);
 		didAdd = true;
 	}
@@ -3659,4 +3671,5 @@ function updateQueryString(key, value, url) {
 function replaceQueryValue(key, value){
 	newURL = updateQueryString(key, value);
 	window.history.replaceState({path: newURL}, '', newURL)
+	console.log(newURL);
 }
