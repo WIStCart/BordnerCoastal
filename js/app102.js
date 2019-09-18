@@ -925,7 +925,7 @@ window.onload = function() {
 	
 
 	// Add layers to client
-	client.addLayers([counties, townships, density1, lines, points, boundary])
+	client.addLayers([counties, townships, density1, lines, points, boundary, sublayer1, sublayer2])
 		// .then(() => {
 		// 	console.log('Layers added');
 		// })
@@ -949,6 +949,8 @@ window.onload = function() {
 	
 
 	// Add client layers to map
+	leafletLayer = client.getLeafletLayer();
+	console.log(leafletLayer)
 	client.getLeafletLayer().addTo(map);
 
 	// // Interactivity
@@ -973,39 +975,42 @@ window.onload = function() {
 			replaceQueryValue("layerOpacity", this.value)
 	});
 
-	// points.on('featureOver', function(featureEvent){onPointOver(featureEvent.data)})
-	// points.on('featureOut', function(featureEvent){onPointOut()})
+	points.on('featureOver', function(featureEvent){onPointOver(featureEvent.data)})
+	points.on('featureOut', function(featureEvent){onPointOut()})
 
-	// if ((legendType == "points") && (typeof(pointTypeSelected) !="undefined")){
-	// 	setTimeout(function(){triggerPointOrLineLegendClick(pointTypeSelected)}, 100)
-	// }
-	// $('#rangeSlider').slider().on('change', function (ev) {
-	// 		ev.preventDefault();
-	// 		layerOpacity = this.value / 100;
-	// 		replaceQueryValue("layerOpacity", this.value)
-	// });
-
+	if ((legendType == "points") && (typeof(pointTypeSelected) !="undefined")){
+		setTimeout(function(){triggerPointOrLineLegendClick(pointTypeSelected)}, 100)
+	}
+	$('#rangeSlider').slider().on('change', function (ev) {
+			ev.preventDefault();
+			layerOpacity = this.value / 100;
+			replaceQueryValue("layerOpacity", this.value)
+	});
 
 
 	// // setupSublayer(layer, 1, "visible");
 	// // setupSublayer(layer, 2, "hidden");
-	// $('#rangeSlider').slider().on('change', function (ev) {
-	// 	ev.preventDefault();
-	// 	layerOpacity.polygons = this.value / 100;
-	// 	density1.setOpacity(layerOpacity);
-	// 	replaceQueryValue("layerOpacity", this.value)
-	// });
+
+	sublayer1.hide();
+	sublayer2.show();
+
+	$('#rangeSlider').slider().on('change', function (ev) {
+		ev.preventDefault();
+		layerOpacity.polygons = this.value / 100;
+		// density1.setOpacity(layerOpacity);
+		replaceQueryValue("layerOpacity", this.value)
+	});
 
 	// // layer.setOpacity(layerOpacity);
-	// density1.on('featureOver', function(featureEvent){onPolyOver(featureEvent.data)})
-	// density1.on('featureOut', function(featureEvent){onPolyOut()})
+	density1.on('featureOver', function(featureEvent){onPolyOver(featureEvent.data)})
+	density1.on('featureOut', function(featureEvent){onPolyOut()})
 
 	// //could add a render event if we updated the leaflet version
 
-	// //dispatch the filter, if required in the url parameter
-	// if ((typeof(level1Selected) != "undefined") && (legendType == "polygons")){
-	// 	dispatchLegendClick(level1Selected)
-	// }
+	//dispatch the filter, if required in the url parameter
+	if ((typeof(level1Selected) != "undefined") && (legendType == "polygons")){
+		dispatchLegendClick(level1Selected)
+	}
 	// setupInfoWindow(bordner);
 
 
@@ -2104,11 +2109,13 @@ function turnOnBasemap(basemapCalled){
 function turnOnOverlay(overlayCalled){
 	if (map.hasLayer(window[overlayCalled])){
 		console.log(overlayCalled)
+		console.log(counties);
 		console.log(window[overlayCalled])
 		map.removeLayer(window[overlayCalled]);
 		didAdd = false;
 	}else{
 		console.log(overlayCalled)
+		console.log(counties);
 		console.log(window[overlayCalled])
 		map.addLayer(window[overlayCalled]);
 		didAdd = true;
@@ -3447,8 +3454,9 @@ function switchLevel(_levelEngaged, _level1Selected){
 	if (_levelEngaged == 2){
 		sublayer2.show();
 		sublayer1.hide();
-		sublayer2.setCartoCSS(cartoCSSRules)
-		sublayer2.setInteraction(true)
+		// sublayer2.setCartoCSS(cartoCSSRules)
+		sublayer2.getStyle().setContent(cartoCSSRules);
+		// sublayer2.setInteraction(true)
 		displayLevel1Label(_level1Selected)
 		//if (!desktopMode){
 			//$("#legendModalHeader").text(titleCase(_level1Selected))
@@ -3671,5 +3679,5 @@ function updateQueryString(key, value, url) {
 function replaceQueryValue(key, value){
 	newURL = updateQueryString(key, value);
 	window.history.replaceState({path: newURL}, '', newURL)
-	console.log(newURL);
+	// console.log(newURL);
 }
