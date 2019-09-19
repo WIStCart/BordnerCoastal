@@ -62,6 +62,12 @@ if (location.protocol != 'https:')
  location.href = 'https:' + window.location.href.substring(window.location.protocol.length);
 }
 
+// Define client
+var client = new carto.Client({
+	apiKey: 'ELdo9yXfp2IfWRTB0NcYKg',
+	username: 'sco-admin'
+});
+
 //limit panning
 var north = 47.5
 var south = 42
@@ -742,11 +748,11 @@ window.onload = function() {
 
 	/********************************* Start Carto v4 ********************************/
 
-	// Define client
-	var client = new carto.Client({
-		apiKey: 'ELdo9yXfp2IfWRTB0NcYKg',
-		username: 'sco-admin'
-	});
+	// // Define client
+	// var client = new carto.Client({
+	// 	apiKey: 'ELdo9yXfp2IfWRTB0NcYKg',
+	// 	username: 'sco-admin'
+	// });
 
 	// Define layer sources
 	const countiesSource = new carto.source.SQL('SELECT * FROM bordner_county_bnds');
@@ -925,7 +931,7 @@ window.onload = function() {
 	
 
 	// Add layers to client
-	client.addLayers([counties, townships, density1, lines, points, boundary, sublayer1, sublayer2])
+	client.addLayers([density1, lines, points, boundary, sublayer1, sublayer2])
 		// .then(() => {
 		// 	console.log('Layers added');
 		// })
@@ -2107,17 +2113,26 @@ function turnOnBasemap(basemapCalled){
 
 // To turn on the appropriate basemap, note, the radio button's id must match the basemap's variable name
 function turnOnOverlay(overlayCalled){
-	if (map.hasLayer(window[overlayCalled])){
+	// if (map.hasLayer(window[overlayCalled])){
+	var clientLayers = client.getLayers();
+	var layerFound = false;
+	for(index in clientLayers){
+		if(window[overlayCalled] == clientLayers[index]){
+			console.log('match found')
+			layerFound = true;
+		}
+	}
+	if (layerFound){
+		console.log('test1')
 		console.log(overlayCalled)
-		console.log(counties);
-		console.log(window[overlayCalled])
-		map.removeLayer(window[overlayCalled]);
+		// map.removeLayer(window[overlayCalled]);
+		client.removeLayer(window[overlayCalled]);
 		didAdd = false;
 	}else{
+		console.log('test2')
 		console.log(overlayCalled)
-		console.log(counties);
-		console.log(window[overlayCalled])
-		map.addLayer(window[overlayCalled]);
+		// map.addLayer(window[overlayCalled]);
+		client.addLayer(window[overlayCalled]);
 		didAdd = true;
 	}
 	reflectChangeLayerInQueryString(overlayCalled, didAdd)
