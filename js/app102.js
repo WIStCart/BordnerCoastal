@@ -745,6 +745,25 @@ var cartoCSSLines = getLineCSS('none')
 	// }, { https: true })
 	// .addTo(map);
 
+	/********************************* Notes about attempts to update to Carto v4 ********************************/
+
+	/*
+	It was attempted to update from Carto v3 to v4 in Sept 2019, but various issues put the process on hold until more time
+	could be devoted towards updating the app as a whole.
+
+	As it stands, the functionality of the app depends heavily on the use of sublayers, which are not used in carto v4.  This
+	means to upgrade, much of the functionality of the app will have to be rewritten.
+
+	Carto v4 also combines layers on the Carto server and returns them as tiles with layers already combined.  This is good for
+	limiting the number of requests to Carto, but it causes the performance of Bordner Coastal to suffer.  This application is
+	exploratory in nature, and often requires changing which layers are displayed.  Every time this is done, Carto has to 
+	redo the tiles on the server side to match the update, then the entire map is reloaded with the new tiles.  The level of 
+	detail on the tiles causes this loading process to be somewhat slow, and the application performance suffers as a result.
+	In Carto v3, the seperate sublayers can be added and removed without reloading all tiles of the map.  This is more 
+	appealing to the user. 
+
+	*/
+
 	/********************************* Combination of layers as sublayers ********************************/
 
 	cartodb.createLayer(map, {
