@@ -1,6 +1,14 @@
 # BordnerCoastal
 Collaborative project between Forest Landscape and Ecology Lab (FLEL) and State Cartographer's Office (SCO). Web-based mapping application featuring point, line, and polygon data digitized from the Wisconsin Land Economic Inventory (a.k.a. "Bordner" survey maps) for Wisconsin's coastal counties.
 
+Carto Layers in Use:/
+bordnercoastal_final_polygons/
+bordnercoastal_final_lines/
+bordnercoastal_final_points/
+scobase_wi_county_boundaries_24k/
+scobase_wi_state_boundary/ 
+scobase_wi_plss_townships_24k
+
 ### Data updates
 Here are the general steps to updating the polygon classification schema in JavaScript:
 1) The classification of the polygons is configured within the *temp_classes.js* file within the ```tempclasses2``` variable that holds a JSON formatted data for each class' attribute/configuration:
@@ -29,9 +37,9 @@ Here are the general steps to updating the Bordner data in CARTO:
 1) Updates from FLEL in the past have been prepared for integration - no processing needed on our end except anything mentioned here.
 - Save the data to: Z:\PROJECTS\Bordner_Coastal_Grant\ (this is where past data has been prepped). Use the naming syntax XX_Bordner_Update_MMDDYY. Follow along with the Folder numbers within the direcotry here for example purposes: Z:\PROJECTS\Bordner_Coastal_Grant\01_App_Data_Updates\01_Bordner_Update_040519.
 2) Folder "01" export each of the 3 feature classes to .shp, titled in a similar manner to this:
-- ```final_coastal_linesMMDDYY``` *The 040519 update to lines worked (size was not an issue)
-- ```final_coastal_pointsMMDDYY``` *The 040519 update to points worked (size was not an issue)
-- ```final_coastal_polygonsMMDDYY``` *The polygon layer will be too big for CARTO to handle. Thus, there are some other steps that need to be done to this layer as well. Read ahead to step 6 for a process for polys.
+- ```bordnercoastal_final_linesMMDDYY``` *The 040519 update to lines worked (size was not an issue)
+- ```bordnercoastal_final_pointsMMDDYY``` *The 040519 update to points worked (size was not an issue)
+- ```bordnercoastal_final_polygonsMMDDYY``` *The polygon layer will be too big for CARTO to handle. Thus, there are some other steps that need to be done to this layer as well. Read ahead to step 6 for a process for polys.
 4) Login to CARTO using the SCO account (see login instructions in keys). Ensure that the schemas of the new .shps match that of their matching tables in CARTO. When comparing schemas, note the following:
 - CARTO tables will automatically set all fieldnames to lowercase (so no need to worry about case differences)
 - There may be extra fields in the new data - it is ok to delete them or keep them.
@@ -41,34 +49,34 @@ Here are the general steps to updating the Bordner data in CARTO:
 - You can test the schema by simply uploading a small chunk of data to CARTO before proceeding to the next steps of chunking the big dataset up.
 - If the poly data's schema checks out then chunk the data into 100k segments (should be ok to use FID to query them), zip the file and load it to CARTO (use a good naming scheme. When you have a batch in CARTO, use a query like this one to merge it into an existing table (this SQL will write the new features into the "final_coastal_polygons_040819_0_100k" table). Your first upload could be 300k in size, but after that I have only had success merging 100k at a time:
   
-  ```INSERT INTO final_coastal_polygons_040819_0_100k (the_geom, the_geom_webmercator, cov1, mindiam1, maxdiam1, den1, pctcov1, cov2, mindiam2, maxdiam2, den2, pctcov2, cov3, mindiam3, maxdiam3, den3, pctcov3, cov4, mindiam4, maxdiam4, den4, pctcov4, extradigit, judgementc, judgemen_1, notes, judgemen_2, judgemen_3, ha, cov5, mindiam5, maxdiam5, den5, pctcov5, shape_leng, shape_area, area)```
+  ```INSERT INTO bordnercoastal_final_polygons_040819_0_100k (the_geom, the_geom_webmercator, cov1, mindiam1, maxdiam1, den1, pctcov1, cov2, mindiam2, maxdiam2, den2, pctcov2, cov3, mindiam3, maxdiam3, den3, pctcov3, cov4, mindiam4, maxdiam4, den4, pctcov4, extradigit, judgementc, judgemen_1, notes, judgemen_2, judgemen_3, ha, cov5, mindiam5, maxdiam5, den5, pctcov5, shape_leng, shape_area, area)```
 
-  ```SELECT the_geom, the_geom_webmercator, cov1, mindiam1, maxdiam1, den1, pctcov1, cov2, mindiam2, maxdiam2, den2, pctcov2, cov3, mindiam3, maxdiam3, den3, pctcov3, cov4, mindiam4, maxdiam4, den4, pctcov4, extradigit, judgementc, judgemen_1, notes, judgemen_2, judgemen_3, ha, cov5, mindiam5, maxdiam5, den5, pctcov5, shape_leng, shape_area, area FROM final_coastal_polygons_040819_100_200k```
+  ```SELECT the_geom, the_geom_webmercator, cov1, mindiam1, maxdiam1, den1, pctcov1, cov2, mindiam2, maxdiam2, den2, pctcov2, cov3, mindiam3, maxdiam3, den3, pctcov3, cov4, mindiam4, maxdiam4, den4, pctcov4, extradigit, judgementc, judgemen_1, notes, judgemen_2, judgemen_3, ha, cov5, mindiam5, maxdiam5, den5, pctcov5, shape_leng, shape_area, area FROM bordnercoastal_final_polygons_040819_100_200k```
 
 - Note, you'll want to explicitly handle the field names, as done in the sample above (there may be a more precise way) trying to write the cartodb_id into another table will throw an error so that is the reason the "\*" astirix/wildcard isnt used above.
 
 - Also, 100,000 record chunks may be too big - if you get an error when doing the merge, split the 100,000 chunk in two and try in 2 pieces.
 
 - This query will return the number of records in a table:
-  ```SELECT count(*) AS exact_count FROM final_coastal_polygons```
+  ```SELECT count(*) AS exact_count FROM bordnercoastal_final_polygons```
   
 - It may be desireable to do it this way - to do the merge on segments using larger .zip data uploads (but be careful!! .shp may become corrupted even before the 2gb limitation is reached - this has happened in the past):
 
-  ```INSERT INTO final_coastal_polygons_040819_0_100k (the_geom, the_geom_webmercator, cov1, mindiam1, maxdiam1, den1, pctcov1, cov2, mindiam2, maxdiam2, den2, pctcov2, cov3, mindiam3, maxdiam3, den3, pctcov3, cov4, mindiam4, maxdiam4, den4, pctcov4, extradigit, judgementc, judgemen_1, notes, judgemen_2, judgemen_3, ha, cov5, mindiam5, maxdiam5, den5, pctcov5, shape_leng, shape_area, area)  ```
+  ```INSERT INTO bordnercoastal_final_polygons_040819_0_100k (the_geom, the_geom_webmercator, cov1, mindiam1, maxdiam1, den1, pctcov1, cov2, mindiam2, maxdiam2, den2, pctcov2, cov3, mindiam3, maxdiam3, den3, pctcov3, cov4, mindiam4, maxdiam4, den4, pctcov4, extradigit, judgementc, judgemen_1, notes, judgemen_2, judgemen_3, ha, cov5, mindiam5, maxdiam5, den5, pctcov5, shape_leng, shape_area, area)  ```
   
-  ```SELECT the_geom, the_geom_webmercator, cov1, mindiam1, maxdiam1, den1, pctcov1, cov2, mindiam2, maxdiam2, den2, pctcov2, cov3, mindiam3, maxdiam3, den3, pctcov3, cov4, mindiam4, maxdiam4, den4, pctcov4, extradigit, judgementc, judgemen_1, notes, judgemen_2, judgemen_3, ha, cov5, mindiam5, maxdiam5, den5, pctcov5, shape_leng, shape_area, area FROM final_coastal_polygons_040819_300_350k WHERE (cartodb_id >= 20000) AND (cartodb_id < 40000)```
+  ```SELECT the_geom, the_geom_webmercator, cov1, mindiam1, maxdiam1, den1, pctcov1, cov2, mindiam2, maxdiam2, den2, pctcov2, cov3, mindiam3, maxdiam3, den3, pctcov3, cov4, mindiam4, maxdiam4, den4, pctcov4, extradigit, judgementc, judgemen_1, notes, judgemen_2, judgemen_3, ha, cov5, mindiam5, maxdiam5, den5, pctcov5, shape_leng, shape_area, area FROM bordnercoastal_final_polygons_040819_300_350k WHERE (cartodb_id >= 20000) AND (cartodb_id < 40000)```
 
 - Menominee and Milwaukee (no survey performed) will likely contain a gap in the new data. We'll add menominee PLSS section polygons to the poly data as a placeholder. A formula like this one can be used to grab the sections from an older table and push them into the new table:
-```INSERT INTO final_coastal_polygons (the_geom, the_geom_webmercator, cov1, mindiam1, maxdiam1, den1, pctcov1, cov2, mindiam2, maxdiam2, den2, pctcov2, cov3, mindiam3, maxdiam3, den3, pctcov3, cov4, mindiam4, maxdiam4, den4, pctcov4, judgementc, judgemen_1, notes, judgemen_2, judgemen_3, cov5, mindiam5, maxdiam5, den5, pctcov5, shape_leng, shape_area)```
+```INSERT INTO bordnercoastal_final_polygons (the_geom, the_geom_webmercator, cov1, mindiam1, maxdiam1, den1, pctcov1, cov2, mindiam2, maxdiam2, den2, pctcov2, cov3, mindiam3, maxdiam3, den3, pctcov3, cov4, mindiam4, maxdiam4, den4, pctcov4, judgementc, judgemen_1, notes, judgemen_2, judgemen_3, cov5, mindiam5, maxdiam5, den5, pctcov5, shape_leng, shape_area)```
 
-SELECT the_geom, the_geom_webmercator, cov1, mindiam1, maxdiam1, den1, pctcov1, cov2, mindiam2, maxdiam2, den2, pctcov2, cov3, mindiam3, maxdiam3, den3, pctcov3, cov4, mindiam4, maxdiam4, den4, pctcov4, judgementc, judgemen_1, notes, judgemen_2, judgemen_3, cov5, mindiam5, maxdiam5, den5, pctcov5, shape_leng, shape_area FROM final_coastal_polygons_old_2019 WHERE cov1 = 'UNSURVEYED'
+SELECT the_geom, the_geom_webmercator, cov1, mindiam1, maxdiam1, den1, pctcov1, cov2, mindiam2, maxdiam2, den2, pctcov2, cov3, mindiam3, maxdiam3, den3, pctcov3, cov4, mindiam4, maxdiam4, den4, pctcov4, judgementc, judgemen_1, notes, judgemen_2, judgemen_3, cov5, mindiam5, maxdiam5, den5, pctcov5, shape_leng, shape_area FROM bordnercoastal_final_polygons_old_2019 WHERE cov1 = 'UNSURVEYED'
 
 
-7) ```final_coastal_points```, ```final_costal_polygons```, ```final_coastal_lines``` are the three live feature tables in CARTO. Archive the ones being updated by appending old + datestamp (e.g. "_old_040519"). NOTE THAT THIS WILL BREAKE THE APP FOR A SHORT WHILE WHILE YOU SWAP THINGS OUT.
+7) ```bordnercoastal_final_points```, ```bordnercoastal_final_polygons```, ```bordnercoastal_final_lines``` are the three live feature tables in CARTO. Archive the ones being updated by appending old + datestamp (e.g. "_old_040519"). NOTE THAT THIS WILL BREAKE THE APP FOR A SHORT WHILE WHILE YOU SWAP THINGS OUT.
 8) In CARTO, rename these tables and make them public.
-- ```final_coastal_polygonsMMDDYY```
-- ```final_coastal_linesMMDDYY```
-- ```final_coastal_pointsMMDDYY```
+- ```bordnercoastal_final_polygonsMMDDYY```
+- ```bordnercoastal_final_linesMMDDYY```
+- ```bordnercoastal_final_pointsMMDDYY```
 
 ### Browser API
 The application has a number of URL parameters that allow users to programmatically create map configurations. At the current time, the options include:

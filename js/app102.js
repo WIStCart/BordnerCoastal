@@ -482,7 +482,7 @@ window.onload = function() {
       user_name: 'sco-admin',
       type: 'cartodb',
       sublayers: [{type: "cartodb",
-			sql: 'SELECT * FROM bordner_county_bnds',
+			sql: 'SELECT * FROM scobase_wi_county_boundaries_24k',
 			cartocss: cartoCSSCounty,
 			layerIndex:4
 	}]
@@ -546,7 +546,7 @@ window.onload = function() {
       user_name: 'sco-admin',
       type: 'cartodb',
       sublayers: [{type: "cartodb",
-			sql: 'SELECT * FROM twpppoly',
+			sql: 'SELECT * FROM scobase_wi_plss_townships_24k',
 			cartocss: cartoCSSTown,
 			layerIndex:3
 	}]
@@ -566,7 +566,7 @@ var cartoCSSLines = getLineCSS('none')
       user_name: 'sco-admin',
       type: 'cartodb',
       sublayers: [{type: "cartodb",
-			sql: 'SELECT * FROM final_coastal_lines',
+			sql: 'SELECT * FROM bordnercoastal_final_lines',
 			cartocss: cartoCSSLines,
 			interactivity: ['line_type'],
 			layerIndex: 5
@@ -616,7 +616,7 @@ var cartoCSSLines = getLineCSS('none')
       user_name: 'sco-admin',
       type: 'cartodb',
       sublayers: [{type: "cartodb",
-			sql: 'SELECT * FROM final_coastal_polygons',
+			sql: 'SELECT * FROM bordnercoastal_final_polygons',
 			cartocss: cartoCSSDensity,
 			layerIndex: 6
 	}]
@@ -634,12 +634,12 @@ var cartoCSSLines = getLineCSS('none')
       user_name: 'sco-admin',
       type: 'cartodb',
       sublayers: [{type: "cartodb",
-			sql: 'SELECT * FROM final_coastal_polygons',
+			sql: 'SELECT * FROM bordnercoastal_final_polygons',
 			cartocss: cartoCSSRules,
 			interactivity: infowindowVars,
 			layerIndex:1
 	},{type: "cartodb",
-			sql: 'SELECT * FROM final_coastal_polygons',
+			sql: 'SELECT * FROM bordnercoastal_final_polygons',
 			cartocss: cartoCSSRules,
 			interactivity: ['cartodb_id','cov1', 'cov2'],
 			layerIndex:2
@@ -677,7 +677,7 @@ var cartoCSSLines = getLineCSS('none')
 	      user_name: 'sco-admin',
 	      type: 'cartodb',
 	      sublayers: [{type: "cartodb",
-				sql: 'SELECT * FROM final_coastal_points',
+				sql: 'SELECT * FROM bordnercoastal_final_points',
 				cartocss: cartoCSSPoints,
 				interactivity: ['point_type'],
 				layerIndex: 6
@@ -739,7 +739,7 @@ var cartoCSSLines = getLineCSS('none')
       user_name: 'sco-admin',
       type: 'cartodb',
       sublayers: [{type: "cartodb",
-			sql: 'SELECT * FROM final_coastal_state_boundary',
+			sql: 'SELECT * FROM scobase_wi_state_boundary',
 			cartocss: cartoCSSState,
 			layerIndex:8
 	}]
@@ -1208,7 +1208,7 @@ function onPolyOut(e, latln, pxPos, data, layer){
 }
 
 function showFeature(cartodb_id) {
-	sql2.execute("SELECT the_geom as the_geom from final_coastal_polygons WHERE cartodb_id = {{cartodb_id}}", {cartodb_id: cartodb_id} ).done(function(geojson) {
+	sql2.execute("SELECT the_geom as the_geom from bordnercoastal_final_polygons WHERE cartodb_id = {{cartodb_id}}", {cartodb_id: cartodb_id} ).done(function(geojson) {
 		if (polygon) {
 		  map.removeLayer(polygon);
 		}
@@ -2256,7 +2256,7 @@ function drawThisView(boundsIn, zoomIn, _levelEngaged, _level1Selected){
 }
 
 function generateAllLayersQuery(boundsIn){
-	var cartoQuery = "SELECT cov1, shape_area FROM final_coastal_polygons WHERE the_geom && ST_SetSRID(ST_MakeBox2D(ST_Point(" +
+	var cartoQuery = "SELECT cov1, shape_area FROM bordnercoastal_final_polygons WHERE the_geom && ST_SetSRID(ST_MakeBox2D(ST_Point(" +
 		String(boundsIn._northEast.lng)+","+String(boundsIn._northEast.lat)+"), ST_Point(" +
 		String(boundsIn._southWest.lng)+","+String(boundsIn._southWest.lat)+")), 4326) ORDER BY cov1 DESC"
 		return cartoQuery
@@ -2264,7 +2264,7 @@ function generateAllLayersQuery(boundsIn){
 
 function generateSpecificLayerQuery(boundsIn, _level1Selected){
 	var classesSelected = getLevel1MemberSearch(_level1Selected)
-	var cartoQuery = "SELECT cov1, shape_area FROM final_coastal_polygons WHERE (" + classesSelected +
+	var cartoQuery = "SELECT cov1, shape_area FROM bordnercoastal_final_polygons WHERE (" + classesSelected +
 		") AND the_geom && ST_SetSRID(ST_MakeBox2D(ST_Point(" +
 		String(boundsIn._northEast.lng)+","+String(boundsIn._northEast.lat)+"), ST_Point(" +
 		String(boundsIn._southWest.lng)+","+String(boundsIn._southWest.lat)+")), 4326) ORDER BY cov1 DESC"
