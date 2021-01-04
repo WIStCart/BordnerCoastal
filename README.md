@@ -1,12 +1,12 @@
 # BordnerCoastal
 Collaborative project between Forest Landscape and Ecology Lab (FLEL) and State Cartographer's Office (SCO). Web-based mapping application featuring point, line, and polygon data digitized from the Wisconsin Land Economic Inventory (a.k.a. "Bordner" survey maps) for Wisconsin's coastal counties.
 
-Carto Layers in Use:/
-bordnercoastal_final_polygons/
-bordnercoastal_final_lines/
-bordnercoastal_final_points/
-scobase_wi_county_boundaries_24k/
-scobase_wi_state_boundary/ 
+Carto Layers in Use:\
+bordnercoastal_final_polygons\
+bordnercoastal_final_lines\
+bordnercoastal_final_points\
+scobase_wi_county_boundaries_24k\
+scobase_wi_state_boundary\ 
 scobase_wi_plss_townships_24k
 
 ### Data updates
