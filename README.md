@@ -6,7 +6,7 @@ bordnercoastal_final_polygons\
 bordnercoastal_final_lines\
 bordnercoastal_final_points\
 scobase_wi_county_boundaries_24k\
-scobase_wi_state_boundary\ 
+scobase_wi_state_boundary\
 scobase_wi_plss_townships_24k
 
 ### Data updates
