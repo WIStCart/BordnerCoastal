@@ -196,6 +196,27 @@
 				<li><a href="https://uwmadison.box.com/shared/static/nd1xcnfhah30ybl13r2xslafwkdeeilr.zip" target="_blank" onClick="ga('send','event','BordnerCoastal','BordnerDataDownload','BordnerLines');">Bordner Transportation Water Infrastructure (.gdb) - Version 1.0.1 (35 MB)</a></li>
 			</div>
         </div>
+		<br>
+		<div class="row">
+			<div class="col-md-4">Optionally download directly from CARTO for most recent version:</div> 
+			<div class="col-md-8">
+				<div class="form-inline">
+					<div class="form-group">
+						<select id="dataset" class="form-control" aria-label="Default select example"></select>
+						<select id="format" class="form-control" aria-label="Default select example">
+						<option selected value="gpkg">GeoPackage</option>
+						<option value="csv">CSV</option>
+						<option value="shp">Shapefile</option>
+						<option value="svg">SVG</option>
+						<option value="kml">KML</option>
+						<option value="spatialite">SpatialLite</option>
+						<option value="geojson">GeoJSON</option>
+						</select>
+					</div>
+					<button id="download-btn" type="button" class="btn btn-primary">Download</button>
+				</div>
+			</div>
+		</div>
         <hr>
 		
 		<!-- Resources; #Resources -->
@@ -459,6 +480,32 @@
 				}
 			}
 		});
+
+		//----------------------------
+		// CARTO Data Download Widget
+
+		// Constants
+		const user = 'sco-admin'
+		const datasets = [
+			['Bordner Polygons','bordnercoastal_final_polygons'],
+			['Bordner Lines','bordnercoastal_final_lines'],
+			['Bordner Points','bordnercoastal_final_points']
+		]
+
+		// Create dataset dropdown
+		$('#dataset').append('<option selected value="'+datasets[0][1]+'">'+datasets[0][0]+'</option>')
+		for (let i=1; i<datasets.length; i++) {
+			$('#dataset').append('<option value="'+datasets[i][1]+'">'+datasets[i][0]+'</option>')
+		}
+
+		// Download button click handler
+		$("#download-btn").click(function() {
+			let dataset = $("#dataset option:selected").val()
+			let format = $("#format option:selected").val()
+			let url = 'https://' + user + '.carto.com/api/v2/sql?filename=' + dataset + '&q=SELECT FROM ' + dataset + '&format=' + format
+			window.open(url)
+		})
+		//----------------------------
 	</script>
 </body>
 
