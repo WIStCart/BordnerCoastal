@@ -23,16 +23,17 @@
         <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
         <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
     <![endif]-->
-	<script type="text/javascript">
-	  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-	  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-	  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-	  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
 
-	  ga('create', 'UA-129066-10', 'auto');
-	  ga('send', 'pageview');
+	<!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-S5QF88CCV6"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
 
-	</script>
+      gtag('config', 'G-S5QF88CCV6');
+    </script>
+
 	<style>
 		#map {
 			height: 700px;
@@ -188,13 +189,12 @@
         <div class="row">
 			<div class="col-md-4">Download the Digitized point, line, and polygon Bordner data:</div> 
 			<div class="col-md-8">
-				<li><a href="Bordner Survey User Guide.pdf" target="_blank" onClick="ga('send','event','BordnerCoastal','BordnerDataDownload','BordnerAllDataDocumentation');">View Data Documentation (as .pdf) - Version 1.0.1</a></li>
-				<li><a href="https://uwmadison.box.com/shared/static/b3m6j0i1ypxcszcldxkojafg6vserdof.zip" target="_blank" onClick="ga('send','event','BordnerCoastal','BordnerDataDownload','BordnerAllDataStyled');">Bordner All Data With Styles (.gdb .mxd .lyr .lpk) - Version 1.0.1 (219 MB)</a></li>
-				<li><a href="https://uwmadison.box.com/shared/static/pxoxehytiw0chdncgrxkpvt2i5ni48qe.zip" target="_blank" onClick="ga('send','event','BordnerCoastal','BordnerDataDownload','BordnerAllData');">Bordner All Data (.gdb) - Version 1.0.1 (102 MB)</a></li>
-				<li><a href="https://uwmadison.box.com/shared/static/yoqbg5jkumr86fchy4hmj2shie40dfm6.zip" target="_blank" onClick="ga('send','event','BordnerCoastal','BordnerDataDownload','BordnerPolygons');">Bordner Land Use Land Cover (.gdb) - Version 1.0.1 (96 MB)</a></li>
-				<li><a href="https://uwmadison.box.com/shared/static/j4wq0u4nis9t67f2lc1ytmr69g0u4lf7.zip" target="_blank" onClick="ga('send','event','BordnerCoastal','BordnerDataDownload','BordnerPoints');">Bordner Economic Natural Features (.gdb) - Version 1.0.1 (31 MB)</a></li>
-				<li><a href="https://uwmadison.box.com/shared/static/nd1xcnfhah30ybl13r2xslafwkdeeilr.zip" target="_blank" onClick="ga('send','event','BordnerCoastal','BordnerDataDownload','BordnerLines');">Bordner Transportation Water Infrastructure (.gdb) - Version 1.0.1 (35 MB)</a></li>
-			</div>
+				<li><a href="Bordner Survey User Guide.pdf" target="_blank" onClick="gtag('event','BordnerAllDataDocumentation');">View Data Documentation (as .pdf) - Version 1.0.1</a></li>
+				<li><a href="https://uwmadison.box.com/shared/static/b3m6j0i1ypxcszcldxkojafg6vserdof.zip" target="_blank" onClick="gtag('event','BordnerAllDataStyled');">Bordner All Data With Styles (.gdb .mxd .lyr .lpk) - Version 1.0.1 (219 MB)</a></li>
+				<li><a href="https://uwmadison.box.com/shared/static/pxoxehytiw0chdncgrxkpvt2i5ni48qe.zip" target="_blank" onClick="gtag('event','BordnerAllData');">Bordner All Data (.gdb) - Version 1.0.1 (102 MB)</a></li>
+				<li><a href="https://uwmadison.box.com/shared/static/yoqbg5jkumr86fchy4hmj2shie40dfm6.zip" target="_blank" onClick="gtag('event','BordnerPolygons');">Bordner Land Use Land Cover (.gdb) - Version 1.0.1 (96 MB)</a></li>
+				<li><a href="https://uwmadison.box.com/shared/static/j4wq0u4nis9t67f2lc1ytmr69g0u4lf7.zip" target="_blank" onClick="gtag('event','BordnerPoints');">Bordner Economic Natural Features (.gdb) - Version 1.0.1 (31 MB)</a></li>
+				<li><a href="https://uwmadison.box.com/shared/static/nd1xcnfhah30ybl13r2xslafwkdeeilr.zip" target="_blank" onClick="gtag('event','BordnerLines');">Bordner Transportation Water Infrastructure (.gdb) - Version 1.0.1 (35 MB)</a></li>			</div>
         </div>
 		<br>
 		<div class="row">
